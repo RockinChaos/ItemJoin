@@ -22,6 +22,8 @@ import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.types.Clear;
 import me.RockinChaos.core.utils.types.Hats;
+import me.RockinChaos.core.utils.types.PlaceHolder;
+import me.RockinChaos.core.utils.types.PlaceHolder.Holder;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
@@ -52,10 +54,7 @@ public class Processes implements Listener {
                 event.setMessage("itemjoin_blocked");
                 event.setCancelled(true);
                 ServerUtils.logDebug("{Processes} " + player.getName() + " tried to perform the command " + command + " on the item " + itemMap.getConfigName() + " but was blocked by the itemflag no-hat.");
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[1] = player.getName();
-                placeHolders[3] = itemMap.getConfigName();
-                placeHolders[9] = command;
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.TARGET_PLAYER, player.getName()).with(Holder.ITEM, itemMap.getConfigName()).with(Holder.COMMAND, command);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.item.badCommand", player, placeHolders);
             }
         }

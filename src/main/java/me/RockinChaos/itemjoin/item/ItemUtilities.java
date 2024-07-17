@@ -23,6 +23,8 @@ import me.RockinChaos.core.utils.CompatUtils;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
+import me.RockinChaos.core.utils.types.PlaceHolder;
+import me.RockinChaos.core.utils.types.PlaceHolder.Holder;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.item.ItemCommand.Executor;
@@ -617,13 +619,10 @@ public class ItemUtilities {
         SchedulerUtils.runAsync(() -> {
             if (this.failCount.get(session) != null && this.failCount.get(session) != 0) {
                 String overWrite = ItemJoin.getCore().getConfig("items.yml").getString("items-Overwrite");
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.FAIL_COUNT, this.failCount.get(session).toString());
                 if ((overWrite != null && StringUtils.containsLocation(player.getWorld().getName(), overWrite.replace(" ", "")))) {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[7] = this.failCount.get(session).toString();
                     ItemJoin.getCore().getLang().sendLangMessage("general.failedInventory", player, placeHolders);
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[7] = this.failCount.get(session).toString();
                     ItemJoin.getCore().getLang().sendLangMessage("general.failedOverwrite", player, placeHolders);
                 }
                 this.failCount.remove(session);

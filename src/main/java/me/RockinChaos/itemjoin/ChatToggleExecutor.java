@@ -20,6 +20,8 @@ package me.RockinChaos.itemjoin;
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
+import me.RockinChaos.core.utils.types.PlaceHolder;
+import me.RockinChaos.core.utils.types.PlaceHolder.Holder;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
@@ -50,10 +52,7 @@ public class ChatToggleExecutor implements CommandExecutor {
             ItemMap itemMap = this.getCommandMap(command, args);
             if (itemMap != null) {
                 DataObject dataObject = (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(player), "Global", itemMap.getConfigName(), String.valueOf(false)));
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[1] = player.getName();
-                placeHolders[0] = player.getWorld().getName();
-                placeHolders[3] = itemMap.getConfigName();
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.PLAYER, player.getName()).with(Holder.WORLD, player.getWorld().getName()).with(Holder.ITEM, itemMap.getConfigName());
                 if ((dataObject == null || Boolean.valueOf(dataObject.getEnabled()).equals(true)) && ((itemMap.getToggleNode() == null || itemMap.getToggleNode().isEmpty()) || (itemMap.getToggleNode() != null && !itemMap.getToggleNode().isEmpty() && sender.hasPermission(itemMap.getToggleNode())))) {
                     if (PluginData.getInfo().isEnabled(player, "ALL")) {
                         ItemJoin.getCore().getSQL().removeData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(player), "Global", itemMap.getConfigName(), String.valueOf(true)));

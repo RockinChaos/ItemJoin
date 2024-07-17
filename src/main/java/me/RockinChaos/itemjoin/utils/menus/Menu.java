@@ -30,6 +30,8 @@ import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.core.utils.interfaces.Interface;
 import me.RockinChaos.core.utils.interfaces.Query;
 import me.RockinChaos.core.utils.interfaces.types.Button;
+import me.RockinChaos.core.utils.types.PlaceHolder;
+import me.RockinChaos.core.utils.types.PlaceHolder.Holder;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.item.ItemCommand;
@@ -738,8 +740,7 @@ public class Menu {
         } else {
             itemMap.setSlot(slot);
             itemMap.saveToConfig();
-            String[] placeHolders = ItemJoin.getCore().getLang().newString();
-            placeHolders[3] = (item.hasItemMeta() && Objects.requireNonNull(item.getItemMeta()).hasDisplayName() ? item.getItemMeta().getDisplayName() : itemMap.getConfigName());
+            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.ITEM, (item.hasItemMeta() && Objects.requireNonNull(item.getItemMeta()).hasDisplayName() ? item.getItemMeta().getDisplayName() : itemMap.getConfigName()));
             ItemJoin.getCore().getLang().sendLangMessage("commands.menu.itemSaved", player, placeHolders);
         }
         itemMap.renderItemStack();
@@ -764,8 +765,7 @@ public class Menu {
             choicePane.addButton(new Button(fillerPaneBItem));
             choicePane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, true, false, "&c&lDelete", "&7", "&7*Delete this item.", "&7This will remove the item from the", "&7items.yml and will no longer be usable.", "&c&lWARNING: &7This &lCANNOT &7be undone!"), event -> {
                 itemMap.removeFromConfig();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[3] = itemMap.getConfigName();
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.ITEM, itemMap.getConfigName());
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.itemRemoved", player, placeHolders);
                 PluginData.getInfo().hardReload(true);
                 {
@@ -928,8 +928,7 @@ public class Menu {
                 }
             }, event -> {
                 itemMap.setCustomLore(StringUtils.split(StringUtils.restoreColor(event.getMessage())));
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "LORE";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "LORE");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 creatingPane(event.getPlayer(), itemMap);
             }));
@@ -948,16 +947,13 @@ public class Menu {
                     creatingPane(player, itemMap);
                 } else {
                     player.closeInventory();
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "CUSTOM PERMISSION";
-                    placeHolders[15] = "itemjoin.ultra";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "CUSTOM PERMISSION").with(Holder.INPUT_EXAMPLE, "itemjoin.ultra");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                 }
             }, event -> {
                 itemMap.setPerm(ChatColor.stripColor(event.getMessage()));
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "CUSTOM PERMISSION";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "CUSTOM PERMISSION");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 creatingPane(event.getPlayer(), itemMap);
             }));
@@ -1037,16 +1033,13 @@ public class Menu {
                         creatingPane(player, itemMap);
                     } else {
                         player.closeInventory();
-                        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                        placeHolders[16] = "MAP IMAGE";
-                        placeHolders[15] = "minecraft.png OR minecraft-dance.gif";
+                        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "MAP IMAGE").with(Holder.INPUT_EXAMPLE, "minecraft.png OR minecraft-dance.gif");
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                     }
                 }, event -> {
                     itemMap.setMapImage(ChatColor.stripColor(event.getMessage()));
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "MAP IMAGE";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "MAP IMAGE");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                     creatingPane(event.getPlayer(), itemMap);
                 }));
@@ -1097,8 +1090,7 @@ public class Menu {
             creatingPane.addButton(new Button(fillerPaneBItem), 3);
             creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIME_WOOL" : "WOOL:5"), 1, false, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), event -> {
                 itemMap.saveToConfig();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[3] = itemMap.getConfigName();
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.ITEM, itemMap.getConfigName());
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.itemSaved", player, placeHolders);
                 PluginData.getInfo().hardReload(true);
                 player.closeInventory();
@@ -1124,8 +1116,7 @@ public class Menu {
             returnPane.addButton(new Button(fillerPaneBItem), 2);
             returnPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIME_WOOL" : "WOOL:5"), 1, false, false, "&a&l&nSave to Config", "&7", "&7*Saves the custom item", "&7settings to the items.yml file."), event -> {
                 itemMap.saveToConfig();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[3] = itemMap.getConfigName();
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.ITEM, itemMap.getConfigName());
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.itemSaved", player, placeHolders);
                 PluginData.getInfo().hardReload(true);
                 startMenu(player);
@@ -1380,14 +1371,11 @@ public class Menu {
                     "&7*Set the &c&lHost &7for", "&7the MySQL database connection.", "&9&lHOST: &a" + ItemJoin.getCore().getConfig("config.yml").getString("Database.host")),
                     event -> {
                         player.closeInventory();
-                        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                        placeHolders[16] = "HOST ADDRESS";
-                        placeHolders[15] = "localhost";
+                        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "HOST ADDRESS").with(Holder.INPUT_EXAMPLE, "localhost");
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                     }, event -> {
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "HOST ADDRESS";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "HOST ADDRESS");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 File fileFolder = new File(ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
@@ -1400,15 +1388,12 @@ public class Menu {
                     "&7*Set the &c&lPort &7for", "&7the MySQL database connection.", "&9&lPORT: &a" + ItemJoin.getCore().getConfig("config.yml").getString("Database.port")),
                     event -> {
                         player.closeInventory();
-                        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                        placeHolders[16] = "ADDRESS PORT";
-                        placeHolders[15] = "3306";
+                        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ADDRESS PORT").with(Holder.INPUT_EXAMPLE, "3306");
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                     }, event -> {
                 if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "ADDRESS PORT";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ADDRESS PORT");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                     File fileFolder = new File(ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
@@ -1416,8 +1401,7 @@ public class Menu {
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
                     PluginData.getInfo().softReload();
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                 }
                 SchedulerUtils.runLater(2L, () -> databasePane(player));
@@ -1428,14 +1412,11 @@ public class Menu {
                     "&7*Set the &c&lTable &7for", "&7the MySQL database connection.", "&9&lTABLE: &a" + ItemJoin.getCore().getConfig("config.yml").getString(databaseString)),
                     event -> {
                         player.closeInventory();
-                        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                        placeHolders[16] = "TABLE NAME";
-                        placeHolders[15] = "ITEMJOIN_LOCAL";
+                        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "TABLE NAME").with(Holder.INPUT_EXAMPLE, "ITEMJOIN_LOCAL");
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                     }, event -> {
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "TABLE NAME";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "TABLE NAME");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 File fileFolder = new File(ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
@@ -1449,14 +1430,11 @@ public class Menu {
                     "&7*Set the &c&lTable &7for", "&7the MySQL database connection.", "&9&lTABLE: &a" + ItemJoin.getCore().getConfig("config.yml").getString("Database.prefix")),
                     event -> {
                         player.closeInventory();
-                        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                        placeHolders[16] = "TABLE PREFIX";
-                        placeHolders[15] = "IJ_";
+                        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "TABLE PREFIX").with(Holder.INPUT_EXAMPLE, "IJ_");
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                     }, event -> {
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "TABLE PREFIX";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "TABLE PREFIX");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 File fileFolder = new File(ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
@@ -1470,14 +1448,11 @@ public class Menu {
                     "&7*Set the &c&lUser &7for", "&7the MySQL database connection.", "&9&lUSER: &a***********"),
                     event -> {
                         player.closeInventory();
-                        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                        placeHolders[16] = "USER";
-                        placeHolders[15] = "rockinchaos";
+                        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "USER").with(Holder.INPUT_EXAMPLE, "rockinchaos");
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                     }, event -> {
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "USER";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "USER");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 File fileFolder = new File(ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
@@ -1490,14 +1465,11 @@ public class Menu {
                     "&7*Set the &c&lPassword &7for", "&7the MySQL database connection.", "&9&lPORT: &a****"),
                     event -> {
                         player.closeInventory();
-                        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                        placeHolders[16] = "PASSWORD";
-                        placeHolders[15] = "cooldude6";
+                        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "PASSWORD").with(Holder.INPUT_EXAMPLE, "cooldude6");
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                     }, event -> {
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "PASSWORD";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "PASSWORD");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 File fileFolder = new File(ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
@@ -2093,9 +2065,7 @@ public class Menu {
             }
             materialPane.addButton(new Button(ItemHandler.getItem("STICK", 1, true, false, "&b&lBukkit Material", "&7", "&7*If you know the name", "&7of the BUKKIT material type", "&7simply click and type it."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "BUKKIT MATERIAL";
-                placeHolders[15] = "IRON_SWORD";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "BUKKIT MATERIAL").with(Holder.INPUT_EXAMPLE, "IRON_SWORD");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
@@ -2108,8 +2078,7 @@ public class Menu {
                     for (String mat : materials) {
                         saveList.add("{id:" + mat + "}");
                     }
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "BUKKIT MATERIAL";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "BUKKIT MATERIAL");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                     File fileFolder = new File(ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
@@ -2118,8 +2087,7 @@ public class Menu {
                     PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> blacklistMatPane(player));
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noMaterial", player, placeHolders);
                     blacklistMatPane(player);
                 }
@@ -2445,9 +2413,7 @@ public class Menu {
             namePane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, false, "&b&lAdd Name", "&7", "&7*Add an items display", "&7name to be blacklisted", "&7simply click and type it.", "&7",
                     "&c&l&nNOTE:&7 Do NOT include any", "&7color codes as these are excluded."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "ITEM NAME";
-                placeHolders[15] = "Ultra Item";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ITEM NAME").with(Holder.INPUT_EXAMPLE, "ULTRA ITEM");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
@@ -2459,8 +2425,7 @@ public class Menu {
                 for (String name : names) {
                     saveList.add("{name:" + name + "}");
                 }
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "ITEM NAME";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ITEM NAME");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 File fileFolder = new File(ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
                 FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
@@ -2836,13 +2801,7 @@ public class Menu {
             }
             materialPane.addButton(new Button(ItemHandler.getItem("STICK", 1, true, false, "&b&lBukkit Material", "&7", "&7*If you know the name", "&7of the BUKKIT material type", "&7simply click and type it."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                if (stage == 2) {
-                    placeHolders[16] = "ITEM COST";
-                } else {
-                    placeHolders[16] = "BUKKIT MATERIAL";
-                }
-                placeHolders[15] = "IRON_SWORD";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, (stage == 2 ? "ITEM COST" : "BUKKIT MATERIAL")).with(Holder.INPUT_EXAMPLE, "IRON_SWORD");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
@@ -2858,12 +2817,7 @@ public class Menu {
                             }
                         }
                     }
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    if (stage == 2) {
-                        placeHolders[16] = "ITEM COST";
-                    } else {
-                        placeHolders[16] = "BUKKIT MATERIAL";
-                    }
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, (stage == 2 ? "ITEM COST" : "BUKKIT MATERIAL"));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                     if (stage == 3) {
                         setIngredients(event.getPlayer(), itemMap, Objects.requireNonNull(ItemHandler.getMaterial(ChatColor.stripColor(event.getMessage()), null)).name(), position);
@@ -2873,8 +2827,7 @@ public class Menu {
                         creatingPane(event.getPlayer(), itemMap);
                     }
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noMaterial", player, placeHolders);
                     materialPane(player, itemMap, stage, position);
                 }
@@ -3380,20 +3333,16 @@ public class Menu {
             texturePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> dataPane(player, itemMap)));
             texturePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Texture", "&7", "&7*Click to set a custom texture", "&7value for the item."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "DURABILITY DATA";
-                placeHolders[15] = "1193";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "DURABILITY DATA").with(Holder.INPUT_EXAMPLE, "1193");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
                     itemMap.setData(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "DURABILITY DATA";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "DURABILITY DATA");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                 }
                 dataPane(event.getPlayer(), itemMap);
@@ -3422,20 +3371,16 @@ public class Menu {
             texturePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> dataPane(player, itemMap)));
             texturePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Model Data", "&7", "&7*Click to set the custom mode data", "&7value for the item."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "MODEL DATA";
-                placeHolders[15] = "1193";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "MODEL DATA").with(Holder.INPUT_EXAMPLE, "1193");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
                     itemMap.setModelData(ChatColor.stripColor(event.getMessage()));
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "MODEL DATA";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "MODEL DATA");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                 }
                 dataPane(event.getPlayer(), itemMap);
@@ -3464,20 +3409,16 @@ public class Menu {
             damagePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> dataPane(player, itemMap)));
             damagePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Damage", "&7", "&7*Click to set a custom damage", "&7value for the item."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "DAMAGE";
-                placeHolders[15] = "1893";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "DAMAGE").with(Holder.INPUT_EXAMPLE, "1893");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
                     itemMap.setDurability((short) Integer.parseInt(ChatColor.stripColor(event.getMessage())));
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "DAMAGE";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "DAMAGE");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                 }
                 dataPane(event.getPlayer(), itemMap);
@@ -3559,16 +3500,13 @@ public class Menu {
                     commandPane(player, itemMap);
                 } else {
                     player.closeInventory();
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "COOLDOWN MESSAGE";
-                    placeHolders[15] = "&cThis item is on cooldown for &a%timeleft%&c seconds..";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "COOLDOWN MESSAGE").with(Holder.INPUT_EXAMPLE, "&cThis item is on cooldown for &a%timeleft%&c seconds..");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                 }
             }, event -> {
                 itemMap.setCooldownMessage(ChatColor.stripColor(event.getMessage()));
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "COOLDOWN MESSAGE";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "COOLDOWN MESSAGE");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 commandPane(event.getPlayer(), itemMap);
             }));
@@ -3849,9 +3787,7 @@ public class Menu {
                     modifyCommandsPane(player, itemMap, action, command, orderNumber);
                 } else {
                     player.closeInventory();
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "COMMAND IDENTIFIER";
-                    placeHolders[15] = "winner";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "COMMAND IDENTIFIER").with(Holder.INPUT_EXAMPLE, "winner");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                 }
@@ -3863,17 +3799,14 @@ public class Menu {
                     }
                 }
                 itemMap.setCommands(commands);
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "COMMAND IDENTIFIER";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "COMMAND IDENTIFIER");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 commandListPane(event.getPlayer(), itemMap, action);
             }));
             modPane.addButton(new Button(fillerPaneGItem));
             modPane.addButton(new Button(ItemHandler.getItem("PAPER", 1, false, false, "&fModify", "&7", "&7*Sets the command to", "&7another text entry."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "MODIFIED COMMAND";
-                placeHolders[15] = "gamemode creative";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "MODIFIED COMMAND").with(Holder.INPUT_EXAMPLE, "gamemode creative");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
@@ -3884,8 +3817,7 @@ public class Menu {
                     }
                 }
                 itemMap.setCommands(commands);
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "MODIFIED COMMAND";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "MODIFIED COMMAND");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 commandListPane(event.getPlayer(), itemMap, action);
             }));
@@ -3918,86 +3850,68 @@ public class Menu {
         SchedulerUtils.runAsync(() -> {
             executorPane.addButton(new Button(ItemHandler.getItem("BOOK", 1, false, false, "&e&lPlayer", "&7", "&7*Executes the command", "&7as the player."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "PLAYER COMMAND";
-                placeHolders[15] = "spawn";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "PLAYER COMMAND").with(Holder.INPUT_EXAMPLE, "spawn");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 modifyCommands(itemMap, ItemCommand.fromString("player: " + ChatColor.stripColor(event.getMessage()), action, itemMap, 0L, null), true);
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "PLAYER COMMAND";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "PLAYER COMMAND");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 commandListPane(event.getPlayer(), itemMap, action);
             }));
             executorPane.addButton(new Button(ItemHandler.getItem("BOOK", 1, true, false, "&e&lOp", "&7", "&7*Executes the command as if the", "&7player has /op (admin permissions)."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "ADMIN COMMAND";
-                placeHolders[15] = "broadcast I am &cADMIN!";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ADMIN COMMAND").with(Holder.INPUT_EXAMPLE, "broadcast I am &cADMIN!");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 modifyCommands(itemMap, ItemCommand.fromString("op: " + ChatColor.stripColor(event.getMessage()), action, itemMap, 0L, null), true);
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "ADMIN COMMAND";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ADMIN COMMAND");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 commandListPane(event.getPlayer(), itemMap, action);
             }));
             executorPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, false, "&e&lConsole", "&7", "&7*Executes the command", "&7in the console window."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "CONSOLE COMMAND";
-                placeHolders[15] = "gamemode creative %player%";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "CONSOLE COMMAND").with(Holder.INPUT_EXAMPLE, "gamemode creative %player%");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 modifyCommands(itemMap, ItemCommand.fromString("console: " + ChatColor.stripColor(event.getMessage()), action, itemMap, 0L, null), true);
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "CONSOLE COMMAND";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "CONSOLE COMMAND");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 commandListPane(event.getPlayer(), itemMap, action);
             }));
             executorPane.addButton(new Button(ItemHandler.getItem("HOPPER", 1, false, false, "&e&lServer", "&7", "&7*Switches the player to", "&7the defined server name.", "&7", "&7&lNote: &7This is the name",
                     "&7defined in the BungeeCord config."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "SERVER SWITCH";
-                placeHolders[15] = "survival";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SERVER SWITCH").with(Holder.INPUT_EXAMPLE, "survival");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 modifyCommands(itemMap, ItemCommand.fromString("server: " + ChatColor.stripColor(event.getMessage()), action, itemMap, 0L, null), true);
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "SERVER SWITCH";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SERVER SWITCH");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 commandListPane(event.getPlayer(), itemMap, action);
             }));
             executorPane.addButton(new Button(ItemHandler.getItem("OBSIDIAN", 1, false, false, "&e&lBungee", "&7", "&7*Executes a BungeeCord specific command."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "BUNGEE COMMAND";
-                placeHolders[15] = "survival";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "BUNGEE COMMAND").with(Holder.INPUT_EXAMPLE, "survival");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 modifyCommands(itemMap, ItemCommand.fromString("bungee: " + ChatColor.stripColor(event.getMessage()), action, itemMap, 0L, null), true);
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "BUNGEE COMMAND";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "BUNGEE COMMAND");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 commandListPane(event.getPlayer(), itemMap, action);
             }));
             executorPane.addButton(new Button(ItemHandler.getItem("PAPER", 1, false, false, "&e&lMessage", "&7", "&7*Sends the player a custom message."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "MESSAGE";
-                placeHolders[15] = "&eWelcome to the Server!";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "MESSAGE").with(Holder.INPUT_EXAMPLE, "&eWelcome to the Server!");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 modifyCommands(itemMap, ItemCommand.fromString("message: " + ChatColor.stripColor(event.getMessage()), action, itemMap, 0L, null), true);
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "MESSAGE";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "MESSAGE");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 commandListPane(event.getPlayer(), itemMap, action);
             }));
@@ -4055,20 +3969,16 @@ public class Menu {
             delayPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the executors menu."), event -> executorPane(player, itemMap, action)));
             delayPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Cooldown", "&7", "&7*Click to set a custom", "&7delay for the next command."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "DELAY";
-                placeHolders[15] = "180";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "DELAY").with(Holder.INPUT_EXAMPLE, "180");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
                     modifyCommands(itemMap, ItemCommand.fromString("delay: " + Integer.parseInt(ChatColor.stripColor(event.getMessage())), action, itemMap, Integer.parseInt(ChatColor.stripColor(event.getMessage())), null), true);
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "DELAY";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "DELAY");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                 }
                 commandListPane(event.getPlayer(), itemMap, action);
@@ -4098,20 +4008,16 @@ public class Menu {
             damagePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the executors menu."), event -> executorPane(player, itemMap, action)));
             damagePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Cooldown", "&7", "&7*Click to set a custom", "&7delay for the next command."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "DAMAGE";
-                placeHolders[15] = "180";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "DAMAGE").with(Holder.INPUT_EXAMPLE, "180");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
                     modifyCommands(itemMap, ItemCommand.fromString("damage: " + Integer.parseInt(ChatColor.stripColor(event.getMessage())), action, itemMap, Integer.parseInt(ChatColor.stripColor(event.getMessage())), null), true);
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "DAMAGE";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "DAMAGE");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                 }
                 commandListPane(event.getPlayer(), itemMap, action);
@@ -4140,20 +4046,16 @@ public class Menu {
             cooldownPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> commandPane(player, itemMap)));
             cooldownPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Cooldown", "&7", "&7*Click to set a custom commands-cooldown", "&7value for the item."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "COMMAND COOLDOWN";
-                placeHolders[15] = "180";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "COMMAND COOLDOWN").with(Holder.INPUT_EXAMPLE, "180");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
                     itemMap.setCommandCooldown(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "COMMAND COOLDOWN";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "COMMAND COOLDOWN");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                 }
                 commandPane(event.getPlayer(), itemMap);
@@ -4182,20 +4084,16 @@ public class Menu {
             warmPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> commandPane(player, itemMap)));
             warmPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Warmup", "&7", "&7*Click to set a custom commands-warmup", "&7value for the item."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "COMMAND WARMUP";
-                placeHolders[15] = "12";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "COMMAND WARMUP").with(Holder.INPUT_EXAMPLE, "12");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
                     itemMap.setWarmDelay(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "COMMAND WARMUP";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "COMMAND WARMUP");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                 }
                 commandPane(event.getPlayer(), itemMap);
@@ -4224,20 +4122,16 @@ public class Menu {
             costPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> commandPane(player, itemMap)));
             costPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Cost", "&7", "&7*Click to set a custom commands-cost", "&7value for the item."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "COMMAND COST";
-                placeHolders[15] = "340";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "COMMAND COST").with(Holder.INPUT_EXAMPLE, "340");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
                     itemMap.setCommandCost(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "COMMAND COST";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "COMMAND COST");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                 }
                 commandPane(event.getPlayer(), itemMap);
@@ -4266,20 +4160,16 @@ public class Menu {
             receivePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> commandPane(player, itemMap)));
             receivePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Receive", "&7", "&7*Click to set a custom commands-receive", "&7value for the item."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "COMMAND RECEIVE";
-                placeHolders[15] = "10";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "COMMAND RECEIVE").with(Holder.INPUT_EXAMPLE, "10");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
                     itemMap.setCommandReceive(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "COMMAND RECEIVE";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "COMMAND RECEIVE");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                 }
                 commandPane(event.getPlayer(), itemMap);
@@ -4435,9 +4325,7 @@ public class Menu {
             }
             soundPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Volume", "&7", "&7*Click to set a custom sound volume value."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "SOUND VOLUME";
-                placeHolders[15] = "1.4";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SOUND VOLUME").with(Holder.INPUT_EXAMPLE, "1.4");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
@@ -4448,12 +4336,10 @@ public class Menu {
                         itemMap.setCommandVolume(Double.parseDouble(ChatColor.stripColor(event.getMessage())));
                     }
                     soundPitchPane(player, itemMap, stage);
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "SOUND VOLUME";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SOUND VOLUME");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                     soundVolumePane(event.getPlayer(), itemMap, stage);
                 }
@@ -4490,9 +4376,7 @@ public class Menu {
             }
             soundPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Pitch", "&7", "&7*Click to set a custom sound pitch", "&7value for the command sound."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "SOUND PITCH";
-                placeHolders[15] = "0.8";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SOUND PITCH").with(Holder.INPUT_EXAMPLE, "0.8");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
@@ -4504,12 +4388,10 @@ public class Menu {
                         itemMap.setCommandPitch(Double.parseDouble(ChatColor.stripColor(event.getMessage())));
                         commandPane(player, itemMap);
                     }
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "SOUND PITCH";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SOUND PITCH");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                     soundPitchPane(event.getPlayer(), itemMap, stage);
                 }
@@ -4588,9 +4470,7 @@ public class Menu {
             lifePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the particle menu."), event -> particlePane(player, itemMap, 3)));
             lifePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom LifeTime", "&7", "&7*Click to set a lifetime (duration)", "&7value for particle effect."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "PARTICLE LIFETIME";
-                placeHolders[15] = "170";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "PARTICLE LIFETIME").with(Holder.INPUT_EXAMPLE, "170");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
@@ -4600,12 +4480,10 @@ public class Menu {
                     } else {
                         explosionPane(player, itemMap, particle, Integer.parseInt(ChatColor.stripColor(event.getMessage())));
                     }
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "PARTICLE LIFETIME";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "PARTICLE LIFETIME");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                     particlePane(event.getPlayer(), itemMap, 3);
                 }
@@ -4713,9 +4591,7 @@ public class Menu {
             enchantLevelPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the enchant selection menu."), event -> enchantPane(player, itemMap)));
             enchantLevelPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Count", "&7", "&7*Click to set a custom damage", "&7value for the item."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "ENCHANT LEVEL";
-                placeHolders[15] = "86";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ENCHANT LEVEL").with(Holder.INPUT_EXAMPLE, "86");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
@@ -4723,12 +4599,10 @@ public class Menu {
                     Map<String, Integer> enchantments = (itemMap.getEnchantments() != null) ? itemMap.getEnchantments() : new HashMap<>();
                     enchantments.put(ItemHandler.getEnchantName(enchant).toUpperCase(), Integer.parseInt(ChatColor.stripColor(event.getMessage())));
                     itemMap.setEnchantments(enchantments);
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "ENCHANT LEVEL";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ENCHANT LEVEL");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                 }
                 enchantPane(event.getPlayer(), itemMap);
@@ -5627,14 +5501,11 @@ public class Menu {
             lorePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
             lorePane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, false, "&eNew Lore Line", "&7", "&7*Add a new lore line", "&7to the item lore."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "LORE LINE";
-                placeHolders[15] = "&bThis is a new lore line.";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "LORE LINE").with(Holder.INPUT_EXAMPLE, "&bThis is a new lore line.");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "LORE LINE";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "LORE LINE");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 List<String> lore = new ArrayList<>();
                 if (itemMap.getCustomLore() != null) {
@@ -5667,17 +5538,14 @@ public class Menu {
             modifyLorePane.addButton(new Button(fillerPaneGItem), 3);
             modifyLorePane.addButton(new Button(ItemHandler.getItem("WRITABLE_BOOK", 1, false, false, "&e&l&nModify", "&7", "&7*Change the lore line.", "&9&lLore: &a" + itemMap.getCustomLore().get(position)), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "LORE LINE";
-                placeHolders[15] = "&bThis is a new lore line.";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "LORE LINE").with(Holder.INPUT_EXAMPLE, "&bThis is a new lore line.");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 List<String> lore = itemMap.getCustomLore();
                 lore.set(position, StringUtils.restoreColor(event.getMessage()));
                 itemMap.setCustomLore(lore);
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "LORE LINE";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "LORE LINE");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 modifyLoreLinePane(event.getPlayer(), itemMap, position);
             }));
@@ -5743,9 +5611,7 @@ public class Menu {
             selectMaterialPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the animated material menu."), event -> animateMaterialPane(player, itemMap)));
             selectMaterialPane.addButton(new Button(ItemHandler.getItem("STICK", 1, true, false, "&b&lBukkit Material", "&7", "&7*If you know the name", "&7of the BUKKIT material type", "&7simply click and type it."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "BUKKIT MATERIAL";
-                placeHolders[15] = "IRON_SWORD";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "BUKKIT MATERIAL").with(Holder.INPUT_EXAMPLE, "IRON_SWORD");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
@@ -5758,12 +5624,10 @@ public class Menu {
                         itemMap.setDynamicMaterials(mats);
                         modifyMaterialPane(player, itemMap, position);
                     }
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "BUKKIT MATERIAL";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "BUKKIT MATERIAL");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noMaterial", player, placeHolders);
                     selectMaterialPane(player, itemMap, position, isNew);
                 }
@@ -5827,15 +5691,12 @@ public class Menu {
             durationPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the animated menu."), event -> animateMaterialPane(player, itemMap)));
             durationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "ANIMATION DURATION";
-                placeHolders[15] = "110";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ANIMATION DURATION").with(Holder.INPUT_EXAMPLE, "110");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "ANIMATION DURATION";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ANIMATION DURATION");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                     List<String> mats = itemMap.getDynamicMaterials();
                     if (isNew) {
@@ -5853,8 +5714,7 @@ public class Menu {
                         modifyMaterialPane(player, itemMap, position);
                     }
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                     durationMaterialPane(player, itemMap, position, isNew, value);
                 }
@@ -5936,15 +5796,12 @@ public class Menu {
             }));
             animatedNamePane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, false, "&eNew Name Line", "&7", "&7*Add a new name line", "&7to be animated between."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "NAME";
-                placeHolders[15] = "&bUltimate Sword";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "NAME").with(Holder.INPUT_EXAMPLE, "&bUltimate Sword");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 durationNamePane(player, itemMap, 0, true, StringUtils.restoreColor(event.getMessage()));
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "NAME";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "NAME");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
             }));
             for (int i = 1; i <= itemMap.getDynamicNames().size(); i++) {
@@ -5970,15 +5827,12 @@ public class Menu {
             durationPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the animated menu."), event -> animatedNamePane(player, itemMap)));
             durationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "ANIMATION DURATION";
-                placeHolders[15] = "110";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ANIMATION DURATION").with(Holder.INPUT_EXAMPLE, "110");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "ANIMATION DURATION";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ANIMATION DURATION");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                     List<String> names = itemMap.getDynamicNames();
                     if (isNew) {
@@ -5996,8 +5850,7 @@ public class Menu {
                         modifyNamePane(player, itemMap, position);
                     }
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                     durationNamePane(player, itemMap, position, isNew, value);
                 }
@@ -6039,9 +5892,7 @@ public class Menu {
             modifyNamePane.addButton(new Button(fillerPaneGItem), 3);
             modifyNamePane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, false, "&a&l&nName", "&7", "&7*Change the animated name line.", "&9&lName: &a" + ItemHandler.cutDelay(itemMap.getDynamicNames().get(position))), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "NAME";
-                placeHolders[15] = "&bUltimate Sword";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "NAME").with(Holder.INPUT_EXAMPLE, "&bUltimate Sword");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
@@ -6049,8 +5900,7 @@ public class Menu {
                 names.set(position, "<delay:" + StringUtils.returnInteger(ItemHandler.getDelayFormat(names.get(position))) + ">" + StringUtils.restoreColor(event.getMessage()));
                 itemMap.setDynamicNames(names)
                 ;
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "NAME";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "NAME");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 modifyNamePane(event.getPlayer(), itemMap, position);
             }));
@@ -6090,14 +5940,11 @@ public class Menu {
             }));
             animatedLorePane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, false, "&eNew Lore Line", "&7", "&7*Add a new lore line", "&7to be animated between."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "ANIMATED LORE";
-                placeHolders[15] = "&bThis is line 1, &cThis is line 2, &6This is line 3";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ANIMATED LORE").with(Holder.INPUT_EXAMPLE, "&bThis is line 1, &cThis is line 2, &6This is line 3");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "ANIMATED LORE";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ANIMATED LORE");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 durationLorePane(event.getPlayer(), itemMap, 0, true, StringUtils.restoreColor(event.getMessage()));
             }));
@@ -6124,15 +5971,12 @@ public class Menu {
             durationPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the animated menu."), event -> animatedLorePane(player, itemMap)));
             durationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "ANIMATION DURATION";
-                placeHolders[15] = "110";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ANIMATION DURATION").with(Holder.INPUT_EXAMPLE, "110");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "ANIMATION DURATION";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ANIMATION DURATION");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                     List<List<String>> lores = itemMap.getDynamicLores();
                     if (isNew) {
@@ -6154,8 +5998,7 @@ public class Menu {
                         modifyLorePane(player, itemMap, position);
                     }
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                     durationLorePane(player, itemMap, position, isNew, value);
                 }
@@ -6201,17 +6044,14 @@ public class Menu {
             modifyLorePane.addButton(new Button(fillerPaneGItem), 3);
             modifyLorePane.addButton(new Button(ItemHandler.getItem("WRITABLE_BOOK", 1, false, false, "&a&l&nLore", "&7", "&7*Change the animated lore line.", "&9&lLore: &a" + ItemHandler.cutDelay(itemMap.getDynamicLores().get(position))), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "ANIMATED LORE";
-                placeHolders[15] = "&bThis is line 1, &cThis is line 2, &6This is line 3";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ANIMATED LORE").with(Holder.INPUT_EXAMPLE, "&bThis is line 1, &cThis is line 2, &6This is line 3");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 List<List<String>> lores = itemMap.getDynamicLores();
                 lores.set(position, StringUtils.split("<delay:" + StringUtils.returnInteger(ItemHandler.getDelayFormat(lores.get(position).get(0))) + ">" + StringUtils.restoreColor(event.getMessage())));
                 itemMap.setDynamicLores(lores);
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "ANIMATED LORE";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ANIMATED LORE");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 modifyLorePane(event.getPlayer(), itemMap, position);
             }));
@@ -6254,15 +6094,12 @@ public class Menu {
                 }));
                 animatedSkullPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, false, "&eNew Skull Owner", "&7", "&7*Add a new skull owner", "&7to be animated between."), event -> {
                     player.closeInventory();
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "SKULL OWNER";
-                    placeHolders[15] = "RockinChaos";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SKULL OWNER").with(Holder.INPUT_EXAMPLE, "RockinChaos");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                 }, event -> {
                     durationSkullPane(player, itemMap, 0, true, ChatColor.stripColor(event.getMessage()), true);
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "SKULL OWNER";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SKULL OWNER");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 }));
                 for (int i = 1; i <= itemMap.getDynamicOwners().size(); i++) {
@@ -6283,15 +6120,12 @@ public class Menu {
                 }));
                 animatedSkullPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, false, "&eNew Skull Texture", "&7", "&7*Add a new skull texture", "&7to be animated between."), event -> {
                     player.closeInventory();
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "SKULL TEXTURE";
-                    placeHolders[15] = "eyJ0ZXh0dYMGQVlN2FjZmU3OSJ9fX0=";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SKULL TEXTURE").with(Holder.INPUT_EXAMPLE, "eyJ0ZXh0dYMGQVlN2FjZmU3OSJ9fX0=");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                 }, event -> {
                     durationSkullPane(player, itemMap, 0, true, ChatColor.stripColor(event.getMessage()), false);
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "SKULL TEXTURE";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SKULL TEXTURE");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 }));
                 for (int i = 1; i <= itemMap.getDynamicTextures().size(); i++) {
@@ -6319,15 +6153,12 @@ public class Menu {
             durationPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the animated menu."), event -> animatedSkullPane(player, itemMap, owner)));
             durationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the animation."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "ANIMATION DURATION";
-                placeHolders[15] = "110";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ANIMATION DURATION").with(Holder.INPUT_EXAMPLE, "110");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "ANIMATION DURATION";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ANIMATION DURATION");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                     List<String> skulls = itemMap.getDynamicOwners();
                     if (!owner) {
@@ -6354,8 +6185,7 @@ public class Menu {
                         modifySkullPane(player, itemMap, position, owner);
                     }
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                     durationSkullPane(player, itemMap, position, isNew, value, owner);
                 }
@@ -6408,17 +6238,14 @@ public class Menu {
                 modifySkullPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GOLDEN_HELMET" : "314"), 1, false, false, "&a&l&nSkull Owner", "&7", "&7*Change the animated skull owner.", "&9&lSkull Owner: &a" +
                         ItemHandler.cutDelay(itemMap.getDynamicOwners().get(position))), event -> {
                     player.closeInventory();
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "SKULL OWNER";
-                    placeHolders[15] = "RockinChaos";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SKULL OWNER").with(Holder.INPUT_EXAMPLE, "RockinChaos");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                 }, event -> {
                     List<String> skulls = itemMap.getDynamicOwners();
                     skulls.set(position, "<delay:" + StringUtils.returnInteger(ItemHandler.getDelayFormat(skulls.get(position))) + ">" + ChatColor.stripColor(event.getMessage()));
                     itemMap.setDynamicOwners(skulls);
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "SKULL OWNER";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SKULL OWNER");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                     modifySkullPane(event.getPlayer(), itemMap, position, true);
                 }));
@@ -6426,17 +6253,14 @@ public class Menu {
                 modifySkullPane.addButton(new Button(ItemHandler.getItem("STRING", 1, false, false, "&a&l&nSkull Texture", "&7", "&7*Change the animated skull texture.", "&9&lSkull Texture: &a" +
                         ItemHandler.cutDelay(itemMap.getDynamicTextures().get(position))), event -> {
                     player.closeInventory();
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "SKULL TEXTURE";
-                    placeHolders[15] = "eyJ0ZXh0dYMGQVlN2FjZmU3OSJ9fX0=";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SKULL TEXTURE").with(Holder.INPUT_EXAMPLE, "eyJ0ZXh0dYMGQVlN2FjZmU3OSJ9fX0=");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                 }, event -> {
                     List<String> skulls = itemMap.getDynamicTextures();
                     skulls.set(position, "<delay:" + StringUtils.returnInteger(ItemHandler.getDelayFormat(skulls.get(position))) + ">" + ChatColor.stripColor(event.getMessage()));
                     itemMap.setDynamicTextures(skulls);
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "SKULL TEXTURE";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SKULL TEXTURE");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                     modifySkullPane(event.getPlayer(), itemMap, position, false);
                 }));
@@ -6598,20 +6422,16 @@ public class Menu {
             usePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
             usePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Usage", "&7", "&7*Click to set a custom usage cooldown", "&7value for the item."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "USAGE COOLDOWN";
-                placeHolders[15] = "120";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "USAGE COOLDOWN").with(Holder.INPUT_EXAMPLE, "120");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
                     itemMap.setInteractCooldown(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "USAGE COOLDOWN";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "USAGE COOLDOWN");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                 }
                 creatingPane(event.getPlayer(), itemMap);
@@ -6717,20 +6537,16 @@ public class Menu {
             blockPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the drop chances menu."), event -> dropsPane(player, itemMap)));
             blockPane.addButton(new Button(ItemHandler.getItem("STICK", 1, true, false, "&b&lBukkit Material", "&7", "&7*If you know the name", "&7of the BUKKIT material type", "&7simply click and type it."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "BUKKIT MATERIAL";
-                placeHolders[15] = "IRON_SWORD";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "BUKKIT MATERIAL").with(Holder.INPUT_EXAMPLE, "IRON_SWORD");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 if (ItemHandler.getMaterial(ChatColor.stripColor(event.getMessage()), null) != Material.AIR) {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "BUKKIT MATERIAL";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "BUKKIT MATERIAL");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                     chancePane(player, itemMap, null, ItemHandler.getMaterial(ChatColor.stripColor(event.getMessage()), null));
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noMaterial", player, placeHolders);
                     blocksPane(player, itemMap);
                 }
@@ -6829,9 +6645,7 @@ public class Menu {
             }
             chancePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRAY_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:7"), 1, false, false, "&e&lCustom Drop Chance", "&7", "&7*Click to set a custom drop chance", "&7value for the item."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "DROP CHANCE";
-                placeHolders[15] = "0.001";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "DROP CHANCE").with(Holder.INPUT_EXAMPLE, "0.001");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
@@ -6845,12 +6659,10 @@ public class Menu {
                         blocksDrop.put(material, Double.parseDouble(ChatColor.stripColor(event.getMessage())));
                         itemMap.setBlocksDrop(blocksDrop);
                     }
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "DROP CHANCE";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "DROP CHANCE");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                 }
                 if (entity != null) {
@@ -7011,15 +6823,12 @@ public class Menu {
                             commandCPane(player, itemMap, commandAction);
                         } else {
                             player.closeInventory();
-                            String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                            placeHolders[16] = "COMMAND FAIL MESSAGE";
-                            placeHolders[15] = "&cYou do not meet the conditions to execute this item command.";
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "COMMAND FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "&cYou do not meet the conditions to execute this item command.");
                             ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                             ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                         }
                     }, event -> {
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "COMMAND FAIL MESSAGE";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "COMMAND FAIL MESSAGE");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 Map<String, String> messages = itemMap.getCommandMessages();
                 messages.put(commandAction.config(), ChatColor.stripColor(event.getMessage()));
@@ -7030,14 +6839,11 @@ public class Menu {
                     "&7in order to execute the", "&7" + commandAction.config().replace("-", " ").replace(".", "") + " item commands."),
                     event -> {
                         player.closeInventory();
-                        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                        placeHolders[16] = "FIRST VALUE";
-                        placeHolders[15] = "100";
+                        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FIRST VALUE").with(Holder.INPUT_EXAMPLE, "100");
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                     }, event -> {
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "FIRST VALUE";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FIRST VALUE");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 addConditionPane(event.getPlayer(), itemMap, commandAction, commandAction.config(), ChatColor.stripColor(event.getMessage()));
             }));
@@ -7077,30 +6883,24 @@ public class Menu {
                             disposableCPane(player, itemMap);
                         } else {
                             player.closeInventory();
-                            String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                            placeHolders[16] = "DISPOSABLE FAIL MESSAGE";
-                            placeHolders[15] = "&cYou do not meet the conditions to dispose of this item.";
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "DISPOSABLE FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "&cYou do not meet the conditions to dispose of this item.");
                             ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                             ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                         }
                     }, event -> {
                 itemMap.setDisposableMessage(ChatColor.stripColor(event.getMessage()));
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "DISPOSABLE FAIL MESSAGE";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "DISPOSABLE FAIL MESSAGE");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 disposableCPane(event.getPlayer(), itemMap);
             }));
             conditionsPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, false, "&b&lAdd Condition", "&7", "&7*Condition(s) that must be met", "&7in order to dispose of the item."),
                     event -> {
                         player.closeInventory();
-                        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                        placeHolders[16] = "FIRST VALUE";
-                        placeHolders[15] = "100";
+                        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FIRST VALUE").with(Holder.INPUT_EXAMPLE, "100");
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                     }, event -> {
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "FIRST VALUE";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FIRST VALUE");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 addConditionPane(event.getPlayer(), itemMap, null, "disposable-conditions", ChatColor.stripColor(event.getMessage()));
             }));
@@ -7136,30 +6936,24 @@ public class Menu {
                             triggerCPane(player, itemMap);
                         } else {
                             player.closeInventory();
-                            String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                            placeHolders[16] = "TRIGGER FAIL MESSAGE";
-                            placeHolders[15] = "&cYou do not meet the conditions to receive this item.";
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "TRIGGER FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "&cYou do not meet the conditions to receive this item.");
                             ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                             ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                         }
                     }, event -> {
                 itemMap.setTriggerMessage(ChatColor.stripColor(event.getMessage()));
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "TRIGGER FAIL MESSAGE";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "TRIGGER FAIL MESSAGE");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 triggerCPane(event.getPlayer(), itemMap);
             }));
             conditionsPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, false, "&b&lAdd Condition", "&7", "&7*Condition(s) that must be met", "&7in order to receive the item."),
                     event -> {
                         player.closeInventory();
-                        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                        placeHolders[16] = "FIRST VALUE";
-                        placeHolders[15] = "100";
+                        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FIRST VALUE").with(Holder.INPUT_EXAMPLE, "100");
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                     }, event -> {
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "FIRST VALUE";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FIRST VALUE");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 addConditionPane(event.getPlayer(), itemMap, null, "trigger-conditions", ChatColor.stripColor(event.getMessage()));
             }));
@@ -7193,14 +6987,11 @@ public class Menu {
             conditionsPane.addButton(new Button(ItemHandler.getItem("MINECART", 1, false, false, "&b&lEQUAL", "&7", "&7*The first value must be", "&7EQUAL to the second value", "&7for the condition to be met."),
                     event -> {
                         player.closeInventory();
-                        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                        placeHolders[16] = "SECOND VALUE";
-                        placeHolders[15] = "400";
+                        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SECOND VALUE").with(Holder.INPUT_EXAMPLE, "400");
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                     }, event -> {
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "SECOND VALUE";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SECOND VALUE");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 List<String> conditions = (condition.equalsIgnoreCase("disposable-conditions") ? itemMap.getDisposableConditions() : condition.equalsIgnoreCase("trigger-conditions") ? itemMap.getTriggerConditions() : itemMap.getCommandConditions().get(condition) != null ? itemMap.getCommandConditions().get(condition) : new ArrayList<>());
                 conditions.add(value + ":" + "EQUAL" + ":" + ChatColor.stripColor(event.getMessage()));
@@ -7221,14 +7012,11 @@ public class Menu {
             conditionsPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_FENCE" : "85"), 1, false, false, "&b&lNOTEQUAL", "&7", "&7*The first value must be", "&7NOTEQUAL to the second value", "&7for the condition to be met."),
                     event -> {
                         player.closeInventory();
-                        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                        placeHolders[16] = "SECOND VALUE";
-                        placeHolders[15] = "400";
+                        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SECOND VALUE").with(Holder.INPUT_EXAMPLE, "400");
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                     }, event -> {
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "SECOND VALUE";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SECOND VALUE");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 List<String> conditions = (condition.equalsIgnoreCase("disposable-conditions") ? itemMap.getDisposableConditions() : condition.equalsIgnoreCase("trigger-conditions") ? itemMap.getTriggerConditions() : itemMap.getCommandConditions().get(condition) != null ? itemMap.getCommandConditions().get(condition) : new ArrayList<>());
                 conditions.add(value + ":" + "NOTEQUAL" + ":" + ChatColor.stripColor(event.getMessage()));
@@ -7249,14 +7037,11 @@ public class Menu {
             conditionsPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_STAIRS" : "53"), 1, false, false, "&b&lOVER", "&7", "&7*The first value must be", "&7OVER the second value", "&7for the condition to be met.", "&7", "&c&l&nNOTE:&7 This only works if both", "&7values referenced are integers."),
                     event -> {
                         player.closeInventory();
-                        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                        placeHolders[16] = "SECOND VALUE";
-                        placeHolders[15] = "400";
+                        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SECOND VALUE").with(Holder.INPUT_EXAMPLE, "400");
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                     }, event -> {
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "SECOND VALUE";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SECOND VALUE");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 List<String> conditions = (condition.equalsIgnoreCase("disposable-conditions") ? itemMap.getDisposableConditions() : condition.equalsIgnoreCase("trigger-conditions") ? itemMap.getTriggerConditions() : itemMap.getCommandConditions().get(condition) != null ? itemMap.getCommandConditions().get(condition) : new ArrayList<>());
                 conditions.add(value + ":" + "OVER" + ":" + ChatColor.stripColor(event.getMessage()));
@@ -7277,14 +7062,11 @@ public class Menu {
             conditionsPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_BOAT" : "333"), 1, false, false, "&b&lUNDER", "&7", "&7*The first value must be", "&7UNDER to the second value", "&7for the condition to be met.", "&7", "&c&l&nNOTE:&7 This only works if both", "&7values referenced are integers."),
                     event -> {
                         player.closeInventory();
-                        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                        placeHolders[16] = "SECOND VALUE";
-                        placeHolders[15] = "400";
+                        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SECOND VALUE").with(Holder.INPUT_EXAMPLE, "400");
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                     }, event -> {
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "SECOND VALUE";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SECOND VALUE");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 List<String> conditions = (condition.equalsIgnoreCase("disposable-conditions") ? itemMap.getDisposableConditions() : condition.equalsIgnoreCase("trigger-conditions") ? itemMap.getTriggerConditions() : itemMap.getCommandConditions().get(condition) != null ? itemMap.getCommandConditions().get(condition) : new ArrayList<>());
                 conditions.add(value + ":" + "UNDER" + ":" + ChatColor.stripColor(event.getMessage()));
@@ -7345,9 +7127,7 @@ public class Menu {
             }
             commandListPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, false, "&e&lNew Line", "&7", "&7*Add a new command to be executed."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = (stage == 4 ? "ACTIVE COMMAND" : "TOGGLE COMMAND");
-                placeHolders[15] = (stage == 4 ? "gamemode creative %player%" : "pvp");
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, (stage == 4 ? "ACTIVE COMMAND" : "TOGGLE COMMAND")).with(Holder.INPUT_EXAMPLE, (stage == 4 ? "gamemode creative %player%" : "pvp"));
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
@@ -7365,8 +7145,7 @@ public class Menu {
                     toggleCommands.add(ChatColor.stripColor(event.getMessage()));
                     itemMap.setToggleCommands(toggleCommands);
                 }
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = (stage == 4 ? "ACTIVE COMMAND" : "TOGGLE COMMAND");
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, (stage == 4 ? "ACTIVE COMMAND" : "TOGGLE COMMAND"));
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 altCommandPane(event.getPlayer(), itemMap, stage);
             }));
@@ -7395,9 +7174,7 @@ public class Menu {
             modPane.addButton(new Button(fillerPaneGItem), 7);
             modPane.addButton(new Button(ItemHandler.getItem("PAPER", 1, false, false, "&fModify", "&7", "&7*Sets the command to", "&7another text entry."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = (stage == 4 ? "MODIFIED ACTIVE COMMAND" : "MODIFIED TOGGLE COMMAND");
-                placeHolders[15] = (stage == 4 ? "gamemode survival %player%" : "pvp on");
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, (stage == 4 ? "MODIFIED ACTIVE COMMAND" : "MODIFIED TOGGLE COMMAND")).with(Holder.INPUT_EXAMPLE, (stage == 4 ? "gamemode survival %player%" : "pvp on"));
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
@@ -7417,8 +7194,7 @@ public class Menu {
                     toggleCommands.add(ChatColor.stripColor(event.getMessage()));
                     itemMap.setToggleCommands(toggleCommands);
                 }
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = (stage == 4 ? "MODIFIED ACTIVE COMMAND" : "MODIFIED TOGGLE COMMAND");
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, (stage == 4 ? "MODIFIED ACTIVE COMMAND" : "MODIFIED TOGGLE COMMAND"));
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 altCommandPane(player, itemMap, stage);
             }));
@@ -7477,16 +7253,13 @@ public class Menu {
                     togglePane(player, itemMap);
                 } else {
                     player.closeInventory();
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "TOGGLE MESSAGE";
-                    placeHolders[15] = "&a%item% has been toggled!";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "TOGGLE MESSAGE").with(Holder.INPUT_EXAMPLE, "&a%item% has been toggled!");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                 }
             }, event -> {
                 itemMap.setToggleMessage(ChatColor.stripColor(event.getMessage()));
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "TOGGLE MESSAGE";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "TOGGLE MESSAGE");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 togglePane(event.getPlayer(), itemMap);
             }));
@@ -7499,16 +7272,13 @@ public class Menu {
                     togglePane(player, itemMap);
                 } else {
                     player.closeInventory();
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "TOGGLE PERMISSION";
-                    placeHolders[15] = "itemjoin.toggle";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "TOGGLE PERMISSION").with(Holder.INPUT_EXAMPLE, "itemjoin.toggle");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                 }
             }, event -> {
                 itemMap.setTogglePerm(ChatColor.stripColor(event.getMessage()));
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "TOGGLE PERMISSION";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "TOGGLE PERMISSION");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 togglePane(event.getPlayer(), itemMap);
             }));
@@ -7666,9 +7436,7 @@ public class Menu {
             nbtPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
             nbtPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, true, false, "&e&l&nNew Property", "&7", "&7*Add a new NBT Property to the custom item."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "NBT PROPERTY";
-                placeHolders[15] = "TranslatableDisplayName:&aUltra &cItem";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "NBT PROPERTY").with(Holder.INPUT_EXAMPLE, "TranslatableDisplayName:&aUltra &cItem");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
@@ -7677,8 +7445,7 @@ public class Menu {
                     properties.put(propertyParts[0], propertyParts[1]);
                 }
                 itemMap.setNBTValues(properties);
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "NBT PROPERTY";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "NBT PROPERTY");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 nbtPane(event.getPlayer(), itemMap);
             }));
@@ -7703,9 +7470,7 @@ public class Menu {
             modifyProperty.addButton(new Button(fillerPaneGItem), 3);
             modifyProperty.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, false, "&c&l&nModify", "&7", "&7*Modify this NBT Property.", "&7", "&9&lProperty: &a" + "&f" + key + ":" + properties.get(key)), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "NBT PROPERTY";
-                placeHolders[15] = "TranslatableDisplayName:&aUltra &cItem";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "NBT PROPERTY").with(Holder.INPUT_EXAMPLE, "TranslatableDisplayName:&aUltra &cItem");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
@@ -7715,8 +7480,7 @@ public class Menu {
                     properties.put(propertyParts[0], propertyParts[1]);
                 }
                 itemMap.setNBTValues(properties);
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "NBT PROPERTY";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "NBT PROPERTY");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 nbtPane(event.getPlayer(), itemMap);
             }));
@@ -7999,20 +7763,16 @@ public class Menu {
             levelPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the potion effect menu."), event -> potionPane(player, itemMap, stage)));
             levelPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Level", "&7", "&7*Click to set a custom level (strength)", "&7value for the potion effect.", "&7", "&c&lNote: &7Any duration LONGER than", "&71800 seconds (30 minutes) will", "&7result in an infinite duration."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "EFFECT LEVEL";
-                placeHolders[15] = "16";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "EFFECT LEVEL").with(Holder.INPUT_EXAMPLE, "16");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "EFFECT LEVEL";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "EFFECT LEVEL");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                     durationPane(event.getPlayer(), itemMap, potion, Integer.parseInt(ChatColor.stripColor(event.getMessage())), stage);
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                     levelPane(event.getPlayer(), itemMap, potion, stage);
                 }
@@ -8041,20 +7801,16 @@ public class Menu {
             durationPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the potion effect menu."), event -> potionPane(player, itemMap, stage)));
             durationPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Duration", "&7", "&7*Click to set a custom duration", "&7value for the potion effect."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "EFFECT DURATION";
-                placeHolders[15] = "110";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "EFFECT DURATION").with(Holder.INPUT_EXAMPLE, "110");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "EFFECT DURATION";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "EFFECT DURATION");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                     potionPane(event.getPlayer(), itemMap, stage);
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                     durationPane(event.getPlayer(), itemMap, potion, level, stage);
                 }
@@ -8085,20 +7841,16 @@ public class Menu {
             powerPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> otherPane(player, itemMap)));
             powerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Power", "&7", "&7*Click to set a custom power", "&7value for the firework."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "FIREWORK POWER";
-                placeHolders[15] = "96";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FIREWORK POWER").with(Holder.INPUT_EXAMPLE, "96");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
                     itemMap.setFireworkPower(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "FIREWORK POWER";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FIREWORK POWER");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                 }
                 otherPane(player, itemMap);
@@ -8198,9 +7950,7 @@ public class Menu {
             if (isNew) {
                 linePane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, false, "&e&l&nNew Line", "&7", "&7*Add a new line to the book page.", "&7", "&9&lPage: &a" + (page + 1)), event -> {
                     player.closeInventory();
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "PAGE LINE";
-                    placeHolders[15] = "&eWelcome to the Server!";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "PAGE LINE").with(Holder.INPUT_EXAMPLE, "&eWelcome to the Server!");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                 }, event -> {
@@ -8208,8 +7958,7 @@ public class Menu {
                     newPage.add(ChatColor.stripColor(event.getMessage()));
                     pages.add(newPage);
                     itemMap.setListPages(pages);
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "PAGE LINE";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "PAGE LINE");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                     linePane(event.getPlayer(), itemMap, false, page);
                 }));
@@ -8223,17 +7972,14 @@ public class Menu {
                 if (selectPage.size() < 14) {
                     linePane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, false, "&e&l&nNew Line", "&7", "&7*Add a new line to the book page.", "&7", "&9&lLine: &a" + (selectPage.size() + 1) + "    &9&lPage: &a" + (page + 1)), event -> {
                         player.closeInventory();
-                        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                        placeHolders[16] = "PAGE LINE";
-                        placeHolders[15] = "&eWelcome to the Server!";
+                        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "PAGE LINE").with(Holder.INPUT_EXAMPLE, "&eWelcome to the Server!");
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                     }, event -> {
                         selectPage.add(ChatColor.stripColor(event.getMessage()));
                         pages.set(page, selectPage);
                         itemMap.setListPages(pages);
-                        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                        placeHolders[16] = "PAGE LINE";
+                        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "PAGE LINE");
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                         linePane(event.getPlayer(), itemMap, false, page);
                     }));
@@ -8263,17 +8009,14 @@ public class Menu {
             linePane.addButton(new Button(fillerPaneGItem), 3);
             linePane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, false, "&c&l&nModify", "&7", "&7*Modify this line in the page.", "&7", "&9&lLine: &a" + (line + 1) + "    &9&lPage: &a" + (page + 1)), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "PAGE LINE";
-                placeHolders[15] = "&eWelcome to the Server!";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "PAGE LINE").with(Holder.INPUT_EXAMPLE, "&eWelcome to the Server!");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 selectPage.set(line, ChatColor.stripColor(event.getMessage()));
                 pages.set(page, selectPage);
                 itemMap.setListPages(pages);
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "PAGE LINE";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "PAGE LINE");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 linePane(event.getPlayer(), itemMap, false, page);
             }));
@@ -8358,21 +8101,17 @@ public class Menu {
             strengthPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the custom attributes menu."), event -> attributePane(player, itemMap, isLeather)));
             strengthPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Strength", "&7", "&7*Click to set a custom strength", "&7value for the custom attribute."), event -> {
                 player.closeInventory();
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[16] = "STRENGTH";
-                placeHolders[15] = "14.0";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "STRENGTH").with(Holder.INPUT_EXAMPLE, "14.0");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player)) || StringUtils.isDouble(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
                     Map<String, Double> attributeList = itemMap.getAttributes();
                     attributeList.put(attribute, Double.parseDouble(ChatColor.stripColor(event.getMessage())));
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "STRENGTH";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "STRENGTH");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = ChatColor.stripColor(event.getMessage());
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                 }
                 attributePane(event.getPlayer(), itemMap, isLeather);
@@ -8413,16 +8152,13 @@ public class Menu {
                         otherPane(player, itemMap);
                     } else {
                         player.closeInventory();
-                        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                        placeHolders[16] = "AUTHOR";
-                        placeHolders[15] = "RockinChaos";
+                        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "AUTHOR").with(Holder.INPUT_EXAMPLE, "RockinChaos");
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                     }
                 }, event -> {
                     itemMap.setAuthor(ChatColor.stripColor(event.getMessage()));
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "AUTHOR";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "AUTHOR");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                     otherPane(event.getPlayer(), itemMap);
                 }));
@@ -8449,9 +8185,7 @@ public class Menu {
                             otherPane(player, itemMap);
                         } else {
                             player.closeInventory();
-                            String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                            placeHolders[16] = "SKULL OWNER";
-                            placeHolders[15] = "RockinChaos";
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SKULL OWNER").with(Holder.INPUT_EXAMPLE, "RockinChaos");
                             ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                             ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                         }
@@ -8459,8 +8193,7 @@ public class Menu {
                 }, event -> {
                     itemMap.setSkull(ChatColor.stripColor(event.getMessage()));
                     itemMap.setSkullTexture(null);
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "SKULL OWNER";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SKULL OWNER");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                     otherPane(event.getPlayer(), itemMap);
                 }));
@@ -8476,9 +8209,7 @@ public class Menu {
                             otherPane(player, itemMap);
                         } else {
                             player.closeInventory();
-                            String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                            placeHolders[16] = "SKULL TEXTURE";
-                            placeHolders[15] = "eyJ0ZXh0dYMGQVlN2FjZmU3OSJ9fX0=";
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SKULL TEXTURE").with(Holder.INPUT_EXAMPLE, "eyJ0ZXh0dYMGQVlN2FjZmU3OSJ9fX0=");
                             ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                             ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                         }
@@ -8486,8 +8217,7 @@ public class Menu {
                 }, event -> {
                     itemMap.setSkullTexture(ChatColor.stripColor(event.getMessage()));
                     itemMap.setSkull(null);
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[16] = "SKULL TEXTURE";
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "SKULL TEXTURE");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                     otherPane(event.getPlayer(), itemMap);
                 }));
@@ -8591,9 +8321,7 @@ public class Menu {
                         otherPane(player, itemMap);
                     } else {
                         player.closeInventory();
-                        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                        placeHolders[16] = "HEX COLOR";
-                        placeHolders[15] = "#033dfc";
+                        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "HEX COLOR").with(Holder.INPUT_EXAMPLE, "#033dfc");
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
                     }
@@ -8601,8 +8329,7 @@ public class Menu {
                     if (itemMap.getLeatherHex() == null) {
                         itemMap.setLeatherHex(ChatColor.stripColor(event.getMessage()));
                         itemMap.setLeatherColor(null);
-                        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                        placeHolders[16] = "HEX COLOR";
+                        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "HEX COLOR");
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                         otherPane(event.getPlayer(), itemMap);
                     }

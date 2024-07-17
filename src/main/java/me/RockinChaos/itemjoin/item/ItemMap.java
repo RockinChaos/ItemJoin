@@ -24,6 +24,8 @@ import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.*;
 import me.RockinChaos.core.utils.ReflectionUtils.MinecraftMethod;
 import me.RockinChaos.core.utils.api.LegacyAPI;
+import me.RockinChaos.core.utils.types.PlaceHolder;
+import me.RockinChaos.core.utils.types.PlaceHolder.Holder;
 import me.RockinChaos.itemjoin.ChatToggleExecutor;
 import me.RockinChaos.itemjoin.ChatToggleTab;
 import me.RockinChaos.itemjoin.ItemJoin;
@@ -5040,27 +5042,18 @@ public class ItemMap implements Cloneable {
     private void warmCycle(final Player player, final Player altPlayer, final ItemMap itemMap, final int warmCount, final Location location, final ItemStack itemCopy, final String action, final String clickType, final String slot) {
         if (warmCount != 0) {
             if (itemMap.warmDelay == warmCount) {
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[13] = warmCount + "";
-                placeHolders[0] = player.getWorld().getName();
-                placeHolders[3] = StringUtils.translateLayout(itemMap.getCustomName(), player);
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.TIME_LEFT, String.valueOf(warmCount)).with(Holder.WORLD, player.getWorld().getName()).with(Holder.ITEM, StringUtils.translateLayout(itemMap.getCustomName(), player));
                 ItemJoin.getCore().getLang().sendLangMessage("general.warmingUp", player, placeHolders);
                 itemMap.addWarmPending(player);
             }
             SchedulerUtils.runLater(20L, () -> {
                 if (itemMap.warmLocation(player, location, action)) {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[13] = warmCount + "";
-                    placeHolders[0] = player.getWorld().getName();
-                    placeHolders[3] = StringUtils.translateLayout(itemMap.getCustomName(), player);
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.TIME_LEFT, String.valueOf(warmCount)).with(Holder.WORLD, player.getWorld().getName()).with(Holder.ITEM, StringUtils.translateLayout(itemMap.getCustomName(), player));
                     ItemJoin.getCore().getLang().sendLangMessage("general.warmingTime", player, placeHolders);
                     itemMap.warmCycle(player, altPlayer, itemMap, (warmCount - 1), location, itemCopy, action, clickType, slot);
                 } else {
                     itemMap.delWarmPending(player);
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[13] = warmCount + "";
-                    placeHolders[0] = player.getWorld().getName();
-                    placeHolders[3] = StringUtils.translateLayout(itemMap.getCustomName(), player);
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.TIME_LEFT, String.valueOf(warmCount)).with(Holder.WORLD, player.getWorld().getName()).with(Holder.ITEM, StringUtils.translateLayout(itemMap.getCustomName(), player));
                     ItemJoin.getCore().getLang().sendLangMessage("general.warmingHalted", player, placeHolders);
                 }
             });
@@ -5083,10 +5076,7 @@ public class ItemMap implements Cloneable {
                         itemMap.addPlayerOnCooldown(player);
                     }
                 } else {
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[13] = warmCount + "";
-                    placeHolders[0] = player.getWorld().getName();
-                    placeHolders[3] = StringUtils.translateLayout(itemMap.getCustomName(), player);
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.TIME_LEFT, String.valueOf(warmCount)).with(Holder.WORLD, player.getWorld().getName()).with(Holder.ITEM, StringUtils.translateLayout(itemMap.getCustomName(), player));
                     ItemJoin.getCore().getLang().sendLangMessage("general.warmingHalted", player, placeHolders);
                 }
                 if (itemMap.warmDelay != 0) {
@@ -5258,9 +5248,7 @@ public class ItemMap implements Cloneable {
             if (balCost || this.cost <= 0) {
                 return true;
             } else {
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[6] = this.cost.toString();
-                placeHolders[5] = balance + "";
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.COST, this.cost.toString()).with(Holder.BALANCE, String.valueOf(balance));
                 ItemJoin.getCore().getLang().sendLangMessage("general.econFailed", player, placeHolders);
                 return false;
             }
@@ -5322,10 +5310,7 @@ public class ItemMap implements Cloneable {
                 formatCost.append(str.substring(0, 1).toUpperCase()).append(str.substring(1)).append(" ");
             }
             formatCost = new StringBuilder(formatCost.substring(0, formatCost.length() - 1));
-            String[] placeHolders = ItemJoin.getCore().getLang().newString();
-            placeHolders[4] = formatCost.toString();
-            placeHolders[6] = String.valueOf(this.cost == 0 ? 1 : this.cost);
-            placeHolders[5] = foundAmount + "";
+            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.ITEM_TYPE, formatCost.toString()).with(Holder.COST, String.valueOf(this.cost == 0 ? 1 : this.cost)).with(Holder.BALANCE, String.valueOf(foundAmount));
             ItemJoin.getCore().getLang().sendLangMessage("general.itemFailed", player, placeHolders);
             return false;
         }
@@ -5384,9 +5369,7 @@ public class ItemMap implements Cloneable {
             formatCost.append(str.substring(0, 1).toUpperCase()).append(str.substring(1)).append(" ");
         }
         formatCost = new StringBuilder(formatCost.substring(0, formatCost.length() - 1));
-        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-        placeHolders[4] = formatCost.toString();
-        placeHolders[6] = String.valueOf(this.cost == 0 ? 1 : this.cost);
+        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.ITEM_TYPE, formatCost.toString()).with(Holder.COST, String.valueOf(this.cost == 0 ? 1 : this.cost));
         ItemJoin.getCore().getLang().sendLangMessage("general.itemSuccess", player, placeHolders);
     }
 
@@ -5410,8 +5393,7 @@ public class ItemMap implements Cloneable {
                     } catch (NullPointerException e) {
                         ServerUtils.sendDebugTrace(e);
                     }
-                    String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                    placeHolders[6] = this.cost.toString();
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.COST, this.cost.toString()).with(Holder.BALANCE, String.valueOf(balance));
                     ItemJoin.getCore().getLang().sendLangMessage("general.econSuccess", player, placeHolders);
                 }
             }

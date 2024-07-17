@@ -22,6 +22,8 @@ import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
+import me.RockinChaos.core.utils.types.PlaceHolder;
+import me.RockinChaos.core.utils.types.PlaceHolder.Holder;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.PluginData;
 import org.bukkit.Bukkit;
@@ -507,12 +509,9 @@ public class ItemCommand {
             if (StringUtils.containsIgnoreCase(this.command, "[close]")) {
                 PlayerHandler.safeInventoryClose(player);
             } else {
-                String[] values = new String[1];
-                if (altPlayer != null) {
-                    values[0] = altPlayer.getName();
-                }
-                PluginData.getInfo().setLoggable("/" + StringUtils.translateLayout(this.command, player, values));
-                Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), StringUtils.translateLayout(this.command, player, values));
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.PLAYER_HIT, (altPlayer != null ? altPlayer.getName() : "")).with(Holder.TARGET_PLAYER, (altPlayer != null ? altPlayer.getName() : ""));
+                PluginData.getInfo().setLoggable("/" + StringUtils.translateLayout(this.command, player, placeHolders));
+                Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), StringUtils.translateLayout(this.command, player, placeHolders));
             }
         } catch (Exception e) {
             ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command as console, if this continues report it to the developer.");
@@ -534,12 +533,9 @@ public class ItemCommand {
                 if (!player.isOp()) {
                     try {
                         player.setOp(true);
-                        String[] values = new String[1];
-                        if (altPlayer != null) {
-                            values[0] = altPlayer.getName();
-                        }
-                        PluginData.getInfo().setLoggable("/" + StringUtils.translateLayout(this.command, player, values));
-                        player.chat("/" + StringUtils.translateLayout(this.command, player, values));
+                        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.PLAYER_HIT, (altPlayer != null ? altPlayer.getName() : "")).with(Holder.TARGET_PLAYER, (altPlayer != null ? altPlayer.getName() : ""));
+                        PluginData.getInfo().setLoggable("/" + StringUtils.translateLayout(this.command, player, placeHolders));
+                        player.chat("/" + StringUtils.translateLayout(this.command, player, placeHolders));
                     } catch (Exception e) {
                         ServerUtils.sendDebugTrace(e);
                         player.setOp(false);
@@ -568,12 +564,9 @@ public class ItemCommand {
             if (StringUtils.containsIgnoreCase(this.command, "[close]")) {
                 PlayerHandler.safeInventoryClose(player);
             } else {
-                String[] values = new String[1];
-                if (altPlayer != null) {
-                    values[0] = altPlayer.getName();
-                }
-                PluginData.getInfo().setLoggable("/" + StringUtils.translateLayout(this.command, player, values));
-                player.chat("/" + StringUtils.translateLayout(this.command, player, values));
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.PLAYER_HIT, (altPlayer != null ? altPlayer.getName() : "")).with(Holder.TARGET_PLAYER, (altPlayer != null ? altPlayer.getName() : ""));
+                PluginData.getInfo().setLoggable("/" + StringUtils.translateLayout(this.command, player, placeHolders));
+                player.chat("/" + StringUtils.translateLayout(this.command, player, placeHolders));
             }
         } catch (Exception e) {
             ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command as a player, if this continues report it to the developer.");
@@ -589,11 +582,8 @@ public class ItemCommand {
      */
     private void dispatchMessageCommands(final Player player, final Player altPlayer) {
         try {
-            String[] values = new String[1];
-            if (altPlayer != null) {
-                values[0] = altPlayer.getName();
-            }
-            String jsonMessage = StringUtils.translateLayout(PluginData.getInfo().getJSONMessage(this.command, this.itemMap.getConfigName()), player, values);
+            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.PLAYER_HIT, (altPlayer != null ? altPlayer.getName() : "")).with(Holder.TARGET_PLAYER, (altPlayer != null ? altPlayer.getName() : ""));
+            String jsonMessage = StringUtils.translateLayout(PluginData.getInfo().getJSONMessage(this.command, this.itemMap.getConfigName()), player, placeHolders);
             Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "minecraft:tellraw " + player.getName() + " " + jsonMessage);
         } catch (Exception e) {
             ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command to send a message, if this continues report it to the developer.");
@@ -628,11 +618,8 @@ public class ItemCommand {
      */
     private void dispatchServerCommands(final Player player, final Player altPlayer) {
         try {
-            String[] values = new String[1];
-            if (altPlayer != null) {
-                values[0] = altPlayer.getName();
-            }
-            ItemJoin.getCore().getBungee().SwitchServers(player, StringUtils.translateLayout(this.command, player, values));
+            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.PLAYER_HIT, (altPlayer != null ? altPlayer.getName() : "")).with(Holder.TARGET_PLAYER, (altPlayer != null ? altPlayer.getName() : ""));
+            ItemJoin.getCore().getBungee().SwitchServers(player, StringUtils.translateLayout(this.command, player, placeHolders));
         } catch (Exception e) {
             ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command to switch servers, if this continues report it to the developer.");
             ServerUtils.sendDebugTrace(e);
@@ -647,11 +634,8 @@ public class ItemCommand {
      */
     private void dispatchBungeeCordCommands(final Player player, final Player altPlayer) {
         try {
-            String[] values = new String[1];
-            if (altPlayer != null) {
-                values[0] = altPlayer.getName();
-            }
-            ItemJoin.getCore().getBungee().ExecuteCommand(player, StringUtils.translateLayout(this.command, player, values));
+            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.PLAYER_HIT, (altPlayer != null ? altPlayer.getName() : "")).with(Holder.TARGET_PLAYER, (altPlayer != null ? altPlayer.getName() : ""));
+            ItemJoin.getCore().getBungee().ExecuteCommand(player, StringUtils.translateLayout(this.command, player, placeHolders));
         } catch (Exception e) {
             ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command to BungeeCord, if this continues report it to the developer.");
             ServerUtils.sendDebugTrace(e);

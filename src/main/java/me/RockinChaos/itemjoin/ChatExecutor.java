@@ -28,6 +28,8 @@ import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.core.utils.api.PasteAPI;
+import me.RockinChaos.core.utils.types.PlaceHolder;
+import me.RockinChaos.core.utils.types.PlaceHolder.Holder;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.menus.Menu;
@@ -187,8 +189,7 @@ public class ChatExecutor implements CommandExecutor {
         } else if (Execute.WORLD.accept(sender, args, 0)) {
             ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
             ItemJoin.getCore().getLang().dispatchMessage(sender, "");
-            String[] placeHolders = ItemJoin.getCore().getLang().newString();
-            placeHolders[0] = ((Player) sender).getWorld().getName();
+            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.WORLD, ((Player) sender).getWorld().getName());
             ItemJoin.getCore().getLang().sendLangMessage("commands.world.worldHeader", sender, placeHolders);
             ItemJoin.getCore().getLang().sendLangMessage("commands.world.worldRow", sender, placeHolders);
             ItemJoin.getCore().getLang().dispatchMessage(sender, "");
@@ -229,13 +230,11 @@ public class ChatExecutor implements CommandExecutor {
         } else if (Execute.REMOVEALL.accept(sender, args, 0)) {
             this.handleAllItems(sender, args, true);
         } else if (Execute.UPDATE.accept(sender, args, 0)) {
-            String[] placeHolders = ItemJoin.getCore().getLang().newString();
-            placeHolders[21] = sender.getName();
+            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.PLAYER, sender.getName());
             ItemJoin.getCore().getLang().sendLangMessage("commands.updates.checkRequest", Bukkit.getServer().getConsoleSender(), placeHolders);
             SchedulerUtils.runAsync(() -> ItemJoin.getCore().getUpdater().checkUpdates(sender, true));
         } else if (Execute.UPGRADE.accept(sender, args, 0)) {
-            String[] placeHolders = ItemJoin.getCore().getLang().newString();
-            placeHolders[21] = sender.getName();
+            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.PLAYER, sender.getName());
             ItemJoin.getCore().getLang().sendLangMessage("commands.updates.updateRequest", Bukkit.getServer().getConsoleSender(), placeHolders);
             SchedulerUtils.runAsync(() -> ItemJoin.getCore().getUpdater().forceUpdates(sender));
         } else if (Execute.DEBUG.accept(sender, args, 0)) {
@@ -330,11 +329,10 @@ public class ChatExecutor implements CommandExecutor {
             ItemJoin.getCore().getLang().dispatchMessage(sender, " ");
             ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]-----------------&a&l[&e Item Info &a&l]&a&l&m----------------[");
             ItemJoin.getCore().getLang().dispatchMessage(sender, "");
-            String[] placeHolders = ItemJoin.getCore().getLang().newString();
-            placeHolders[3] = handItem.getType().toString();
+            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.ITEM, handItem.getType().toString());
             ItemJoin.getCore().getLang().sendLangMessage("commands.info.material", sender, placeHolders);
             if (!ServerUtils.hasSpecificUpdate("1_13")) {
-                placeHolders[3] = LegacyAPI.getDataValue(handItem) + "";
+                placeHolders.with(Holder.ITEM, String.valueOf(LegacyAPI.getDataValue(handItem)));
                 ItemJoin.getCore().getLang().sendLangMessage("commands.info.data", sender, placeHolders);
             }
             ItemJoin.getCore().getLang().dispatchMessage(sender, "");
@@ -353,19 +351,18 @@ public class ChatExecutor implements CommandExecutor {
      */
     private void query(final @Nonnull CommandSender sender, final @Nonnull String[] args) {
         final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(args[1]);
-        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-        placeHolders[3] = (itemMap != null ? itemMap.getConfigName() : args[1]);
+        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.ITEM, (itemMap != null ? itemMap.getConfigName() : args[1]));
         if (itemMap != null) {
-            placeHolders[4] = ((itemMap.getDynamicMaterials() == null || itemMap.getDynamicMaterials().isEmpty()) ? itemMap.getMaterial().name() : itemMap.getDynamicMaterials().toString().replace("[", "").replace("{", "").replace("]", "").replace("}", ""));
-            placeHolders[17] = ((itemMap.getMultipleSlots() == null || itemMap.getMultipleSlots().isEmpty()) ? itemMap.getSlot() : itemMap.getMultipleSlots().toString().replace("[", "").replace("{", "").replace("]", "").replace("}", ""));
+            placeHolders.with(Holder.ITEM_TYPE, ((itemMap.getDynamicMaterials() == null || itemMap.getDynamicMaterials().isEmpty()) ? itemMap.getMaterial().name() : itemMap.getDynamicMaterials().toString().replace("[", "").replace("{", "").replace("]", "").replace("}", "")));
+            placeHolders.with(Holder.ITEM_SLOT, ((itemMap.getMultipleSlots() == null || itemMap.getMultipleSlots().isEmpty()) ? itemMap.getSlot() : itemMap.getMultipleSlots().toString().replace("[", "").replace("{", "").replace("]", "").replace("}", "")));
             if (sender instanceof Player) {
                 if (itemMap.hasPermission(((Player) sender), ((Player) sender).getWorld())) {
-                    placeHolders[18] = "&a[✔] " + PermissionsHandler.customPermissions(itemMap.getPermissionNode(), ((Player) sender).getWorld().getName() + "." + itemMap.getConfigName());
+                    placeHolders.with(Holder.ITEM_PERMISSION, "&a[✔] " + PermissionsHandler.customPermissions(itemMap.getPermissionNode(), ((Player) sender).getWorld().getName() + "." + itemMap.getConfigName()));
                 } else {
-                    placeHolders[18] = "&c[✘] " + PermissionsHandler.customPermissions(itemMap.getPermissionNode(), ((Player) sender).getWorld().getName() + "." + itemMap.getConfigName());
+                    placeHolders.with(Holder.ITEM_PERMISSION, "&c[✘] " + PermissionsHandler.customPermissions(itemMap.getPermissionNode(), ((Player) sender).getWorld().getName() + "." + itemMap.getConfigName()));
                 }
             } else {
-                placeHolders[18] = "&a[✔] itemjoin.console" + "." + itemMap.getConfigName();
+                placeHolders.with(Holder.ITEM_PERMISSION, "&a[✔] itemjoin.console" + "." + itemMap.getConfigName());
             }
             ItemJoin.getCore().getLang().dispatchMessage(sender, " ");
             ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]-----------------&a&l[&e Query Data &a&l]&a&l&m----------------[");
@@ -392,11 +389,10 @@ public class ChatExecutor implements CommandExecutor {
         int maxPage = PluginData.getInfo().getListPages();
         int lineCount = 0;
         boolean worldSent = false;
-        for (World world : Bukkit.getWorlds()) {
+        for (final World world : Bukkit.getWorlds()) {
             if (((lineCount + 1) != (page * 15))) {
                 boolean itemFound = false;
-                String[] placeHolders = ItemJoin.getCore().getLang().newString();
-                placeHolders[0] = world.getName();
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.WORLD, world.getName());
                 if (!(lineCount > (page * 15)) && (page == 1 || !(lineCount < ((page - 1) * 15)))) {
                     ItemJoin.getCore().getLang().sendLangMessage("commands.list.worldHeader", sender, placeHolders);
                     lineCount++;
@@ -405,19 +401,17 @@ public class ChatExecutor implements CommandExecutor {
                     lineCount++;
                 }
                 List<String> inputListed = new ArrayList<>();
-                for (ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
+                for (final ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
                     if (!inputListed.contains(itemMap.getConfigName()) && itemMap.inWorld(world)) {
                         if (page == 1 && !(lineCount >= page * 15) || page != 1 && !(lineCount > page * 15) && !(lineCount < (page - 1) * 15)) {
                             if (!worldSent) {
-                                placeHolders[0] = world.getName();
                                 if (!(lineCount > (page * 15)) && (page == 1 || !(lineCount < ((page - 1) * 15)))) {
                                     ItemJoin.getCore().getLang().sendLangMessage("commands.list.worldHeader", sender, placeHolders);
                                     lineCount++;
                                     worldSent = true;
                                 }
                             }
-                            placeHolders[3] = itemMap.getConfigName();
-                            placeHolders[4] = itemMap.getConfigName();
+                            placeHolders.with(Holder.ITEM, itemMap.getConfigName());
                             inputListed.add(itemMap.getConfigName());
                             ItemJoin.getCore().getLang().sendLangMessage("commands.list.itemRow", sender, placeHolders);
                         }
@@ -477,7 +471,7 @@ public class ChatExecutor implements CommandExecutor {
         } else if (page != 0) {
             List<String> customPermissions = new ArrayList<>();
             List<String> inputMessage = new ArrayList<>();
-            for (World world : Bukkit.getServer().getWorlds()) {
+            for (final World world : Bukkit.getServer().getWorlds()) {
                 ItemMap probable = null;
                 for (Object itemMap : ItemJoin.getCore().getChances().getItems().keySet()) {
                     if (((ItemMap) itemMap).hasItem(((Player) sender), true)) {
@@ -487,7 +481,7 @@ public class ChatExecutor implements CommandExecutor {
                 if (probable == null) {
                     probable = (ItemMap) ItemJoin.getCore().getChances().getRandom(((Player) sender));
                 }
-                for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
+                for (final ItemMap item : ItemUtilities.getUtilities().getItems()) {
                     if ((item.getPermissionNode() == null || !customPermissions.contains(item.getPermissionNode())) && item.inWorld(world) && ((probable != null && item.getConfigName().equals(probable.getConfigName())) || item.getProbability() == -1)) {
                         if (item.getPermissionNode() != null) {
                             customPermissions.add(item.getPermissionNode());
@@ -518,12 +512,10 @@ public class ChatExecutor implements CommandExecutor {
      * @param args   - The player name having their data purged.
      */
     private void purge(final CommandSender sender, final String table, final String args) {
-        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-        placeHolders[1] = args;
-        placeHolders[10] = table;
+        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.TARGET_PLAYER, args).with(Holder.PURGE_DATA, table);
         OfflinePlayer foundPlayer = null;
         if (!table.equalsIgnoreCase("Database")) {
-            placeHolders[9] = "/ij purge " + table + (table.equalsIgnoreCase("map-ids") ? " <image>" : " <player>");
+            placeHolders.with(Holder.COMMAND, "/ij purge " + table + (table.equalsIgnoreCase("map-ids") ? " <image>" : " <player>"));
             if (!table.equalsIgnoreCase("map-ids")) {
                 foundPlayer = LegacyAPI.getOfflinePlayer(args);
             }
@@ -532,7 +524,7 @@ public class ChatExecutor implements CommandExecutor {
                 return;
             }
         } else {
-            placeHolders[9] = "/ij purge";
+            placeHolders.with(Holder.COMMAND, "/ij purge");
         }
         if (this.confirmationRequests.get(table + sender.getName()) != null && this.confirmationRequests.get(table + sender.getName()).equals(true)) {
             if (!table.equalsIgnoreCase("Database")) {
@@ -583,21 +575,19 @@ public class ChatExecutor implements CommandExecutor {
      * @param arguments - The max length of arguments in the command line.
      */
     private void enable(final CommandSender sender, final String player, final String world, final int arguments) {
-        Player argsPlayer = (arguments >= 2 ? PlayerHandler.getPlayerString(player) : null);
-        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-        placeHolders[1] = (arguments >= 2 ? player : sender.getName());
-        placeHolders[0] = world;
+        final Player argsPlayer = (arguments >= 2 ? PlayerHandler.getPlayerString(player) : null);
+        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.TARGET_PLAYER, (arguments >= 2 ? player : sender.getName())).with(Holder.WORLD, world);
         if (arguments >= 2 && argsPlayer == null) {
             ItemJoin.getCore().getLang().sendLangMessage("commands.default.noTarget", sender, placeHolders);
             return;
         }
-        DataObject dataObject = (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, "ALL", String.valueOf(true)));
+        final DataObject dataObject = (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, "ALL", String.valueOf(true)));
         if (dataObject == null || Boolean.valueOf(dataObject.getEnabled()).equals(false)) {
             ItemJoin.getCore().getSQL().removeData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, "ALL", String.valueOf(false)));
             ItemJoin.getCore().getSQL().saveData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, "ALL", String.valueOf(true)));
             ItemJoin.getCore().getLang().sendLangMessage("commands.enabled." + (arguments == 3 ? "forPlayerWorld" : (arguments == 2 ? "forPlayer" : "globalPlayers")), sender, placeHolders);
             if (arguments >= 2 && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
-                placeHolders[1] = sender.getName();
+                placeHolders.with(Holder.TARGET_PLAYER, sender.getName());
                 ItemJoin.getCore().getLang().sendLangMessage("commands.enabled." + (arguments == 3 ? "forTargetWorld" : "forTarget"), argsPlayer, placeHolders);
             }
         } else {
@@ -614,21 +604,19 @@ public class ChatExecutor implements CommandExecutor {
      * @param arguments - The max length of arguments in the command line.
      */
     private void disable(final CommandSender sender, final String player, final String world, final int arguments) {
-        Player argsPlayer = (arguments >= 2 ? PlayerHandler.getPlayerString(player) : null);
-        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-        placeHolders[1] = (arguments >= 2 ? player : sender.getName());
-        placeHolders[0] = world;
+        final Player argsPlayer = (arguments >= 2 ? PlayerHandler.getPlayerString(player) : null);
+        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.TARGET_PLAYER, (arguments >= 2 ? player : sender.getName())).with(Holder.WORLD, world);
         if (arguments >= 2 && argsPlayer == null) {
             ItemJoin.getCore().getLang().sendLangMessage("commands.default.noTarget", sender, placeHolders);
             return;
         }
-        DataObject dataObject = (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, "ALL", String.valueOf(false)));
+        final DataObject dataObject = (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, "ALL", String.valueOf(false)));
         if (dataObject == null || Boolean.valueOf(dataObject.getEnabled()).equals(true)) {
             ItemJoin.getCore().getSQL().removeData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, "ALL", String.valueOf(true)));
             ItemJoin.getCore().getSQL().saveData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, "ALL", String.valueOf(false)));
             ItemJoin.getCore().getLang().sendLangMessage("commands.disabled." + (arguments == 3 ? "forPlayerWorld" : (arguments == 2 ? "forPlayer" : "globalPlayers")), sender, placeHolders);
             if (arguments >= 2 && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
-                placeHolders[1] = sender.getName();
+                placeHolders.with(Holder.TARGET_PLAYER, sender.getName());
                 ItemJoin.getCore().getLang().sendLangMessage("commands.disabled." + (arguments == 3 ? "forTargetWorld" : "forTarget"), argsPlayer, placeHolders);
             }
         } else {
@@ -645,9 +633,7 @@ public class ChatExecutor implements CommandExecutor {
      */
     private void handleItems(final CommandSender sender, final String[] args, final boolean remove) {
         Player argsPlayer = (args.length >= 3 ? PlayerHandler.getPlayerString(args[2]) : (Player) sender);
-        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-        placeHolders[1] = (args.length >= 3 && argsPlayer != null ? argsPlayer.getName() : (args.length >= 3 ? args[2] : sender.getName()));
-        placeHolders[3] = args[1];
+        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.TARGET_PLAYER, (args.length >= 3 && argsPlayer != null ? argsPlayer.getName() : (args.length >= 3 ? args[2] : sender.getName()))).with(Holder.ITEM, args[1]);
         int amount = (((args.length >= 3 && argsPlayer == null) || (args.length > 3)) && StringUtils.isInt(args[args.length - 1]) ? Integer.parseInt(args[args.length - 1]) : 0);
         if (args.length >= 3 && !StringUtils.isInt(args[2]) && argsPlayer == null) {
             ItemJoin.getCore().getLang().sendLangMessage("commands.default.noTarget", sender, placeHolders);
@@ -656,13 +642,13 @@ public class ChatExecutor implements CommandExecutor {
             argsPlayer = (Player) sender;
         }
         boolean messageSent = false;
-        ItemMap itemMapExist = ItemUtilities.getUtilities().getItemMap(args[1]);
+        final ItemMap itemMapExist = ItemUtilities.getUtilities().getItemMap(args[1]);
         if (itemMapExist == null) {
             ItemJoin.getCore().getLang().sendLangMessage("commands.item.noItem", sender, placeHolders);
             return;
         }
         final Map<String, Integer> arbitraryMap = new HashMap<>();
-        for (ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
+        for (final ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
             if (itemMap.getConfigName().equalsIgnoreCase(args[1]) && (!arbitraryMap.containsKey(itemMap.getConfigName()) || arbitraryMap.get(itemMap.getConfigName()) != 0) && argsPlayer != null) {
                 if (itemMap.getSlot().equalsIgnoreCase("ARBITRARY") && !arbitraryMap.containsKey(itemMap.getConfigName())) {
                     int arbitrary = ItemUtilities.getUtilities().getArbitrary(itemMap);
@@ -676,7 +662,7 @@ public class ChatExecutor implements CommandExecutor {
                 }
                 final String customName = StringUtils.translateLayout(itemMap.getCustomName(), argsPlayer);
                 final boolean canGive = (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions", true, false) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer, false))));
-                placeHolders[3] = customName;
+                placeHolders.with(Holder.ITEM, customName);
                 if ((remove && itemMap.hasItem(argsPlayer, true)) || (canGive && ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap))) {
                     if (remove || !itemMap.isCMDPermissionNeeded() || itemMap.hasPermission(argsPlayer, argsPlayer.getWorld())) {
                         if (itemMap.isAlwaysGive() && !StringUtils.isInt(args[args.length - 1])) {
@@ -697,13 +683,12 @@ public class ChatExecutor implements CommandExecutor {
                                 arbitraryMap.put(itemMap.getConfigName(), arbitraryCount);
                             }
                         }
-                        placeHolders[11] = Integer.toString((amount == 0 ? 1 : amount));
-                        placeHolders[1] = sender.getName();
+                        placeHolders.with(Holder.TARGET_PLAYER, sender.getName()).with(Holder.AMOUNT, Integer.toString((amount == 0 ? 1 : amount)));
                         if (!messageSent) {
                             ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.removedYou" : "get.givenYou"), argsPlayer, placeHolders);
                         }
                         if (!messageSent && (args.length >= 3 && !StringUtils.isInt(args[2]) && !sender.getName().equalsIgnoreCase(argsPlayer.getName()))) {
-                            placeHolders[1] = argsPlayer.getName();
+                            placeHolders.with(Holder.TARGET_PLAYER, argsPlayer.getName());
                             ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.removedTarget" : "get.givenTarget"), sender, placeHolders);
                         }
                         PlayerHandler.quickCraftSave(argsPlayer);
@@ -711,25 +696,25 @@ public class ChatExecutor implements CommandExecutor {
                         ItemJoin.getCore().getLang().sendLangMessage("commands.get." + (args.length >= 3 && !StringUtils.isInt(args[2]) && !sender.getName().equalsIgnoreCase(argsPlayer.getName()) ? "targetNoPermission" : "noPermission"), sender, placeHolders);
                     }
                 } else if (!messageSent && (args.length >= 3 && !StringUtils.isInt(args[2]) && !sender.getName().equalsIgnoreCase(argsPlayer.getName()))) {
-                    placeHolders[1] = sender.getName();
+                    placeHolders.with(Holder.TARGET_PLAYER, sender.getName());
                     if (canGive) {
-                        placeHolders[7] = String.valueOf(1);
+                        placeHolders.with(Holder.FAIL_COUNT, String.valueOf(1));
                         if (argsPlayer.getInventory().firstEmpty() == -1) {
                             ItemJoin.getCore().getLang().sendLangMessage("general.failedInventory", argsPlayer, placeHolders);
                         } else {
                             ItemJoin.getCore().getLang().sendLangMessage("general.failedOverwrite", argsPlayer, placeHolders);
                         }
-                        placeHolders[1] = argsPlayer.getName();
+                        placeHolders.with(Holder.TARGET_PLAYER, argsPlayer.getName());
                         ItemJoin.getCore().getLang().sendLangMessage("commands.get.targetNoPermission", sender, placeHolders);
                     } else {
                         ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.targetTriedRemoval" : "get.targetTriedGive"), argsPlayer, placeHolders);
-                        placeHolders[1] = argsPlayer.getName();
+                        placeHolders.with(Holder.TARGET_PLAYER, argsPlayer.getName());
                         ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.targetFailedInventory" : "get.targetFailedInventory"), sender, placeHolders);
                     }
                 } else if (!messageSent) {
-                    placeHolders[1] = sender.getName();
+                    placeHolders.with(Holder.TARGET_PLAYER, sender.getName());
                     if (canGive) {
-                        placeHolders[7] = String.valueOf(1);
+                        placeHolders.with(Holder.FAIL_COUNT, String.valueOf(1));
                         if (argsPlayer.getInventory().firstEmpty() == -1) {
                             ItemJoin.getCore().getLang().sendLangMessage("general.failedInventory", argsPlayer, placeHolders);
                         } else {
@@ -754,22 +739,19 @@ public class ChatExecutor implements CommandExecutor {
      * @param remove - If the item is expected to be removed.
      */
     private void handleOnline(final CommandSender sender, final String[] args, final boolean remove) {
-        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-        placeHolders[3] = args[1];
-        List<String> handledPlayers = new ArrayList<>();
-        List<String> failedPlayers = new ArrayList<>();
-        int amount = (args.length == 3 ? Integer.parseInt(args[2]) : 0);
+        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.ITEM, args[1]);
+        final List<String> handledPlayers = new ArrayList<>();
+        final List<String> failedPlayers = new ArrayList<>();
+        final int amount = (args.length == 3 ? Integer.parseInt(args[2]) : 0);
         PlayerHandler.forOnlinePlayers(argsPlayer -> {
             boolean messageSent = false;
-            ItemMap itemMapExist = ItemUtilities.getUtilities().getItemMap(args[1]);
+            final ItemMap itemMapExist = ItemUtilities.getUtilities().getItemMap(args[1]);
             if (itemMapExist == null) {
                 ItemJoin.getCore().getLang().sendLangMessage("commands.item.noItem", sender, placeHolders);
                 return;
             }
-            placeHolders[3] = StringUtils.translateLayout(itemMapExist.getCustomName(), argsPlayer);
-            placeHolders[1] = sender.getName();
-            placeHolders[11] = (amount == 0 ? "&lAll" : Integer.toString(amount));
-            for (ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
+            placeHolders.with(Holder.ITEM, StringUtils.translateLayout(itemMapExist.getCustomName(), argsPlayer)).with(Holder.TARGET_PLAYER, sender.getName()).with(Holder.AMOUNT, amount == 0 ? "&lAll" : Integer.toString(amount));
+            for (final ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
                 if (itemMap.getConfigName().equalsIgnoreCase(args[1])) {
                     if (remove || !itemMap.isCMDPermissionNeeded() || itemMap.hasPermission(argsPlayer, argsPlayer.getWorld())) {
                         final boolean canGive = (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions", true, false) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer, false))));
@@ -795,7 +777,7 @@ public class ChatExecutor implements CommandExecutor {
                         } else if (!messageSent) {
                             if (!sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
                                 if (canGive) {
-                                    placeHolders[7] = String.valueOf(1);
+                                    placeHolders.with(Holder.FAIL_COUNT, String.valueOf(1));
                                     if (argsPlayer.getInventory().firstEmpty() == -1) {
                                         ItemJoin.getCore().getLang().sendLangMessage("general.failedInventory", argsPlayer, placeHolders);
                                     } else {
@@ -816,7 +798,7 @@ public class ChatExecutor implements CommandExecutor {
                 }
             }
         });
-        placeHolders[12] = handledPlayers.toString().replace("]", "").replace("[", "");
+        placeHolders.with(Holder.PLAYERS, handledPlayers.toString().replace("]", "").replace("[", ""));
         if (!handledPlayers.isEmpty()) {
             ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.removedOnline" : "get.givenOnline"), sender, placeHolders);
         } else if (!failedPlayers.isEmpty()) {
@@ -832,9 +814,8 @@ public class ChatExecutor implements CommandExecutor {
      * @param remove - If the item is expected to be removed.
      */
     private void handleAllItems(final CommandSender sender, final String[] args, final boolean remove) {
-        Player argsPlayer = (args.length >= 2 ? PlayerHandler.getPlayerString(args[1]) : (Player) sender);
-        String[] placeHolders = ItemJoin.getCore().getLang().newString();
-        placeHolders[1] = (args.length >= 2 ? args[1] : sender.getName());
+        final Player argsPlayer = (args.length >= 2 ? PlayerHandler.getPlayerString(args[1]) : (Player) sender);
+        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.TARGET_PLAYER, (args.length >= 2 ? args[1] : sender.getName()));
         if (argsPlayer == null) {
             ItemJoin.getCore().getLang().sendLangMessage("commands.default.noTarget", sender, placeHolders);
             return;
@@ -896,33 +877,33 @@ public class ChatExecutor implements CommandExecutor {
         }
         if (itemGiven && failedCount == 0) {
             failedPermissions = false;
-            placeHolders[1] = sender.getName();
+            placeHolders.with(Holder.TARGET_PLAYER, sender.getName());
             ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.removedYou_All" : "get.givenYou_All"), argsPlayer, placeHolders);
             if (!sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
-                placeHolders[1] = argsPlayer.getName();
+                placeHolders.with(Holder.TARGET_PLAYER, argsPlayer.getName());
                 ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.removedTarget_All" : "get.givenTarget_All"), sender, placeHolders);
             }
         } else if (!failedPermissions && failedCount == 0) {
-            placeHolders[1] = argsPlayer.getName();
+            placeHolders.with(Holder.TARGET_PLAYER, argsPlayer.getName());
             ItemJoin.getCore().getLang().sendLangMessage("commands." + (!sender.getName().equalsIgnoreCase(argsPlayer.getName()) ? (remove ? "remove.targetFailedInventory_All" : "get.targetFailedInventory_All") : (remove ? "remove.failedInventory_All" : "get.failedInventory_All")), sender, placeHolders);
             if (!sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
-                placeHolders[1] = sender.getName();
+                placeHolders.with(Holder.TARGET_PLAYER, sender.getName());
                 ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.targetTriedRemoval_All" : "get.targetFailedInventory_All"), argsPlayer, placeHolders);
             }
         } else if (failedCount > 0) {
-            placeHolders[7] = String.valueOf(failedCount);
+            placeHolders.with(Holder.FAIL_COUNT, String.valueOf(failedCount));
             if (argsPlayer.getInventory().firstEmpty() == -1) {
                 ItemJoin.getCore().getLang().sendLangMessage("general.failedInventory", argsPlayer, placeHolders);
             } else {
                 ItemJoin.getCore().getLang().sendLangMessage("general.failedOverwrite", argsPlayer, placeHolders);
             }
             if (!sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
-                placeHolders[1] = argsPlayer.getName();
+                placeHolders.with(Holder.TARGET_PLAYER, argsPlayer.getName());
                 ItemJoin.getCore().getLang().sendLangMessage("commands.get.targetNoPermission_All", sender, placeHolders);
             }
         }
         if (failedPermissions) {
-            placeHolders[1] = argsPlayer.getName();
+            placeHolders.with(Holder.TARGET_PLAYER, argsPlayer.getName());
             ItemJoin.getCore().getLang().sendLangMessage("commands.get." + (!sender.getName().equalsIgnoreCase(argsPlayer.getName()) ? "targetNoPermission_All" : "noPermission_All"), sender, placeHolders);
         }
     }
