@@ -4860,6 +4860,14 @@ public class Menu {
                 itemMap.setSelfDroppable(!itemMap.isSelfDroppable());
                 flagPane(player, itemMap);
             }));
+            flagPane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_13") ? "FLINT_AND_STEEL" : "259", 1, itemMap.isEraseDroppable(), false, "&a&l&nErase Drops", "&7",
+                    "&a&lTrue&f: &7Deletes the item if it is", "&7dropped by the player.", "&7",
+                    "&c&lFalse&f: &7Allows the item to be dropped.", "&7",
+                    "&e&nNote: &eThis is similar to self-drops", "&eand death-drops, but instead the", "&eitem is entirely deleted.", "&7",
+                    "&9&lENABLED: &a" + (itemMap.isEraseDroppable() + "").toUpperCase()), event -> {
+                itemMap.setEraseDroppable(!itemMap.isEraseDroppable());
+                flagPane(player, itemMap);
+            }));
             flagPane.addButton(new Button(ItemHandler.getItem("FURNACE", 1, itemMap.isItemModify(), false, "&a&l&nItem Modifiable", "&7",
                     "&a&lTrue&f: &7Blocks the item from being", "&7repaired or enchanted in-game.", "&7",
                     "&c&lFalse&f: &7Allows items to", "&7be repaired and enchanted.", "&7",
@@ -4951,7 +4959,7 @@ public class Menu {
                 itemMap.setSplittable(!itemMap.isSplittable());
                 flagPane(player, itemMap);
             }));
-            flagPane.addButton(new Button(fillerPaneBItem), 30);
+            flagPane.addButton(new Button(fillerPaneBItem), 29);
         });
         flagPane.open(player);
     }
@@ -5046,6 +5054,9 @@ public class Menu {
         }
         if (itemMap.isSelfDroppable()) {
             itemflags += "SELF-DROPS, ";
+        }
+        if (itemMap.isEraseDroppable()) {
+            itemflags += "ERASE-DROPS, ";
         }
         if (itemMap.isDisposable()) {
             itemflags += "DISPOSABLE, ";

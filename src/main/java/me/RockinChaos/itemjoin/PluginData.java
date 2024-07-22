@@ -687,7 +687,7 @@ public class PluginData {
         if ((itemMap.isNotHat() || itemMap.isNoClear()) && StringUtils.isRegistered(Processes.class.getSimpleName())) {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Processes(), ItemJoin.getCore().getPlugin());
         }
-        if ((itemMap.isDeathKeepable() || itemMap.isDeathDroppable() || itemMap.isSelfDroppable()) && StringUtils.isRegistered(Drops.class.getSimpleName())) {
+        if ((itemMap.isDeathKeepable() || itemMap.isDeathDroppable() || itemMap.isSelfDroppable() || itemMap.isEraseDroppable()) && StringUtils.isRegistered(Drops.class.getSimpleName())) {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Drops(), ItemJoin.getCore().getPlugin());
         }
         if (itemMap.getCommands() != null && itemMap.getCommands().length != 0) {

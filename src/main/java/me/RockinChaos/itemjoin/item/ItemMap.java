@@ -199,6 +199,7 @@ public class ItemMap implements Cloneable {
     private boolean closeInventory = false;
     private boolean selfDroppable = false;
     private boolean deathDroppable = false;
+    private boolean eraseDroppable = false;
     private boolean deathKeepable = false;
     private boolean disposable = false;
     private boolean itemChangeable = false;
@@ -501,6 +502,7 @@ public class ItemMap implements Cloneable {
             this.deathKeepable = StringUtils.splitIgnoreCase(this.itemflags, "death-keep", ",");
             this.deathDroppable = StringUtils.splitIgnoreCase(this.itemflags, "death-drops", ",");
             this.selfDroppable = StringUtils.splitIgnoreCase(this.itemflags, "self-drops", ",");
+            this.eraseDroppable = StringUtils.splitIgnoreCase(this.itemflags, "erase-drops", ",");
 
             /* Shared with Triggers */
             this.setOnlyFirstJoin((StringUtils.splitIgnoreCase(this.itemflags, "first-join", ",") || this.onlyFirstJoin));
@@ -3714,6 +3716,24 @@ public class ItemMap implements Cloneable {
     }
 
     /**
+     * Checks if the Erase Droppable Flag is enabled.
+     *
+     * @return If it is enabled.
+     */
+    public boolean isEraseDroppable() {
+        return this.eraseDroppable;
+    }
+
+    /**
+     * Sets the Erase Droppable Flag.
+     *
+     * @param bool - The value to be set.
+     */
+    public void setEraseDroppable(final boolean bool) {
+        this.eraseDroppable = bool;
+    }
+
+    /**
      * Checks if the Death Droppable Flag is enabled.
      *
      * @return If it is enabled.
@@ -3854,6 +3874,8 @@ public class ItemMap implements Cloneable {
                 return cancelEvents;
             } else if (findFlag.equals("self-drops")) {
                 return selfDroppable;
+            } else if (findFlag.equals("erase-drops")) {
+                return eraseDroppable;
             } else if (findFlag.equals("death-drops")) {
                 return deathDroppable;
             } else if (findFlag.equals("death-keep")) {
