@@ -141,6 +141,11 @@
             <id>CraftationGaming-chaos</id>
             <url>https://repo.craftationgaming.com/chaos</url>
         </repository>
+        <!--bStats Repository-->
+        <repository>
+            <id>CodeMC</id>
+            <url>https://repo.codemc.org/repository/maven-public</url>
+        </repository>
     </repositories>
 
     <dependencies>
