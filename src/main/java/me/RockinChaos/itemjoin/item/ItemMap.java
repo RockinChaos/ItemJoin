@@ -5044,7 +5044,7 @@ public class ItemMap implements Cloneable {
      * @param slot      - The Slot of the ItemStack.
      */
     public void executeCommands(final Player player, final Player altPlayer, final ItemStack itemCopy, final String action, final String clickType, final String slot) {
-        if (this.commands != null && this.commands.length > 0 && !Menu.isOpen(player) && !this.getWarmPending(player) && this.isExecutable(player, action, clickType) && !this.onCooldown(player) && this.isPlayerChargeable(player, this.itemCost != null && !this.itemCost.isEmpty())) {
+        if (this.commands != null && this.commands.length > 0 && ItemJoin.getCore().getDependencies().isAuthenticated(player) && !Menu.isOpen(player) && !this.getWarmPending(player) && this.isExecutable(player, action, clickType) && !this.onCooldown(player) && this.isPlayerChargeable(player, this.itemCost != null && !this.itemCost.isEmpty())) {
             this.warmCycle(player, altPlayer, this, this.getWarmDelay(), player.getLocation(), itemCopy, action, clickType, slot);
         }
     }

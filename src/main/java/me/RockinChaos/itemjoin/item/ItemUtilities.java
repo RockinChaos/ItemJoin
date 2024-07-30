@@ -209,10 +209,7 @@ public class ItemUtilities {
                 @Override
                 public void run() {
                     try {
-                        final fr.xephi.authme.api.v3.AuthMeApi authMe = fr.xephi.authme.api.v3.AuthMeApi.getInstance();
-                        if (fr.xephi.authme.api.v3.AuthMeApi.getInstance().isAuthenticated(player)
-                                || (authMe.getPlugin().getConfig().getString("settings.registration.force") != null
-                                && !authMe.getPlugin().getConfig().getBoolean("settings.registration.force"))) {
+                        if (ItemJoin.getCore().getDependencies().isAuthenticated(player)) {
                             setItems(player, world, type, newMode, targetRegion, regions);
                             this.cancel();
                         } else if (!player.isOnline()) {
