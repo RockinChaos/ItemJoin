@@ -199,14 +199,14 @@ public class Drops implements Listener {
         if (!LegacyAPI.hasGameRule(player.getWorld(), "keepInventory")) {
             if (!bottomInventory.isEmpty()) {
                 for (int playerInventory = 0; playerInventory < bottomInventory.getSize(); playerInventory++) {
-                    this.handleDeathKeepItem(player, bottomInventory.getItem(playerInventory), playerInventory, "bottom_inventory");
+                    this.handleKeepItem(player, bottomInventory.getItem(playerInventory), playerInventory, "bottom_inventory");
                 }
             }
-            this.handleDeathKeepItem(player, helmetItem, -1, "helmet");
-            this.handleDeathKeepItem(player, chestItem, -1, "chest");
-            this.handleDeathKeepItem(player, legsItem, -1, "legs");
-            this.handleDeathKeepItem(player, bootsItem, -1, "boots");
-            this.handleDeathKeepItem(player, offHandItem, -1, "offhand");
+            this.handleKeepItem(player, helmetItem, -1, "helmet");
+            this.handleKeepItem(player, chestItem, -1, "chest");
+            this.handleKeepItem(player, legsItem, -1, "legs");
+            this.handleKeepItem(player, bootsItem, -1, "boots");
+            this.handleKeepItem(player, offHandItem, -1, "offhand");
             final List<ItemStack> drops = new ArrayList<>(event.getDrops());
             for (final ItemStack stack : drops) {
                 if (stack != null && (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops") || !ItemUtilities.getUtilities().isAllowed(player, stack, "erase-drops") || !ItemUtilities.getUtilities().isAllowed(player, stack, "death-keep"))) {
@@ -224,7 +224,7 @@ public class Drops implements Listener {
                     final AtomicInteger cycleTask = new AtomicInteger();
                     cycleTask.set(SchedulerUtils.runAsyncAtInterval(20L, 40L, () -> {
                         if (player.isOnline() && !player.isDead() && PlayerHandler.isCraftingInv(player)) {
-                            handleDeathKeepItem(player, stack, setSlot, "top_inventory");
+                            handleKeepItem(player, stack, setSlot, "top_inventory");
                             Bukkit.getServer().getScheduler().cancelTask(cycleTask.get());
                         }
                     }));
@@ -233,7 +233,15 @@ public class Drops implements Listener {
         }
     }
 
-    private void handleDeathKeepItem(final Player player, final ItemStack item, final int slot, final String itemType) {
+    /**
+     * Attempts to give back any death-keep custom items.
+     *
+     * @param player   - The Player being referenced.
+     * @param item     - The ItemStack to be kept.
+     * @param slot     - The slot to return the item.
+     * @param itemType - The type of item handling.
+     */
+    private void handleKeepItem(final Player player, final ItemStack item, final int slot, final String itemType) {
         if (item != null && !ItemUtilities.getUtilities().isAllowed(player, item, "death-keep")) {
             final ItemStack keepItem = item.clone();
             SchedulerUtils.run(() -> {
