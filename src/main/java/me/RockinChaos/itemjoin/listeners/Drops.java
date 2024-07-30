@@ -168,8 +168,6 @@ public class Drops implements Listener {
             if (!ItemUtilities.getUtilities().isAllowed(player, event.getCurrentItem(), "self-drops") || !ItemUtilities.getUtilities().isAllowed(player, event.getCurrentItem(), "erase-drops")) {
                 if (!ItemUtilities.getUtilities().isAllowed(player, event.getCurrentItem(), "self-drops")) {
                     event.setCancelled(true);
-                } else {
-
                 }
                 player.closeInventory();
                 PlayerHandler.updateInventory(player, 1L);
@@ -191,36 +189,27 @@ public class Drops implements Listener {
     private void onDeathDrops(PlayerDeathEvent event) {
         final Player player = event.getEntity();
         final Inventory topInventory = CompatUtils.getTopInventory(player);
+        final Inventory bottomInventory = CompatUtils.getBottomInventory(player);
+        final ItemStack helmetItem = player.getInventory().getHelmet();
+        final ItemStack chestItem = player.getInventory().getChestplate();
+        final ItemStack legsItem = player.getInventory().getLeggings();
+        final ItemStack bootsItem = player.getInventory().getBoots();
+        final ItemStack offHandItem = PlayerHandler.getOffHandItem(player);
         ItemUtilities.getUtilities().closeAnimations(player);
         if (!LegacyAPI.hasGameRule(player.getWorld(), "keepInventory")) {
+            if (!bottomInventory.isEmpty()) {
+                for (int playerInventory = 0; playerInventory < bottomInventory.getSize(); playerInventory++) {
+                    this.handleDeathKeepItem(player, bottomInventory.getItem(playerInventory), playerInventory, "bottom_inventory");
+                }
+            }
+            this.handleDeathKeepItem(player, helmetItem, -1, "helmet");
+            this.handleDeathKeepItem(player, chestItem, -1, "chest");
+            this.handleDeathKeepItem(player, legsItem, -1, "legs");
+            this.handleDeathKeepItem(player, bootsItem, -1, "boots");
+            this.handleDeathKeepItem(player, offHandItem, -1, "offhand");
             final List<ItemStack> drops = new ArrayList<>(event.getDrops());
             for (final ItemStack stack : drops) {
                 if (stack != null && (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops") || !ItemUtilities.getUtilities().isAllowed(player, stack, "erase-drops") || !ItemUtilities.getUtilities().isAllowed(player, stack, "death-keep"))) {
-                    if (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-keep")) {
-                        int slot = -1;
-                        final ItemStack keepItem = stack.clone();
-                        for (int inventory = 0; inventory < player.getInventory().getSize(); inventory++) {
-                            final ItemStack item = player.getInventory().getItem(inventory);
-                            final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
-                            if (itemMap != null && itemMap.isSimilar(player, stack)) {
-                                slot = inventory;
-                                break;
-                            }
-                        }
-                        final int setSlot = slot;
-                        final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(keepItem);
-                        SchedulerUtils.run(() -> {
-                            if (player.isOnline()) {
-                                if (setSlot == -1) {
-                                    player.getInventory().addItem(keepItem);
-                                } else {
-                                    player.getInventory().setItem(setSlot, keepItem);
-                                }
-                                itemMap.setAnimations(player);
-                                ServerUtils.logDebug("{Drops} " + player.getName() + " has triggered the DEATH-KEEP itemflag for " + ItemUtilities.getUtilities().getItemMap(keepItem).getConfigName() + ".");
-                            }
-                        });
-                    }
                     player.getInventory().remove(stack);
                     event.getDrops().remove(stack);
                 }
@@ -229,25 +218,54 @@ public class Drops implements Listener {
                 for (int craftInventory = 0; craftInventory < topInventory.getSize(); craftInventory++) {
                     final ItemStack stack = topInventory.getItem(craftInventory);
                     if (stack != null && (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops") || !ItemUtilities.getUtilities().isAllowed(player, stack, "erase-drops") || !ItemUtilities.getUtilities().isAllowed(player, stack, "death-keep"))) {
-                        if (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-keep")) {
-                            final ItemStack keepItem = stack.clone();
-                            final int setSlot = craftInventory;
-                            final AtomicInteger cycleTask = new AtomicInteger();
-                            cycleTask.set(SchedulerUtils.runAsyncAtInterval(20L, 40L, () -> {
-                                if (player.isOnline() && !player.isDead() && PlayerHandler.isCraftingInv(player)) {
-                                    SchedulerUtils.run(() -> {
-                                        final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(keepItem);
-                                        CompatUtils.getTopInventory(player).setItem(setSlot, keepItem);
-                                        itemMap.setAnimations(player);
-                                    });
-                                    Bukkit.getServer().getScheduler().cancelTask(cycleTask.get());
-                                }
-                            }));
-                        }
                         topInventory.remove(stack);
                     }
+                    final int setSlot = craftInventory;
+                    final AtomicInteger cycleTask = new AtomicInteger();
+                    cycleTask.set(SchedulerUtils.runAsyncAtInterval(20L, 40L, () -> {
+                        if (player.isOnline() && !player.isDead() && PlayerHandler.isCraftingInv(player)) {
+                            handleDeathKeepItem(player, stack, setSlot, "top_inventory");
+                            Bukkit.getServer().getScheduler().cancelTask(cycleTask.get());
+                        }
+                    }));
                 }
             }
+        }
+    }
+
+    private void handleDeathKeepItem(final Player player, final ItemStack item, final int slot, final String itemType) {
+        if (item != null && !ItemUtilities.getUtilities().isAllowed(player, item, "death-keep")) {
+            final ItemStack keepItem = item.clone();
+            SchedulerUtils.run(() -> {
+                if (player.isOnline()) {
+                    final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(keepItem);
+                    switch (itemType) {
+                        case "helmet":
+                            player.getInventory().setHelmet(keepItem);
+                            break;
+                        case "chest":
+                            player.getInventory().setChestplate(keepItem);
+                            break;
+                        case "legs":
+                            player.getInventory().setLeggings(keepItem);
+                            break;
+                        case "boots":
+                            player.getInventory().setBoots(keepItem);
+                            break;
+                        case "offhand":
+                            player.getInventory().setItemInOffHand(keepItem);
+                            break;
+                        case "bottom_inventory":
+                            CompatUtils.getBottomInventory(player).setItem(slot, keepItem);
+                            break;
+                        case "top_inventory":
+                            CompatUtils.getTopInventory(player).setItem(slot, keepItem);
+                            break;
+                    }
+                    itemMap.setAnimations(player);
+                    ServerUtils.logDebug("{Drops} " + player.getName() + " has triggered the DEATH-KEEP itemflag for " + itemMap.getConfigName() + ".");
+                }
+            });
         }
     }
 
