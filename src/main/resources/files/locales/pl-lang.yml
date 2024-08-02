@@ -1,0 +1,130 @@
+# --{ =-=-=-=-=-=-=-=-=-= ItemJoin's Polish Language file, by Corelio =-=-=-=-=-=-=-=-=-= }--
+# If you don't want a message to be sent, fully remove it from below or make it blank.
+
+# Modifying this will cause the file to break and regenerate.
+en-Version: 8
+
+# This is the prefix that will be sent at the beginning of every single message sent in the language file.
+Prefix: '&7[&eItemJoin&7]'
+
+# These are simply general messages sent from the plugin item usages.
+general:
+  failedOverwrite: '%prefix% &cNie udało się dać Ci &4%fail_count% &cprzedmiotów, nie masz pozwolenia na nadpisywanie przedmiotów!'
+  failedInventory: '%prefix% &cNie udało się dać Ci &4%fail_count% &cprzedmiotów, Twój ekwipunek jest pełny!'
+  econSuccess: '%prefix% &aPomyślnie wykonano polecenie za &e$%cost%&a.'
+  econFailed: '%prefix% &cNie masz wystarczającej ilości pieniędzy, aby wykonać to polecenie! \n%prefix% &cMasz &4$%balance% &cz wymaganych &4$%cost%.'
+  itemSuccess: '%prefix% &aPomyślnie wykonano polecenie za &e%cost% %item_type%(ów)&a.'
+  itemFailed: '%prefix% &cNie masz wystarczającej ilości &4%item_type%&c, aby wykonać to polecenie! \n%prefix% &cMasz &4%balance% &cz wymaganych &4%cost% %item_type%(ów)&c.'
+  warmingUp: '%prefix% &aPrzedmiot [%item%&a] jest w trakcie rozgrzewania...'
+  warmingTime: '%prefix% &aRozpoczęcie wykonania [%item%&a] za &2%time_left%&a sekund.'
+  warmingHalted: '%prefix% &cRozpoczęcie wykonania &4[&c%item%&4] &czostało anulowane!'
+
+# These messages are specific to the plugin commands.
+commands:
+  default:
+    unknownCommand: '%prefix% &cNieznana komenda, zobacz &l/ItemJoin Help &cpo liste komend.'
+    noPermission: '%prefix% &cNie masz permisji do użycia tej komendy!'
+    configReload: '%prefix% &aKonfiguracja przeładowana!'
+    noPlayer: '%prefix% &cMusisz być graczem by użyć tej komendy!'
+    noTarget: '%prefix% &cGracz &c%target_player% &cnie może zostać znaleziony!'
+  menu:
+    openMenu: '%prefix% &aOtwarto menu.'
+    itemSaved: '%prefix% &e%item% &azostał zapisany.'
+    itemRemoved: '%prefix% &e%item% &czostał usunięty.'
+    noInteger: '%prefix% &c&l&nBŁĄD:&c Wartość wejściowa &4%input% &cnie jest liczbą całkowitą!'
+    noMaterial: '%prefix% &c&l&nBŁĄD:&c Wartość wejściowa &4%input% &cnie jest poprawnym materiałem!'
+    inputType: '%prefix% &aWpisz &e%input% &aktóry chcesz mieć na swoim przedmiocie.'
+    inputSet: '%prefix% &aPrzedmioty &e%input% &azostały pomyślnie ustawione!'
+    inputExample: '%prefix% &aPrzykład: %input_example%'
+
+  item:
+    noItemHeld: '%prefix% &cNie trzymasz itemu w ręce!'
+    noItem: '%prefix% &cNieznaleziono &b%item%&c!'
+    badCommand: '%prefix% &cNie jesteś uprawniony do użycia komendy &4&l%command%&c na tym przedmiocie!'
+  info:
+    material: '&aID przedmiotu (Typ materiału): &e&l%item%'
+    data: '&aWartość przedmiotu (Typ danych): &e&l%item%'
+  query:
+    node: '&aNode: &e&l%item%'
+    material: '&aMateriał: &e&l%item_type%'
+    slot: '&aSlot: &e&l%item_slot%'
+    permission: '&aUprawnienia: %item_permission%'
+    badSyntax: '%prefix% &cZłe użycie! Spróbuj: /itemjoin query <NazwaPrzedmiotu>!'
+  list:
+    worldHeader: '&a&l%world%:'
+    itemRow: '&a&l   &a%item%'
+    noItems: '&c&l   &cNie ma zdefiniowanych przedmiotów dla tego świata.'
+  world:
+    worldFound: '&aZnalezione światy:'
+    worldHeader: '&aJesteś w świecie:'
+    worldRow: '&e- %world%'
+  updates:
+    checkRequest: '%prefix% &4%player% zażądał sprawdzenia aktualizacji!'
+    updateRequest: '%prefix% &4%player% zażądał wymuszenia aktualizacji!'
+  get:
+    givenYou: '%prefix% &aDostałeś &b%amount%x &7[&e%item%&7]&a.'
+    givenYou_All: '%prefix% &aDostałeś &bwszystkie przedmioty&a.'
+    givenTarget: '%prefix% &aDałeś %target_player% &b%amount%x &7[&e%item%&7]&a.'
+    givenTarget_All: '%prefix% &aDałeś %target_player% &bwszystkie przedmioty&a.'
+    givenOnline: '%prefix% &aDałeś &b%amount%x &7[&b%item%&7]&a graczom: &e%players%&c.'
+    targetTriedGive: '%prefix% &4%target_player% &cpróbował dać &7[&b%item%&7]&c ale masz już to w ekwipunku!'
+    targetTriedGive_All: '%prefix% &4%target_player% &cpróbował dać ci &bwszystkie przedmioty &cale są już w twoim ekwipunku!'
+    failedInventory: '%prefix% &cMasz już przedmiot &7[&b%item%&7]&c!'
+    failedInventory_All: '%prefix% &cMasz już &bwszystkie przedmioty&c!'
+    targetFailedInventory: '%prefix% &4%target_player% &cma już &7[&b%item%&7]&c!'
+    targetFailedInventory_All: '%prefix% &4%target_player% &cma już &bwszystkie przedmioty&c!'
+    onlineFailedInventory: '%prefix% &4Wszyscy gracze online &cma już &7[&b%item%&7]&c!'
+    targetNoPermission: '%prefix% &4%target_player% &cnie ma uprawnień do uzyskania &7[&b%item%&7]&c.'
+    targetNoPermission_All: '%prefix% &4%target_player% &cnie ma wszystkich uprawnień, &lnie &bwszystkie przedmioty &czostały dane.'
+    noPermission: '%prefix% &cNie masz potrzebnych uprawnień do &7[&b%item%&7]&c.'
+    noPermission_All: '%prefix% &cNie masz potrzebnych uprawnień, &lnie &bwszystkie przedmioty &czostały dane.'
+    usageSyntax: '%prefix% &cUżyj /ItemJoin get <itemname> <player> jako konsola.'
+    badSyntax: '%prefix% &cZłe użycie! Spróbuj: /itemjoin get <itemname> &llub &c/itemjoin get <itemname> <amount>!'
+    badOnlineSyntax: '%prefix% &cZłe użycie! Spróbuj: /itemjoin getOnline <itemname> &llub &c/itemjoin getOnline <itemname> <amount>!'
+  remove:
+    removedYou: '%prefix% &b%amount%x &7[&e%item%&7]&c zostało usunięte z Twojego ekwipunku.'
+    removedYou_All: '%prefix% &bWszystkie przedmioty &azostały usunięte z Twojego ekwipunku.'
+    removedTarget: '%prefix% &cUsunąłeś &b%amount%x &7[&e%item%&7]&c od &4%target_player%&c.'
+    removedTarget_All: '%prefix% &aUsunąłeś &bwszystkie przedmioty &az ekwipunku &b%target_player%&a.'
+    removedOnline: '%prefix% &cUsunąłeś przedmiot &b%amount%x &7[&b%item%&7]&c od graczy &4%players%&c.'
+    targetTriedRemoval: '%prefix% &4%target_player% &cpróbował usunąć &7[&b%item%&7]&c, ale nie istnieje on w Twoim ekwipunku!'
+    targetTriedRemoval_All: '%prefix% &4%target_player% &cpróbował usunąć &bw wszystkie przedmioty &c, ale nie masz żadnych w swoim ekwipunku!'
+    failedInventory: '%prefix% &cPrzedmiot &7[&e%item%&7] &cnie istnieje w Twoim ekwipunku!'
+    failedInventory_All: '%prefix% &cŻadne zdefiniowane przedmioty &cnie istnieją w Twoim ekwipunku!'
+    targetFailedInventory: '%prefix% &cPrzedmiot &7[&e%item%&7] &cnie istnieje w ekwipunku &4%target_player%&c!'
+    targetFailedInventory_All: '%prefix% &bŻadne zdefiniowane przedmioty &cnie istnieją w ekwipunku &4%target_player%&c!'
+    onlineFailedInventory: '%prefix% &cPrzedmiot &b%item% &cnie istnieje w ekwipunkach żadnego z &4aktywnych graczy&c.'
+    usageSyntax: '%prefix% &cSpróbuj /ItemJoin remove <itemname> <player> jako konsola.'
+    badSyntax: '%prefix% &cNiepoprawne użycie! Spróbuj: /itemjoin remove <itemname>!'
+    badOnlineSyntax: '%prefix% &cNiepoprawne użycie! Spróbuj: /itemjoin removeOnline <itemname>!'
+  database:
+    purgeWarn: '%prefix% &aCzyszczenie bazy danych usunie &cWSZYSTKIE &adane %purge_data% dla &b%target_player%&a.'
+    purgeSuccess: '%prefix% &aWyczyściłeś plik bazy danych z danych %purge_data% dla &b%target_player%&a!'
+    purgeConfirm: '%prefix% &aMasz 5 sekund, aby ponownie wpisać &e%command% &aaby potwierdzić chęć wyczyszczenia bazy danych.'
+    purgeTimeOut: '%prefix% &cNie potwierdziłeś czyszczenia bazy danych w ciągu &b5 sekund&c, czyszczenie zostało anulowane!'
+  enabled:
+    forPlayer: '%prefix% &aWłączyłeś &ewszystkie przedmioty &adla &e%target_player%&a.'
+    forTarget: '%prefix% &a%player% włączył &ewszystkie przedmioty &adla Ciebie.'
+    forPlayerFailed: '%prefix% &cPrzedmioty zostały już &ewłączone &cdla &e%player%&c.'
+    forPlayerWorld: '%prefix% &aWłączyłeś &7[&e%world%&7] przedmioty &adla &e%player%&a.'
+    forTargetWorld: '%prefix% &a%player% włączył &7[&e%world%&7] przedmioty dla Ciebie.'
+    forPlayerWorldFailed: '%prefix% &cJuż włączyłeś &7[&e%world%&7] przedmioty &cdla &e%player%&c.'
+    globalPlayers: '%prefix% &aWłączyłeś &ewszystkie przedmioty &adla &ews wszystkich graczy&a.'
+    globalPlayersFailed: '%prefix% &cPrzedmioty zostały już &ewłączone &cdla &ews wszystkich graczy&c.'
+    toggleEnable: '%prefix% &aWłączyłeś przedmiot &b%item%&a i teraz będzie on rozdawany.'
+    togglePlayerFailed: '%prefix% &cNie możesz włączyć przedmiotu %item%, ponieważ wszystkie przedmioty są wyłączone dla Ciebie globalnie!'
+  disabled:
+    forPlayer: '%prefix% &aWyłączyłeś &ewszystkie przedmioty &adla &e%player%&a.'
+    forTarget: '%prefix% &a%player% wyłączył &ewszystkie przedmioty &adla Ciebie.'
+    forPlayerFailed: '%prefix% &cPrzedmioty zostały już &ewyłączone &cdla &e%player%&c.'
+    forPlayerWorld: '%prefix% &aWyłączyłeś &7[&e%world%&7] przedmioty &adla &e%player%&a.'
+    forTargetWorld: '%prefix% &a%player% wyłączył &7[&e%world%&7] przedmioty dla Ciebie.'
+    forPlayerWorldFailed: '%prefix% &cJuż wyłączyłeś &7[&e%world%&7] przedmioty &cdla &e%player%&c.'
+    globalPlayers: '%prefix% &aWyłączyłeś &ewszystkie przedmioty &adla &ewszystkich graczy&a.'
+    globalPlayersFailed: '%prefix% &cPrzedmioty zostały już &ewyłączone &cdla &ewszystkich graczy&c.'
+    toggleDisable: '&cWyłączyłeś przedmiot &b%item%&c i nie będzie on już rozdawany.'
+    togglePlayerFailed: '%prefix% &cNie możesz wyłączyć przedmiotu %item%, ponieważ wszystkie przedmioty są wyłączone dla Ciebie globalnie!'
+
+# These placeholders are specific to the plugin messages.
+placeholders:
+  PLAYER_INTERACT: 'Unknown'
