@@ -535,7 +535,7 @@ public class ItemCommand {
                         player.setOp(true);
                         final PlaceHolder placeHolders = new PlaceHolder().with(Holder.PLAYER_HIT, (altPlayer != null ? altPlayer.getName() : "")).with(Holder.TARGET_PLAYER, (altPlayer != null ? altPlayer.getName() : ""));
                         PluginData.getInfo().setLoggable("/" + StringUtils.translateLayout(this.command, player, placeHolders));
-                        player.chat("/" + StringUtils.translateLayout(this.command, player, placeHolders));
+                        Bukkit.getServer().dispatchCommand(player, StringUtils.translateLayout(this.command, player, placeHolders));
                     } catch (Exception e) {
                         ServerUtils.sendDebugTrace(e);
                         player.setOp(false);
@@ -566,7 +566,7 @@ public class ItemCommand {
             } else {
                 final PlaceHolder placeHolders = new PlaceHolder().with(Holder.PLAYER_HIT, (altPlayer != null ? altPlayer.getName() : "")).with(Holder.TARGET_PLAYER, (altPlayer != null ? altPlayer.getName() : ""));
                 PluginData.getInfo().setLoggable("/" + StringUtils.translateLayout(this.command, player, placeHolders));
-                player.chat("/" + StringUtils.translateLayout(this.command, player, placeHolders));
+                Bukkit.getServer().dispatchCommand(player, StringUtils.translateLayout(this.command, player, placeHolders));
             }
         } catch (Exception e) {
             ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command as a player, if this continues report it to the developer.");
