@@ -32,6 +32,7 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.item.ItemCommand.Action;
 import me.RockinChaos.itemjoin.item.ItemCommand.CommandSequence;
+import me.RockinChaos.itemjoin.listeners.Interact;
 import me.RockinChaos.itemjoin.utils.api.EffectAPI;
 import me.RockinChaos.itemjoin.utils.menus.Menu;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
@@ -4924,6 +4925,15 @@ public class ItemMap implements Cloneable {
         } else {
             this.executeCommands(player, null, this.tempItem, "ON_RECEIVE", "RECEIVED", this.getSlot());
         }
+        SchedulerUtils.runLater(6L, () -> {
+            final ItemStack item = this.getItem(player).clone();
+            final int slot = player.getInventory().getHeldItemSlot();
+            if (Objects.equals(PlayerHandler.getMainHandItem(player), item)) {
+                if (!Interact.setSelectSlot(player, slot, true)) {
+                    Interact.setSelectSlot(player, slot, false);
+                }
+            }
+        });
     }
 
     /**

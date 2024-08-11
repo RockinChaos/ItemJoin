@@ -21,6 +21,7 @@ import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
+import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.api.ItemAPI;
@@ -30,6 +31,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
@@ -88,6 +90,27 @@ public class Interact implements Listener {
     /**
      * Prevents the player from selecting custom items with the selectable itemflag upon holding it.
      *
+     * @param event - InventoryClickEvent.
+     */
+    @EventHandler()
+    private void onMoveToSelectItem(InventoryClickEvent event) {
+        final Player player = (Player) event.getWhoClicked();
+        final ItemStack item = StringUtils.containsIgnoreCase(event.getAction().name(), "HOTBAR") ? (event.getCurrentItem() != null ? event.getCurrentItem().clone() : event.getCurrentItem()) : (event.getCursor() != null ? event.getCursor().clone() : event.getCursor());
+        final int slot = event.getSlot() <= 8 ? event.getSlot() : event.getHotbarButton() >= 0 ? event.getHotbarButton() : 9;
+        if (slot <= 8 && !ItemUtilities.getUtilities().isAllowed(player, item, "selectable")) {
+            SchedulerUtils.run(() -> {
+                if (Objects.equals(PlayerHandler.getMainHandItem(player), item)) {
+                    if (!setSelectSlot(player, slot, true)) {
+                        setSelectSlot(player, slot, false);
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * Prevents the player from selecting custom items with the selectable itemflag upon holding it.
+     *
      * @param event - PlayerItemHeldEvent
      */
     @EventHandler(ignoreCancelled = true)
@@ -97,10 +120,10 @@ public class Interact implements Listener {
         final int newSlot = event.getNewSlot();
         final int oldSlot = event.getPreviousSlot();
         if (!ItemUtilities.getUtilities().isAllowed(player, item, "selectable")) {
-            SchedulerUtils.runLater(10L, () -> {
+            SchedulerUtils.run(() -> {
                 if (Objects.equals(PlayerHandler.getMainHandItem(player), item)) {
-                    if (!this.setSelectSlot(player, newSlot, (newSlot > oldSlot))) {
-                        this.setSelectSlot(player, newSlot, !(newSlot > oldSlot));
+                    if (!setSelectSlot(player, newSlot, (newSlot > oldSlot))) {
+                        setSelectSlot(player, newSlot, !(newSlot > oldSlot));
                     }
                 }
             });
@@ -114,7 +137,7 @@ public class Interact implements Listener {
      * @param slot    - The currently selected slot.
      * @param forward - If they are moving to right of the inventory.
      */
-    private boolean setSelectSlot(final Player player, final int slot, final boolean forward) {
+    public static boolean setSelectSlot(final Player player, final int slot, final boolean forward) {
         for (int i = slot; (forward ? i < 9 : i >= 0); ) {
             if (ItemUtilities.getUtilities().isAllowed(player, player.getInventory().getItem(i), "selectable")) {
                 PlayerHandler.setHotbarSlot(player, i);
