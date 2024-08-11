@@ -661,7 +661,7 @@ public class ChatExecutor implements CommandExecutor {
                     arbitraryMap.put(itemMap.getConfigName(), (arbitrary - count));
                 }
                 final String customName = StringUtils.translateLayout(itemMap.getCustomName(), argsPlayer);
-                final boolean canGive = (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions", true, false) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer, false))));
+                final boolean canGive = (!remove && itemMap.inWorld(argsPlayer.getWorld()) && (itemMap.conditionMet(argsPlayer, "trigger-conditions", true, false) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer, false))));
                 placeHolders.with(Holder.ITEM, customName);
                 if ((remove && itemMap.hasItem(argsPlayer, true)) || (canGive && ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap))) {
                     if (remove || !itemMap.isCMDPermissionNeeded() || itemMap.hasPermission(argsPlayer, argsPlayer.getWorld())) {
@@ -754,7 +754,7 @@ public class ChatExecutor implements CommandExecutor {
             for (final ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
                 if (itemMap.getConfigName().equalsIgnoreCase(args[1])) {
                     if (remove || !itemMap.isCMDPermissionNeeded() || itemMap.hasPermission(argsPlayer, argsPlayer.getWorld())) {
-                        final boolean canGive = (!remove && (itemMap.conditionMet(argsPlayer, "trigger-conditions", true, false) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer, false))));
+                        final boolean canGive = (!remove && itemMap.inWorld(argsPlayer.getWorld()) && (itemMap.conditionMet(argsPlayer, "trigger-conditions", true, false) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer, false))));
                         if ((remove && itemMap.hasItem(argsPlayer, true)) || (canGive && ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap))) {
                             if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0 && PlayerHandler.isCraftingInv(argsPlayer)) {
                                 final ItemStack topItem = CompatUtils.getTopInventory(argsPlayer).getItem(0);
