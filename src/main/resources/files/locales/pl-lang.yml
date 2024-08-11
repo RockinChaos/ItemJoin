@@ -1,13 +1,13 @@
 # --{ =-=-=-=-=-=-=-=-=-= ItemJoin's Polish Language file, by Corelio =-=-=-=-=-=-=-=-=-= }--
-# If you don't want a message to be sent, fully remove it from below or make it blank.
+# Jeśli nie chcesz, aby wiadomość została wysłana, usuń ją całkowicie z dołu lub pozostaw pustą.
 
-# Modifying this will cause the file to break and regenerate.
-en-Version: 8
+# Modyfikowanie tego spowoduje uszkodzenie i regenerację pliku.
+pl-Version: 8
 
-# This is the prefix that will be sent at the beginning of every single message sent in the language file.
+# Jest to prefiks, który będzie wysyłany na początku każdej pojedynczej wiadomości wysyłanej w pliku językowym.
 Prefix: '&7[&eItemJoin&7]'
 
-# These are simply general messages sent from the plugin item usages.
+# Są to po prostu ogólne wiadomości wysyłane w związku z użyciem elementów wtyczki.
 general:
   failedOverwrite: '%prefix% &cNie udało się dać Ci &4%fail_count% &cprzedmiotów, nie masz pozwolenia na nadpisywanie przedmiotów!'
   failedInventory: '%prefix% &cNie udało się dać Ci &4%fail_count% &cprzedmiotów, Twój ekwipunek jest pełny!'
@@ -19,7 +19,7 @@ general:
   warmingTime: '%prefix% &aRozpoczęcie wykonania [%item%&a] za &2%time_left%&a sekund.'
   warmingHalted: '%prefix% &cRozpoczęcie wykonania &4[&c%item%&4] &czostało anulowane!'
 
-# These messages are specific to the plugin commands.
+# Komunikaty te są specyficzne dla poleceń wtyczki.
 commands:
   default:
     unknownCommand: '%prefix% &cNieznana komenda, zobacz &l/ItemJoin Help &cpo liste komend.'
@@ -125,6 +125,6 @@ commands:
     toggleDisable: '&cWyłączyłeś przedmiot &b%item%&c i nie będzie on już rozdawany.'
     togglePlayerFailed: '%prefix% &cNie możesz wyłączyć przedmiotu %item%, ponieważ wszystkie przedmioty są wyłączone dla Ciebie globalnie!'
 
-# These placeholders are specific to the plugin messages.
+# Te symbole zastępcze są specyficzne dla wiadomości wtyczek.
 placeholders:
   PLAYER_INTERACT: 'Unknown'

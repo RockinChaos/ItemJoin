@@ -1193,10 +1193,11 @@ public class Menu {
      * @param player - The Player to have the Pane opened.
      */
     private static void languagePane(final Player player) {
-        Interface languagePane = new Interface(false, 2, exitButton, GUIName, player);
+        Interface languagePane = new Interface(false, 3, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
             final String lang = ItemJoin.getCore().getConfig("config.yml").getString("Language");
             final String language = (lang != null && !lang.isEmpty()) ? lang.replace(" ", "") : "ENGLISH";
+            languagePane.addButton(new Button(fillerPaneBItem), 4);
             languagePane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2", 1, language.equalsIgnoreCase("ENGLISH"), false, "&6&l&nEnglish", "&7",
                     "&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lEnglish&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.",
                     "&9&lENABLED: &a" + (language.equalsIgnoreCase("ENGLISH") + "").toUpperCase()), event -> {
@@ -1209,6 +1210,7 @@ public class Menu {
                     SchedulerUtils.runLater(2L, () -> languagePane(player));
                 }
             }));
+            languagePane.addButton(new Button(fillerPaneBItem), 4);
             languagePane.addButton(new Button(ItemHandler.getItem("SAND", 1, language.equalsIgnoreCase("SPANISH"), false, "&6&l&nSpanish", "&7",
                     "&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lSpanish&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.",
                     "&9&lENABLED: &a" + (language.equalsIgnoreCase("SPANISH") + "").toUpperCase()), event -> {
@@ -1276,6 +1278,18 @@ public class Menu {
                     File fileFolder = new File(ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
                     FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
                     dataFile.set("Language", "PORTUGUESE");
+                    ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
+                    PluginData.getInfo().softReload();
+                    SchedulerUtils.runLater(2L, () -> languagePane(player));
+                }
+            }));
+            languagePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PRISMARINE" : "168"), 1, language.equalsIgnoreCase("POLISH"), false, "&6&l&nPolish", "&7",
+                    "&7*Sets the messages sent by", "&7the plugin to the player", "&7to be written in &c&lPolish&7.", "&7This is the type of lang.yml file", "&7generated in the plugin folder.",
+                    "&9&lENABLED: &a" + (language.equalsIgnoreCase("POLISH") + "").toUpperCase()), event -> {
+                if (!language.equalsIgnoreCase("POLISH")) {
+                    File fileFolder = new File(ItemJoin.getCore().getPlugin().getDataFolder(), "config.yml");
+                    FileConfiguration dataFile = YamlConfiguration.loadConfiguration(fileFolder);
+                    dataFile.set("Language", "POLISH");
                     ItemJoin.getCore().getConfiguration().saveFile(dataFile, fileFolder, "config.yml");
                     PluginData.getInfo().softReload();
                     SchedulerUtils.runLater(2L, () -> languagePane(player));
