@@ -210,6 +210,7 @@ public class ItemMap implements Cloneable {
     private boolean notHat = false;
     private boolean noClear = false;
     private boolean selectable = false;
+    private int selectableDelay = 0;
     private boolean splittable = false;
     private boolean CreativeBypass = false;
     private boolean AllowOpBypass = false;
@@ -483,6 +484,7 @@ public class ItemMap implements Cloneable {
             this.notHat = StringUtils.splitIgnoreCase(this.itemflags, "not-hat", ",");
             this.noClear = StringUtils.splitIgnoreCase(this.itemflags, "no-clear", ",");
             this.selectable = StringUtils.splitIgnoreCase(this.itemflags, "selectable", ",");
+            this.selectableDelay = this.nodeLocation.getString(".selectable-delay") != null ? this.nodeLocation.getInt(".selectable-delay") : 0;
             this.splittable = StringUtils.splitIgnoreCase(this.itemflags, "splittable", ",");
             this.animate = StringUtils.splitIgnoreCase(this.itemflags, "animate", ",");
             this.dynamic = StringUtils.splitIgnoreCase(this.itemflags, "dynamic", ",");
@@ -3426,6 +3428,15 @@ public class ItemMap implements Cloneable {
      */
     public void setNoClear(final boolean bool) {
         this.noClear = bool;
+    }
+
+    /**
+     * Gets the set selectable delay.
+     *
+     * @return The selectable delay
+     */
+    public long getSelectableDelay() {
+        return (this.selectableDelay != 0 ? this.selectableDelay * 10L : 0L);
     }
 
     /**

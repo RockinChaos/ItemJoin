@@ -120,7 +120,8 @@ public class Interact implements Listener {
         final int newSlot = event.getNewSlot();
         final int oldSlot = event.getPreviousSlot();
         if (!ItemUtilities.getUtilities().isAllowed(player, item, "selectable")) {
-            SchedulerUtils.run(() -> {
+            final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
+            SchedulerUtils.runLater(itemMap.getSelectableDelay(), () -> {
                 if (Objects.equals(PlayerHandler.getMainHandItem(player), item)) {
                     if (!setSelectSlot(player, newSlot, (newSlot > oldSlot))) {
                         setSelectSlot(player, newSlot, !(newSlot > oldSlot));
