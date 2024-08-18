@@ -238,7 +238,7 @@ public class ItemUtilities {
      */
     public void setItems(final Player player, final World world, final TriggerType type, final GameMode newMode, final String targetRegion, final List<String> regions) {
         this.setStatistics(player);
-        this.safeSet(player, world, type, targetRegion);
+        this.safeSet(player, world, type, targetRegion, regions);
         if (this.getItemDelay() != 0 && type != TriggerType.LIMIT_SWITCH && type != TriggerType.REGION_ENTER && type != TriggerType.REGION_LEAVE) {
             SchedulerUtils.runLater(this.getItemDelay(), () -> {
                 PluginData.getInfo().restoreCraftItems(player, type);
@@ -287,7 +287,7 @@ public class ItemUtilities {
                     || (type.equals(TriggerType.RESPAWN_POINT) && (item.isGiveOnRespawnPoint() || item.isGiveOnRespawn()) && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions)))
                     || (type.equals(TriggerType.WORLD_SWITCH) && item.isGiveOnWorldSwitch() && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions)))
                     || (type.equals(TriggerType.PERMISSION_SWITCH) && item.isGiveOnPermissionSwitch() && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions)))
-                    || (type.name().startsWith("REGION") && (item.isGiveOnRegionEnter() || item.isGiveOnRegionAccess()) && item.inRegion(regions))
+                    || (type.name().startsWith("REGION") && (item.isGiveOnRegionEnter() || item.isGiveOnRegionAccess()) && item.inRegion(targetRegion))
                     || (type.name().startsWith("REGION") && (item.isGiveOnRegionLeave() || item.isGiveOnRegionEgress()) && item.inRegion(targetRegion) && !item.inRegion(regions))
                     || (type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions))))
                     && item.inWorld(world) && item.isLimitMode(gameMode) && ((probable != null && item.getConfigName().equals(probable.getConfigName())) || item.getProbability() == -1)
@@ -348,24 +348,32 @@ public class ItemUtilities {
     /**
      * Safely checks and sets the items for their corresponding TriggerType.
      *
-     * @param player - The Player that is having their items set.
-     * @param type   - The TriggerType that is being performed.
-     * @param region - The region the Player is in.
+     * @param player        - The Player that is having their items set.
+     * @param type          - The TriggerType that is being performed.
+     * @param targetRegion  - The region the Player is in.
+     * @param regions       - The regions the Player is in.
      */
-    private void safeSet(final Player player, final World world, final TriggerType type, final String region) {
+    private void safeSet(final Player player, final World world, final TriggerType type, final String targetRegion, final List<String> regions) {
         if (StringUtils.splitIgnoreCase(PluginData.getInfo().getHotbarTriggers(), type.name, ",")) {
             PlayerHandler.setHotbarSlot(player, PluginData.getInfo().getHotbarSlot());
         }
-        if (type.equals(TriggerType.REGION_LEAVE)) {
-            GuardAPI.pasteReturnItems(player, region);
+        if (type.equals(TriggerType.REGION_LEAVE) && !regions.contains(targetRegion)) {
+            final List<String> regionList = clearRegions.get(player) != null ? clearRegions.get(player) : new ArrayList<>();
+            regionList.remove(targetRegion);
+            GuardAPI.pasteReturnItems(player, targetRegion);
+            clearRegions.put(player, regionList);
         }
         if (type.equals(TriggerType.WORLD_SWITCH)) {
             this.pasteReturnItems(type, player, world.getName());
         }
-        if (type.equals(TriggerType.REGION_ENTER)) {
-            this.clearEvent(type, player, "", region);
+        if (type.equals(TriggerType.REGION_ENTER) && (clearRegions.get(player) == null || !clearRegions.get(player).contains(targetRegion))) {
+            final List<String> regionList = clearRegions.get(player) != null ? clearRegions.get(player) : new ArrayList<>();
+            regionList.add(targetRegion);
+            this.clearEvent(type, player, "", targetRegion);
+            clearRegions.put(player, regionList);
         }
         if (type.equals(TriggerType.QUIT)) {
+            clearRegions.remove(player);
             this.clearEvent(type, player, world.getName(), "");
         }
         if (this.getClearDelay() != 0) {
@@ -382,6 +390,7 @@ public class ItemUtilities {
             this.triggerCommands(player, type);
         }
     }
+    private final HashMap<Player, List<String>> clearRegions = new HashMap<>();
 
     /**
      * Sets the Players items to be cleared upon performing the specified event.
