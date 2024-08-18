@@ -534,8 +534,13 @@ public class ItemCommand {
                     try {
                         player.setOp(true);
                         final PlaceHolder placeHolders = new PlaceHolder().with(Holder.PLAYER_HIT, (altPlayer != null ? altPlayer.getName() : "")).with(Holder.TARGET_PLAYER, (altPlayer != null ? altPlayer.getName() : ""));
-                        PluginData.getInfo().setLoggable("/" + StringUtils.translateLayout(this.command, player, placeHolders));
-                        Bukkit.getServer().dispatchCommand(player, StringUtils.translateLayout(this.command, player, placeHolders));
+                        final String cmd = StringUtils.translateLayout(this.command, player, placeHolders);
+                        PluginData.getInfo().setLoggable("/" + cmd);
+                        if (StringUtils.invalidASCII(cmd)) {
+                            Bukkit.getServer().dispatchCommand(player, cmd);
+                        } else {
+                            player.chat("/" + cmd);
+                        }
                     } catch (Exception e) {
                         ServerUtils.sendDebugTrace(e);
                         player.setOp(false);
@@ -565,8 +570,13 @@ public class ItemCommand {
                 PlayerHandler.safeInventoryClose(player);
             } else {
                 final PlaceHolder placeHolders = new PlaceHolder().with(Holder.PLAYER_HIT, (altPlayer != null ? altPlayer.getName() : "")).with(Holder.TARGET_PLAYER, (altPlayer != null ? altPlayer.getName() : ""));
-                PluginData.getInfo().setLoggable("/" + StringUtils.translateLayout(this.command, player, placeHolders));
-                Bukkit.getServer().dispatchCommand(player, StringUtils.translateLayout(this.command, player, placeHolders));
+                final String cmd = StringUtils.translateLayout(this.command, player, placeHolders);
+                PluginData.getInfo().setLoggable("/" + cmd);
+                if (StringUtils.invalidASCII(cmd)) {
+                    Bukkit.getServer().dispatchCommand(player, cmd);
+                } else {
+                    player.chat("/" + cmd);
+                }
             }
         } catch (Exception e) {
             ServerUtils.logSevere("{ItemCommand} There was an error executing an item's command as a player, if this continues report it to the developer.");
