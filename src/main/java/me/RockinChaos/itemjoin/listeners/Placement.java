@@ -28,10 +28,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
@@ -41,17 +41,15 @@ public class Placement implements Listener {
     /**
      * Prevents the player from placing the custom item.
      *
-     * @param event - PlayerInteractEvent
+     * @param event - BlockPlaceEvent
      */
     @EventHandler(ignoreCancelled = true)
-    private void onPreventPlayerPlace(PlayerInteractEvent event) {
-        ItemStack item = event.getItem();
+    private void onBlockPlace(BlockPlaceEvent event) {
+        ItemStack item = event.getItemInHand();
         Player player = event.getPlayer();
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && !ItemUtilities.getUtilities().isAllowed(player, item, "placement")) {
-            if (event.getClickedBlock() == null || !(event.getClickedBlock().getState() instanceof InventoryHolder) || event.getPlayer().isSneaking()) {
-                event.setCancelled(true);
-                PlayerHandler.updateInventory(player, 1L);
-            }
+        if (!ItemUtilities.getUtilities().isAllowed(player, item, "placement")) {
+            event.setCancelled(true);
+            PlayerHandler.updateInventory(player, 1L);
         }
     }
 
