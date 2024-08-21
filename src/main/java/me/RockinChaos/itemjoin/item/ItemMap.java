@@ -5879,6 +5879,7 @@ public class ItemMap implements Cloneable {
             Map<String, List<String>> onEquip = new HashMap<>();
             Map<String, List<String>> unEquip = new HashMap<>();
             Map<String, List<String>> onHold = new HashMap<>();
+            Map<String, List<String>> onJoin = new HashMap<>();
             Map<String, List<String>> onDeath = new HashMap<>();
             Map<String, List<String>> onKill = new HashMap<>();
             Map<String, List<String>> onDamage = new HashMap<>();
@@ -5929,6 +5930,8 @@ public class ItemMap implements Cloneable {
                     unEquip = this.addMapCommand(unEquip, command);
                 } else if (command.matchAction(ItemCommand.Action.ON_HOLD)) {
                     onHold = this.addMapCommand(onHold, command);
+                } else if (command.matchAction(ItemCommand.Action.ON_JOIN)) {
+                    onJoin = this.addMapCommand(onJoin, command);
                 } else if (command.matchAction(ItemCommand.Action.ON_DEATH)) {
                     onDeath = this.addMapCommand(onDeath, command);
                 } else if (command.matchAction(ItemCommand.Action.ON_KILL)) {
@@ -6010,6 +6013,9 @@ public class ItemMap implements Cloneable {
             }
             if (!onHold.isEmpty()) {
                 this.setMapCommand(itemData, onHold, "on-hold");
+            }
+            if (!onJoin.isEmpty()) {
+                this.setMapCommand(itemData, onJoin, "on-join");
             }
             if (!onDeath.isEmpty()) {
                 this.setMapCommand(itemData, onDeath, "on-death");

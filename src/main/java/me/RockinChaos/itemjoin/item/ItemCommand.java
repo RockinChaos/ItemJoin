@@ -751,6 +751,7 @@ public class ItemCommand {
         ON_CONSUME(".on-consume", "ON_CONSUME", "CONSUME"),
         ON_DROP(".on-drop", "ON_DROP", "DROP"),
         ON_RECEIVE(".on-receive", "ON_RECEIVE", "RECEIVED"),
+        ON_JOIN(".on-join", "ON_JOIN", "JOINED"),
         PHYSICAL(".physical", "PHYSICAL", "INTERACTED");
 
         public final String config;

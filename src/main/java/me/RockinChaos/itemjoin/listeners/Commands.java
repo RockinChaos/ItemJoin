@@ -23,6 +23,7 @@ import me.RockinChaos.core.utils.CompatUtils;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
+import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import org.bukkit.Material;
@@ -41,6 +42,7 @@ import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -137,6 +139,58 @@ public class Commands implements Listener {
         final ItemStack item = player.getInventory().getItem(event.getNewSlot());
         final String slot = String.valueOf(event.getNewSlot());
         this.runCommands(player, null, item, "ON_HOLD", "HELD", slot);
+    }
+
+    /**
+     * Runs the on_join commands for custom items upon joining the server.
+     *
+     * @param event - PlayerJoinEvent
+     */
+    @EventHandler(priority = EventPriority.LOW)
+    private void onJoin(PlayerJoinEvent event) {
+        final Player player = event.getPlayer();
+        if (ItemJoin.getCore().getDependencies().authMeEnabled()) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    try {
+                        if (ItemJoin.getCore().getDependencies().isAuthenticated(player)) {
+                            handleJoin(player);
+                            this.cancel();
+                        } else if (!player.isOnline()) {
+                            this.cancel();
+                        }
+                    } catch (NoClassDefFoundError e) {
+                        ServerUtils.logSevere("{Commands} You are using an outdated version of AuthMe, ON_JOIN commands will not be executed.");
+                        this.cancel();
+                    }
+                }
+            }.runTaskTimer(ItemJoin.getCore().getPlugin(), 0, 20);
+        } else {
+            this.handleJoin(player);
+        }
+    }
+
+    /**
+     * Handles running the on_join commands for custom items upon joining the server.
+     *
+     * @param player - the player being referenced.
+     */
+    private void handleJoin(final Player player) {
+        for (int i = 0; i < player.getInventory().getSize(); i++) {
+            final ItemStack item = player.getInventory().getItem(i);
+            if (item != null && item.getType() != Material.AIR) {
+                this.runCommands(player, null, item, "ON_JOIN", "JOINED", String.valueOf(i));
+            }
+        }
+        if (PlayerHandler.isCraftingInv(player)) {
+            for (int i = 0; i < CompatUtils.getTopInventory(player).getSize(); i++) {
+                final ItemStack item = CompatUtils.getTopInventory(player).getItem(i);
+                if (item != null && item.getType() != Material.AIR) {
+                    this.runCommands(player, null, item, "ON_JOIN", "JOINED", String.valueOf(i));
+                }
+            }
+        }
     }
 
     /**

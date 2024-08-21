@@ -3628,7 +3628,8 @@ public class Menu {
                     listCommands(itemMap, Action.INVENTORY_SHIFT_LEFT)), event -> commandListPane(player, itemMap, Action.INVENTORY_SHIFT_LEFT)));
             clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COBBLESTONE_SLAB" : "44:3"), 2, false, false, "&e&lInventory-Shift-Right", "&7", "&7*Commands that will execute only", "&7when cursor shift right clicking the item.", "&7", "&9&lCommands: &a" +
                     listCommands(itemMap, Action.INVENTORY_SHIFT_RIGHT)), event -> commandListPane(player, itemMap, Action.INVENTORY_SHIFT_RIGHT)));
-            clickPane.addButton(new Button(fillerPaneGItem));
+            clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_SIGN" : "323"), 1, false, false, "&e&lOn-Join", "&7", "&7*Commands that will execute only", "&7when the player joins the server", "&7and they already have the item.", "&7", "&7Note: This will not be triggered", "&7after the user receives the item", "&7they must already have the item.", "&7", "&9&lCommands: &a" +
+                    listCommands(itemMap, Action.ON_JOIN)), event -> commandListPane(player, itemMap, Action.ON_JOIN)));
             clickPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, false, "&e&lOn-Damage", "&7", "&7*Commands that will execute only", "&7when the player damages an", "&7entity or is damaged by an", "&7entity with the item in", "&7their inventory.", "&7", "&9&lCommands: &a" +
                     listCommands(itemMap, Action.ON_DAMAGE)), event -> commandListPane(player, itemMap, Action.ON_DAMAGE)));
             clickPane.addButton(new Button(ItemHandler.getItem("DIAMOND_SWORD", 1, false, false, "&e&lOn-Hit", "&7", "&7*Commands that will execute only", "&7when the player damages an", "&7entity while holding the item.", "&7", "&9&lCommands: &a" +
@@ -6813,7 +6814,8 @@ public class Menu {
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_SHIFT_LEFT.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.INVENTORY_SHIFT_LEFT)));
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COBBLESTONE_SLAB" : "44:3"), 2, false, false, "&e&lInventory-Shift-Right", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_SHIFT_RIGHT.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.INVENTORY_SHIFT_RIGHT)));
-            commandPane.addButton(new Button(fillerPaneGItem));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_SIGN" : "323"), 1, false, false, "&e&lOn-Join", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_JOIN.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.ON_JOIN)));
             commandPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, false, "&e&lOn-Damage", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_DAMAGE.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.ON_DAMAGE)));
             commandPane.addButton(new Button(ItemHandler.getItem("DIAMOND_SWORD", 1, false, false, "&e&lOn-Hit", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
