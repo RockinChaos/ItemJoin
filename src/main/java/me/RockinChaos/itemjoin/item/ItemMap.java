@@ -166,6 +166,7 @@ public class ItemMap implements Cloneable {
     private List<String> disposableConditions = new ArrayList<>();
     private List<String> triggerConditions = new ArrayList<>();
     private Map<String, List<String>> commandConditions = new HashMap<>();
+    private Map<String, List<String>> commandPermissions = new HashMap<>();
     private String disposableMessage = null;
     private String triggerMessage = null;
     /*  ============================================== */
@@ -284,6 +285,7 @@ public class ItemMap implements Cloneable {
             this.setCommandParticle();
             this.setCommandCooldown();
             this.setCommandSequence();
+            this.setCommandPermissions();
             this.setCommands(ItemCommand.arrayFromString(this, this.sequence == CommandSequence.RANDOM_LIST));
             this.setToggleCommands(this.nodeLocation.getString(".toggle"));
             this.setConditions();
@@ -429,6 +431,23 @@ public class ItemMap implements Cloneable {
                 this.sequence = CommandSequence.RANDOM;
             } else if (StringUtils.containsIgnoreCase(this.nodeLocation.getString("commands-sequence"), "REMAIN")) {
                 this.sequence = CommandSequence.REMAIN;
+            }
+        }
+    }
+
+    /**
+     * Sets the ItemMaps Command Permissions.
+     */
+    private void setCommandPermissions() {
+        for (Action action : Action.values()) {
+            final String actionPermissions = this.nodeLocation.getString(action.config() + "-permission");
+            final List<String> actionPermissionsList = this.nodeLocation.getStringList(action.config() + "-permission");
+            if (!actionPermissionsList.isEmpty()) {
+                this.commandPermissions.put(action.config(), actionPermissionsList);
+            } else if (actionPermissions != null && !actionPermissions.isEmpty()) {
+                List<String> commandCond = new ArrayList<>();
+                commandCond.add(actionPermissions);
+                this.commandPermissions.put(action.config(), commandCond);
             }
         }
     }
@@ -2530,10 +2549,28 @@ public class ItemMap implements Cloneable {
     /**
      * Sets the Commands Messages.
      *
-     * @param s - The Commands Messages to be set.
+     * @param messages - The Commands Messages to be set.
      */
-    public void setCommandMessages(final Map<String, String> s) {
-        this.commandMessages = s;
+    public void setCommandMessages(final Map<String, String> messages) {
+        this.commandMessages = messages;
+    }
+
+    /**
+     * Gets the Commands Permissions.
+     *
+     * @return The Commands Permission List.
+     */
+    public Map<String, List<String>> getCommandPermissions() {
+        return this.commandPermissions;
+    }
+
+    /**
+     * Sets the Commands Permissions.
+     *
+     * @param permissions - The Commands Permissions to be set.
+     */
+    public void setCommandPermissions(final Map<String, List<String>> permissions) {
+        this.commandPermissions = permissions;
     }
 
     /**
@@ -2548,10 +2585,10 @@ public class ItemMap implements Cloneable {
     /**
      * Sets the Commands Conditions.
      *
-     * @param s - The Commands Conditions to be set.
+     * @param conditions - The Commands Conditions to be set.
      */
-    public void setCommandConditions(final Map<String, List<String>> s) {
-        this.commandConditions = s;
+    public void setCommandConditions(final Map<String, List<String>> conditions) {
+        this.commandConditions = conditions;
     }
 
     /**
@@ -2589,15 +2626,15 @@ public class ItemMap implements Cloneable {
      * @return If the Player has Permission.
      */
     public boolean hasPermission(final Player player, final World world) {
-        String customPerm = PermissionsHandler.customPermissions(this.permissionNode, world.getName() + "." + this.configName);
+        final String customPerm = PermissionsHandler.customPermissions(this.permissionNode, world.getName() + "." + this.configName);
         if (!this.isPermissionNeeded() && !player.isOp() || (!this.isOPPermissionNeeded() && player.isOp())) {
             return true;
         } else if (this.isOPPermissionNeeded() && player.isOp()) {
             return player.isPermissionSet(customPerm) && player.hasPermission(customPerm) && (!player.isPermissionSet("itemjoin." + world.getName() + ".*")
                     || (player.isPermissionSet("itemjoin." + world.getName() + ".*") && player.hasPermission("itemjoin." + world.getName() + ".*")))
                     || ((player.isPermissionSet("itemjoin." + world.getName() + ".*") && player.hasPermission("itemjoin." + world.getName() + ".*")) || (player.isPermissionSet(customPerm) && player.hasPermission(customPerm)));
-        } else
-            return (player.isPermissionSet("itemjoin." + world.getName() + ".*") && player.hasPermission("itemjoin." + world.getName() + ".*")) || (player.isPermissionSet(customPerm) && player.hasPermission(customPerm));
+        }
+        return (player.isPermissionSet("itemjoin." + world.getName() + ".*") && player.hasPermission("itemjoin." + world.getName() + ".*")) || (player.isPermissionSet(customPerm) && player.hasPermission(customPerm));
     }
 
     /**
@@ -4753,34 +4790,64 @@ public class ItemMap implements Cloneable {
     }
 
     /**
-     * Gets the condition message for the ItemMap.
+     * Checks if the Player has the Command Permissions for the Action.
      *
-     * @param conditions - The condition list to be fetched.
-     * @return The fetched condition message.
+     * @param player  - The player being referenced.
+     * @param action  - The permission list to be fetched.
+     * @param doCheck - If the conditions should be checked.
+     * @param silent  - If the fail message should be sent.
+     * @return If the Player has the Command Permissions for the Action.
      */
-    private List<String> getConditions(final String conditions) {
-        if (conditions.equalsIgnoreCase("disposable-conditions")) {
+    private boolean hasCommandPermissions(final Player player, final String action, final boolean doCheck, final boolean silent) {
+        final List<String> permissions = this.commandPermissions.get(action);
+        if (permissions != null && !permissions.isEmpty()) {
+            if (doCheck) {
+                for (String permission : permissions) {
+                    final boolean isNeeded = !permission.startsWith("!");
+                    final String permissionString = (isNeeded ? permission : permission.substring(1));
+                    final boolean hasPermission = player.isPermissionSet(permissionString) && player.hasPermission(permissionString);
+                    if ((isNeeded && !hasPermission) || (!isNeeded && hasPermission)) {
+                        if (!silent) {
+                            player.sendMessage(StringUtils.translateLayout(this.getFailMessage(action), player));
+                            ServerUtils.logDebug("{ItemMap} " + player.getName() + " has not met any of the " + action + "-permission(s), for the item: " + this.getConfigName() + ".");
+                        }
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Gets the conditions for the Action.
+     *
+     * @param action - The condition list to be fetched.
+     * @return The fetched conditions.
+     */
+    private List<String> getConditions(final String action) {
+        if (action.equalsIgnoreCase("disposable-conditions")) {
             return this.disposableConditions;
-        } else if (conditions.equalsIgnoreCase("trigger-conditions")) {
+        } else if (action.equalsIgnoreCase("trigger-conditions")) {
             return this.triggerConditions;
         } else {
-            return this.commandConditions.get(conditions.replace("-conditions", ""));
+            return this.commandConditions.get(action.replace("-conditions", ""));
         }
     }
 
     /**
-     * Gets the condition message for the ItemMap.
+     * Gets the fail message for the ItemMap.
      *
-     * @param conditions - The condition list to be fetched.
-     * @return The fetched condition message.
+     * @param action - The action list to be fetched.
+     * @return The fetched actions fail message.
      */
-    private String getConditionMessage(final String conditions) {
-        if (conditions.replace("conditions", "fail-message").equalsIgnoreCase("disposable-fail-message")) {
+    private String getFailMessage(final String action) {
+        if (action.replace("conditions", "fail-message").equalsIgnoreCase("disposable-fail-message")) {
             return this.disposableMessage;
-        } else if (conditions.replace("conditions", "fail-message").equalsIgnoreCase("trigger-fail-message")) {
+        } else if (action.replace("conditions", "fail-message").equalsIgnoreCase("trigger-fail-message")) {
             return this.triggerMessage;
         } else {
-            return this.commandMessages.get(conditions.replace("-conditions", ""));
+            return this.commandMessages.get(action.replace("-conditions", ""));
         }
     }
 
@@ -4803,9 +4870,9 @@ public class ItemMap implements Cloneable {
                         String operand = parts[1];
                         String value2 = parts[2];
                         final boolean conditionMet = StringUtils.conditionMet(value1, operand, value2);
-                        if (!conditionMet && !silent && this.getConditionMessage(conditions) != null && !this.getConditionMessage(conditions).isEmpty()) {
-                            player.sendMessage(StringUtils.translateLayout(this.getConditionMessage(conditions), player));
-                            ServerUtils.logDebug("{ItemMap} " + player.getName() + " has not met any of the " + conditions + "(s), for the Item: " + this.getConfigName() + ".");
+                        if (!conditionMet && !silent && this.getFailMessage(conditions) != null && !this.getFailMessage(conditions).isEmpty()) {
+                            player.sendMessage(StringUtils.translateLayout(this.getFailMessage(conditions), player));
+                            ServerUtils.logDebug("{ItemMap} " + player.getName() + " has not met any of the " + conditions + "(s), for the item: " + this.getConfigName() + ".");
                         }
                         return conditionMet;
                     } else {
@@ -5155,8 +5222,8 @@ public class ItemMap implements Cloneable {
         for (ItemCommand itemCommand : itemCommands) {
             if (!playerSuccess) {
                 playerSuccess = itemCommand.canExecute(action, clickType);
-                boolean conditionLimited = !this.conditionMet(player, itemCommand.getAction().config + "-conditions", playerSuccess, silentLimit);
-                if (conditionLimited) {
+                boolean restrictionLimited = !this.hasCommandPermissions(player, itemCommand.getAction().config, playerSuccess, silentLimit) || !this.conditionMet(player, itemCommand.getAction().config + "-conditions", playerSuccess, silentLimit);
+                if (restrictionLimited) {
                     silentLimit = true;
                     playerSuccess = false;
                 }
@@ -6286,6 +6353,15 @@ public class ItemMap implements Cloneable {
                     itemData.set("items." + this.configName + property + "-conditions", this.commandConditions.get(property).get(0));
                 } else if (!this.commandConditions.get(property).isEmpty()) {
                     itemData.set("items." + this.configName + property + "-conditions", this.commandConditions.get(property));
+                }
+            }
+        }
+        if (this.commandPermissions != null && !this.commandPermissions.isEmpty()) {
+            for (String property : this.commandPermissions.keySet()) {
+                if (this.commandPermissions.get(property).size() == 1) {
+                    itemData.set("items." + this.configName + property + "-permission", this.commandPermissions.get(property).get(0));
+                } else if (!this.commandPermissions.get(property).isEmpty()) {
+                    itemData.set("items." + this.configName + property + "-permission", this.commandPermissions.get(property));
                 }
             }
         }

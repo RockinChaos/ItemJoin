@@ -997,7 +997,7 @@ public class Menu {
                     usePane(player, itemMap);
                 }
             }));
-            creatingPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, false, "&b&lConditions", "&7", "&7*Define conditions for triggers,", "&7commands, and the disposable itemflag.", "&9Enabled: &a" +
+            creatingPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, false, "&b&lConditions", "&7", "&7*Define conditions for triggers", "&7and the disposable itemflag.", "&9Enabled: &a" +
                     ((itemMap.getTriggerConditions() != null && !itemMap.getTriggerConditions().isEmpty()) || (itemMap.getDisposableConditions() != null && !itemMap.getDisposableConditions().isEmpty())
                             || (itemMap.getCommandConditions() != null && !itemMap.getCommandConditions().isEmpty()) ? "YES" : "NONE")), event -> conditionsPane(player, itemMap)));
             creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "REPEATER" : "356"), 1, false, false, "&b&lToggle", "&7", "&7*Specify command(s) players can", "&7execute to enable or disable the", "&7custom item for themselves.", "&9Enabled: &a" + (itemMap.getToggleCommands() != null && !itemMap.getToggleCommands().isEmpty() ? "YES" : "NONE")), event -> togglePane(player, itemMap)));
@@ -3456,46 +3456,19 @@ public class Menu {
      * @param itemMap - The ItemMap currently being modified.
      */
     private static void commandPane(final Player player, final ItemMap itemMap) {
-        Interface commandPane = new Interface(false, 3, exitButton, GUIName, player);
+        Interface commandPane = new Interface(false, 4, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
             commandPane.addButton(new Button(fillerPaneGItem), 4);
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "WRITABLE_BOOK" : "386"), 1, false, false, "&e&lCommands", "&7", "&7*Click to define the custom command lines", "&7for the item and click type.",
-                    "&7", "&9&lCommands: &a" + (itemMap.getCommands().length > 0 ? "YES" : "NONE")), event -> actionPane(player, itemMap)));
-            commandPane.addButton(new Button(fillerPaneGItem), 4);
-            commandPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, false, "&a&lParticle", "&7", "&7*Custom particle(s) that will be", "&7displayed when the commands", "&7are successfully executed.", "&9&lCOMMANDS-PARTICLE: &a" +
-                    StringUtils.nullCheck(itemMap.getCommandParticle())), event -> {
-                if (!StringUtils.nullCheck(itemMap.getCommandParticle()).equals("NONE")) {
-                    itemMap.setCommandParticle(null);
+                    "&7", "&9&lCOMMANDS: &a" + (itemMap.getCommands().length > 0 ? "YES" : "NONE")), event -> actionPane(player, itemMap)));
+            commandPane.addButton(new Button(fillerPaneGItem), 7);
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LAVA_BUCKET" : "327"), 1, false, false, "&a&lWarmup", "&7", "&7*The time it will take before", "&7the commands are executed.", "&7Player movement will cancel the", "&7pending commands execution.", "&7",
+                    "&9&lCOMMANDS-WARMUP: &a" + StringUtils.nullCheck(itemMap.getWarmDelay() + "&7") + (!StringUtils.nullCheck(itemMap.getWarmDelay() + "&7").equals("NONE") ? "&a second(s)" : "")), event -> {
+                if (!StringUtils.nullCheck(itemMap.getWarmDelay() + "&7").equals("NONE")) {
+                    itemMap.setWarmDelay(0);
                     commandPane(player, itemMap);
                 } else {
-                    particlePane(player, itemMap, 3);
-                }
-            }));
-            commandPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, false, "&a&lItem Cost", "&7", "&7*Material that will", "&7be charged upon successfully", "&7executing the commands.", "&9&lCOMMANDS-ITEM: &a" +
-                    (StringUtils.nullCheck(itemMap.getItemCost()))), event -> {
-                if (!StringUtils.nullCheck(itemMap.getItemCost()).equals("NONE")) {
-                    itemMap.setItemCost(null);
-                    commandPane(player, itemMap);
-                } else {
-                    materialPane(player, itemMap, 2, 0);
-                }
-            }));
-            commandPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, false, false, "&a&lCost", "&7", "&7*Amount that the player will", "&7be charged upon successfully", "&7executing the commands.", "&9&lCOMMANDS-COST: &a" +
-                    (StringUtils.nullCheck(itemMap.getCommandCost() + "&7"))), event -> {
-                if (!StringUtils.nullCheck(itemMap.getCommandCost() + "&7").equals("NONE")) {
-                    itemMap.setCommandCost(0);
-                    commandPane(player, itemMap);
-                } else {
-                    costPane(player, itemMap);
-                }
-            }));
-            commandPane.addButton(new Button(ItemHandler.getItem("STONE_BUTTON", 1, false, false, "&a&lReceive", "&7", "&7*The number of times the", "&7commands will execute when", "&7receiving the custom item.",
-                    "&cNOTE: &7Only functions with", "&7the on-receive command action.", "&9&lCOMMANDS-RECEIVE: &a" + (StringUtils.nullCheck(itemMap.getCommandReceive() + "&7"))), event -> {
-                if (!StringUtils.nullCheck(itemMap.getCommandReceive() + "&7").equals("NONE")) {
-                    itemMap.setCommandReceive(0);
-                    commandPane(player, itemMap);
-                } else {
-                    receivePane(player, itemMap);
+                    warmPane(player, itemMap);
                 }
             }));
             commandPane.addButton(new Button(ItemHandler.getItem("ICE", 1, false, false, "&a&lCooldown", "&7", "&7*The time that the commands will", "&7be on cooldown for.", "&7", "&9&lCOMMANDS-COOLDOWN: &a" + StringUtils.nullCheck(itemMap.getCommandCooldown() + "&7") +
@@ -3508,7 +3481,7 @@ public class Menu {
                 }
             }));
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_SIGN" : "323"), 1, false, false, "&a&lCooldown Message", "&7", "&7*Optional cooldown message", "&7to be displayed when", "&7the items commands are",
-                    "&7on cooldown.", "&9&lCOOLDOWN-MESSAGE: &a" + StringUtils.nullCheck(itemMap.getCooldownMessage())), event -> {
+                    "&7on cooldown.", "&7", "&9&lCOOLDOWN-MESSAGE: &a" + StringUtils.nullCheck(itemMap.getCooldownMessage())), event -> {
                 if (!StringUtils.nullCheck(itemMap.getCooldownMessage()).equals("NONE")) {
                     itemMap.setCooldownMessage(null);
                     commandPane(player, itemMap);
@@ -3524,7 +3497,44 @@ public class Menu {
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 commandPane(event.getPlayer(), itemMap);
             }));
-            commandPane.addButton(new Button(ItemHandler.getItem("JUKEBOX", 1, false, false, "&a&lSound", "&7", "&7*The sound that will be", "&7played after a successful", "&7command execution.", "&9&lCOMMANDS-SOUND: &a" +
+            commandPane.addButton(new Button(fillerPaneGItem), 3);
+            commandPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, false, "&a&lParticle", "&7", "&7*Custom particle(s) that will be", "&7displayed when the commands", "&7are successfully executed.", "&7", "&9&lCOMMANDS-PARTICLE: &a" +
+                    StringUtils.nullCheck(itemMap.getCommandParticle())), event -> {
+                if (!StringUtils.nullCheck(itemMap.getCommandParticle()).equals("NONE")) {
+                    itemMap.setCommandParticle(null);
+                    commandPane(player, itemMap);
+                } else {
+                    particlePane(player, itemMap, 3);
+                }
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, false, "&a&lItem Cost", "&7", "&7*Material that will", "&7be charged upon successfully", "&7executing the commands.", "&7", "&9&lCOMMANDS-ITEM: &a" +
+                    (StringUtils.nullCheck(itemMap.getItemCost()))), event -> {
+                if (!StringUtils.nullCheck(itemMap.getItemCost()).equals("NONE")) {
+                    itemMap.setItemCost(null);
+                    commandPane(player, itemMap);
+                } else {
+                    materialPane(player, itemMap, 2, 0);
+                }
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, false, false, "&a&lCost", "&7", "&7*Amount that the player will", "&7be charged upon successfully", "&7executing the commands.", "&7", "&9&lCOMMANDS-COST: &a" +
+                    (StringUtils.nullCheck(itemMap.getCommandCost() + "&7"))), event -> {
+                if (!StringUtils.nullCheck(itemMap.getCommandCost() + "&7").equals("NONE")) {
+                    itemMap.setCommandCost(0);
+                    commandPane(player, itemMap);
+                } else {
+                    costPane(player, itemMap);
+                }
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem("STONE_BUTTON", 1, false, false, "&a&lReceive", "&7", "&7*The number of times the", "&7commands will execute when", "&7receiving the custom item.",
+                    "&cNOTE: &7Only functions with", "&7the on-receive command action.", "&7", "&9&lCOMMANDS-RECEIVE: &a" + (StringUtils.nullCheck(itemMap.getCommandReceive() + "&7"))), event -> {
+                if (!StringUtils.nullCheck(itemMap.getCommandReceive() + "&7").equals("NONE")) {
+                    itemMap.setCommandReceive(0);
+                    commandPane(player, itemMap);
+                } else {
+                    receivePane(player, itemMap);
+                }
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem("JUKEBOX", 1, false, false, "&a&lSound", "&7", "&7*The sound that will be", "&7played after a successful", "&7command execution.", "&7", "&9&lCOMMANDS-SOUND: &a" +
                             StringUtils.nullCheck(itemMap.getCommandSound() + ""),
                     "&9&lVOLUME: &a" + ((!StringUtils.nullCheck(itemMap.getCommandSound() + "").equals("NONE")) ? itemMap.getCommandVolume() : "0"),
                     "&9&lPITCH: &a" + ((!StringUtils.nullCheck(itemMap.getCommandSound() + "").equals("NONE")) ? itemMap.getCommandPitch() : "0")), event -> {
@@ -3535,7 +3545,7 @@ public class Menu {
                     soundPane(player, itemMap, 3);
                 }
             }));
-            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "REPEATER" : "356"), 1, false, false, "&a&lSequence", "&7", "&7*The order that the command lines", "&7will be executed in.", "&9&lCOMMANDS-SEQUENCE: &a" +
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "REPEATER" : "356"), 1, false, false, "&a&lSequence", "&7", "&7*The order that the command lines", "&7will be executed in.", "&7", "&9&lCOMMANDS-SEQUENCE: &a" +
                     StringUtils.nullCheck(itemMap.getCommandSequence() + "")), event -> {
                 if (!StringUtils.nullCheck(itemMap.getCommandSequence() + "").equals("NONE")) {
                     itemMap.setCommandSequence(null);
@@ -3544,15 +3554,12 @@ public class Menu {
                     sequencePane(player, itemMap, 0);
                 }
             }));
-            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LAVA_BUCKET" : "327"), 1, false, false, "&a&lWarmup", "&7", "&7*The time it will take before", "&7the commands are executed.", "&7Player movement will cancel the", "&7pending commands execution.", "&7",
-                    "&9&lCOMMANDS-WARMUP: &a" + StringUtils.nullCheck(itemMap.getWarmDelay() + "&7") + (!StringUtils.nullCheck(itemMap.getWarmDelay() + "&7").equals("NONE") ? "&a second(s)" : "")), event -> {
-                if (!StringUtils.nullCheck(itemMap.getWarmDelay() + "&7").equals("NONE")) {
-                    itemMap.setWarmDelay(0);
-                    commandPane(player, itemMap);
-                } else {
-                    warmPane(player, itemMap);
-                }
-            }));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "REDSTONE_TORCH" : "76"), 1, false, false, "&b&lPermissions", "&7", "&7*Permissions(s) that must be met",
+                    "&7in order to execute item commands.", "&7", "&9&lENABLED: &a" + String.valueOf((!StringUtils.nullCheck(itemMap.getCommandPermissions() + "").equals("NONE"))).toUpperCase()), event -> commandPermissionPane(player, itemMap)));
+            commandPane.addButton(new Button(ItemHandler.getItem("BOOK", 1, false, false, "&b&lConditions", "&7", "&7*Condition(s) that must be met",
+                    "&7in order to execute item commands.", "&7", "&9&lENABLED: &a" + String.valueOf((!StringUtils.nullCheck(itemMap.getCommandConditions() + "").equals("NONE"))).toUpperCase()), event -> commandActionPane(player, itemMap)));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GLOWSTONE_DUST" : "348"), 1, false, false, "&b&lFail Messages", "&7", "&7*Define messages for each command action", "&7that will be sent when either", "&7permissions or conditions requirements", "&7are not met.", "&7", "&9&lENABLED: &a" +
+                    String.valueOf((!StringUtils.nullCheck(itemMap.getCommandMessages() + "").equals("NONE"))).toUpperCase()), event -> commandFailPane(player, itemMap)));
             commandPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
             commandPane.addButton(new Button(fillerPaneBItem), 7);
             commandPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
@@ -3580,9 +3587,9 @@ public class Menu {
             clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PISTON" : "PISTON_BASE"), 1, false, false, "&e&lPhysical", "&7", "&7*Commands that will execute", "&7when held in the player hand", "&7and they interact with a object", "&7such as a pressure plate.", "&7",
                     "&9&lCommands: &a" + listCommands(itemMap, Action.PHYSICAL)), event -> commandListPane(player, itemMap, Action.PHYSICAL)));
             clickPane.addButton(new Button(fillerPaneGItem), 2);
-            clickPane.addButton(new Button(ItemHandler.getItem("DIAMOND_HELMET", 1, false, false, "&e&lOn-Equip", "&7", "&7*Commands that will execute only", "&7when the item is placed", "&7in an armor slot.", "&7", "&9&lCommands: &a" +
+            clickPane.addButton(new Button(ItemHandler.getItem("DIAMOND_HELMET", 1, false, true, "&e&lOn-Equip", "&7", "&7*Commands that will execute only", "&7when the item is placed", "&7in an armor slot.", "&7", "&9&lCommands: &a" +
                     listCommands(itemMap, Action.ON_EQUIP)), event -> commandListPane(player, itemMap, Action.ON_EQUIP)));
-            clickPane.addButton(new Button(ItemHandler.getItem("IRON_HELMET", 1, false, false, "&e&lUn-Equip", "&7", "&7*Commands that will execute only", "&7when the item is removed", "&7from an armor slot.", "&7", "&9&lCommands: &a" +
+            clickPane.addButton(new Button(ItemHandler.getItem("IRON_HELMET", 1, false, true, "&e&lUn-Equip", "&7", "&7*Commands that will execute only", "&7when the item is removed", "&7from an armor slot.", "&7", "&9&lCommands: &a" +
                     listCommands(itemMap, Action.UN_EQUIP)), event -> commandListPane(player, itemMap, Action.UN_EQUIP)));
             clickPane.addButton(new Button(ItemHandler.getItem("TORCH", 1, false, false, "&e&lOn-Hold", "&7", "&7*Commands that will execute only", "&7when holding the item.", "&7", "&9&lCommands: &a" +
                     listCommands(itemMap, Action.ON_HOLD)), event -> commandListPane(player, itemMap, Action.ON_HOLD)));
@@ -3590,7 +3597,7 @@ public class Menu {
                     listCommands(itemMap, Action.ON_FIRE)), event -> commandListPane(player, itemMap, Action.ON_FIRE)));
             clickPane.addButton(new Button(ItemHandler.getItem("HOPPER", 1, false, false, "&e&lOn-Drop", "&7", "&7*Commands that will execute only", "&7when you drop the item.", "&7", "&9&lCommands: &a" +
                     listCommands(itemMap, Action.ON_DROP)), event -> commandListPane(player, itemMap, Action.ON_DROP)));
-            clickPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, false, "&e&lOn-Consume", "&7", "&7*Commands that will execute only", "&7when you consume the item.", "&7", "&9&lCommands: &a" +
+            clickPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, true, "&e&lOn-Consume", "&7", "&7*Commands that will execute only", "&7when you consume the item.", "&7", "&9&lCommands: &a" +
                     listCommands(itemMap, Action.ON_CONSUME)), event -> commandListPane(player, itemMap, Action.ON_CONSUME)));
             clickPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, false, "&e&lOn-Receive", "&7", "&7*Commands that will execute only", "&7when you are given the item.", "&7", "&9&lCommands: &a" +
                     listCommands(itemMap, Action.ON_RECEIVE)), event -> commandListPane(player, itemMap, Action.ON_RECEIVE)));
@@ -3632,7 +3639,7 @@ public class Menu {
                     listCommands(itemMap, Action.ON_JOIN)), event -> commandListPane(player, itemMap, Action.ON_JOIN)));
             clickPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, false, "&e&lOn-Damage", "&7", "&7*Commands that will execute only", "&7when the player damages an", "&7entity or is damaged by an", "&7entity with the item in", "&7their inventory.", "&7", "&9&lCommands: &a" +
                     listCommands(itemMap, Action.ON_DAMAGE)), event -> commandListPane(player, itemMap, Action.ON_DAMAGE)));
-            clickPane.addButton(new Button(ItemHandler.getItem("DIAMOND_SWORD", 1, false, false, "&e&lOn-Hit", "&7", "&7*Commands that will execute only", "&7when the player damages an", "&7entity while holding the item.", "&7", "&9&lCommands: &a" +
+            clickPane.addButton(new Button(ItemHandler.getItem("DIAMOND_SWORD", 1, false, true, "&e&lOn-Hit", "&7", "&7*Commands that will execute only", "&7when the player damages an", "&7entity while holding the item.", "&7", "&9&lCommands: &a" +
                     listCommands(itemMap, Action.ON_HIT)), event -> commandListPane(player, itemMap, Action.ON_HIT)));
             clickPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> commandPane(player, itemMap)));
             clickPane.addButton(new Button(fillerPaneBItem), 7);
@@ -6731,13 +6738,12 @@ public class Menu {
         Interface conditionsPane = new Interface(false, 2, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
             conditionsPane.addButton(new Button(fillerPaneBItem), 3);
-            conditionsPane.addButton(new Button(ItemHandler.getItem("BOOK", 1, false, false, "&b&l&nCommand&b&l Conditions", "&7", "&7*Condition(s) that must be met",
-                    "&7in order to execute item commands.", "&7", "&9&lENABLED: " + String.valueOf((!StringUtils.nullCheck(itemMap.getCommandConditions() + "").equals("NONE"))).toUpperCase()), event -> commandActionPane(player, itemMap)));
             conditionsPane.addButton(new Button(ItemHandler.getItem("CACTUS", 1, false, false, "&b&l&nDisposable&b&l Conditions", "&7", "&7*Condition(s) that must be met", "&7in order for the disposable", "&7itemflag to function.",
                     "&7", "&c&l&nNOTE:&7 The disposable itemflag", "&7must be defined for this", "&7condition to function.",
-                    "&7", "&9&lENABLED: " + String.valueOf((!StringUtils.nullCheck(itemMap.getDisposableConditions() + "").equals("NONE"))).toUpperCase()), event -> disposableCPane(player, itemMap)));
+                    "&7", "&9&lENABLED: &a" + String.valueOf((!StringUtils.nullCheck(itemMap.getDisposableConditions() + "").equals("NONE"))).toUpperCase()), event -> disposableCPane(player, itemMap)));
+            conditionsPane.addButton(new Button(fillerPaneBItem));
             conditionsPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, false, "&b&l&nTrigger&b&l Conditions", "&7", "&7*Condition(s) that must be met", "&7in order to to receive the",
-                    "&7item when performing a trigger.", "&7", "&9&lENABLED: " + String.valueOf((!StringUtils.nullCheck(itemMap.getTriggerConditions() + "").equals("NONE"))).toUpperCase()), event -> triggerCPane(player, itemMap)));
+                    "&7item when performing a trigger.", "&7", "&9&lENABLED: &a" + String.valueOf((!StringUtils.nullCheck(itemMap.getTriggerConditions() + "").equals("NONE"))).toUpperCase()), event -> triggerCPane(player, itemMap)));
             conditionsPane.addButton(new Button(fillerPaneBItem), 3);
             conditionsPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
             conditionsPane.addButton(new Button(fillerPaneBItem), 7);
@@ -6766,9 +6772,9 @@ public class Menu {
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PISTON" : "PISTON_BASE"), 1, false, false, "&e&lPhysical", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.PHYSICAL.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.PHYSICAL)));
             commandPane.addButton(new Button(fillerPaneGItem), 2);
-            commandPane.addButton(new Button(ItemHandler.getItem("DIAMOND_HELMET", 1, false, false, "&e&lOn-Equip", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+            commandPane.addButton(new Button(ItemHandler.getItem("DIAMOND_HELMET", 1, false, true, "&e&lOn-Equip", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_EQUIP.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.ON_EQUIP)));
-            commandPane.addButton(new Button(ItemHandler.getItem("IRON_HELMET", 1, false, false, "&e&lUn-Equip", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+            commandPane.addButton(new Button(ItemHandler.getItem("IRON_HELMET", 1, false, true, "&e&lUn-Equip", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.UN_EQUIP.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.UN_EQUIP)));
             commandPane.addButton(new Button(ItemHandler.getItem("TORCH", 1, false, false, "&e&lOn-Hold", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_HOLD.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.ON_HOLD)));
@@ -6776,7 +6782,7 @@ public class Menu {
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_FIRE.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.ON_FIRE)));
             commandPane.addButton(new Button(ItemHandler.getItem("HOPPER", 1, false, false, "&e&lOn-Drop", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_DROP.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.ON_DROP)));
-            commandPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, false, "&e&lOn-Consume", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+            commandPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, true, "&e&lOn-Consume", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_CONSUME.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.ON_CONSUME)));
             commandPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, false, "&e&lOn-Receive", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_RECEIVE.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.ON_RECEIVE)));
@@ -6818,13 +6824,825 @@ public class Menu {
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_JOIN.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.ON_JOIN)));
             commandPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, false, "&e&lOn-Damage", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_DAMAGE.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.ON_DAMAGE)));
-            commandPane.addButton(new Button(ItemHandler.getItem("DIAMOND_SWORD", 1, false, false, "&e&lOn-Hit", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+            commandPane.addButton(new Button(ItemHandler.getItem("DIAMOND_SWORD", 1, false, true, "&e&lOn-Hit", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.ON_HIT.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.ON_HIT)));
-            commandPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item conditions menu."), event -> conditionsPane(player, itemMap)));
+            commandPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item conditions menu."), event -> commandPane(player, itemMap)));
             commandPane.addButton(new Button(fillerPaneBItem), 7);
-            commandPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item conditions menu."), event -> conditionsPane(player, itemMap)));
+            commandPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item conditions menu."), event -> commandPane(player, itemMap)));
         });
         commandPane.open(player);
+    }
+
+    /**
+     * Opens the Pane for the Player.
+     * This Pane is for setting the command action permissions.
+     *
+     * @param player  - The Player to have the Pane opened.
+     * @param itemMap - The ItemMap currently being modified.
+     */
+    private static void commandPermissionPane(final Player player, final ItemMap itemMap) {
+        Interface commandPane = new Interface(false, 5, exitButton, GUIName, player);
+        SchedulerUtils.runAsync(() -> {
+            commandPane.addButton(new Button(fillerPaneGItem), 2);
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_DOOR" : "324"), 1, false, false, "&e&lInteract", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INTERACT_ALL.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INTERACT_ALL)));
+            commandPane.addButton(new Button(fillerPaneGItem));
+            commandPane.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, false, "&e&lInventory", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INVENTORY_ALL.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INVENTORY_ALL)));
+            commandPane.addButton(new Button(fillerPaneGItem));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PISTON" : "PISTON_BASE"), 1, false, false, "&e&lPhysical", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.PHYSICAL.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.PHYSICAL)));
+            commandPane.addButton(new Button(fillerPaneGItem), 2);
+            commandPane.addButton(new Button(ItemHandler.getItem("DIAMOND_HELMET", 1, false, true, "&e&lOn-Equip", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.ON_EQUIP.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.ON_EQUIP)));
+            commandPane.addButton(new Button(ItemHandler.getItem("IRON_HELMET", 1, false, true, "&e&lUn-Equip", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.UN_EQUIP.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.UN_EQUIP)));
+            commandPane.addButton(new Button(ItemHandler.getItem("TORCH", 1, false, false, "&e&lOn-Hold", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.ON_HOLD.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.ON_HOLD)));
+            commandPane.addButton(new Button(ItemHandler.getItem("ARROW", 1, false, false, "&e&lOn-Fire", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.ON_FIRE.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.ON_FIRE)));
+            commandPane.addButton(new Button(ItemHandler.getItem("HOPPER", 1, false, false, "&e&lOn-Drop", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.ON_DROP.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.ON_DROP)));
+            commandPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, true, "&e&lOn-Consume", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.ON_CONSUME.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.ON_CONSUME)));
+            commandPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, false, "&e&lOn-Receive", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.ON_RECEIVE.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.ON_RECEIVE)));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SKELETON_SKULL" : "397"), 1, false, false, "&e&lOn-Death", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.ON_DEATH.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.ON_DEATH)));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PLAYER_HEAD" : "397:3"), 1, false, false, "&e&lOn-Kill", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.ON_KILL.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.ON_KILL)));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GLASS" : "20"), 1, false, false, "&e&lInteract-Air", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INTERACT_AIR.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INTERACT_AIR)));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIGHT_BLUE_STAINED_GLASS" : "95:3"), 1, false, false, "&e&lInteract-Air-Left", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INTERACT_LEFT_AIR.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INTERACT_LEFT_AIR)));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PINK_STAINED_GLASS" : "95:6"), 1, false, false, "&e&lInteract-Air-Right", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INTERACT_RIGHT_AIR.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INTERACT_RIGHT_AIR)));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2:4"), 1, false, false, "&e&lInteract-Block", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INTERACT_BLOCK.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INTERACT_BLOCK)));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "STONE" : "1"), 1, false, false, "&e&lInteract-Block-Left", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INTERACT_LEFT_BLOCK.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INTERACT_LEFT_BLOCK)));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COBBLESTONE" : "4"), 1, false, false, "&e&lInteract-Block-Right", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INTERACT_RIGHT_BLOCK.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INTERACT_RIGHT_BLOCK)));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "IRON_DOOR" : "330"), 1, false, false, "&e&lInteract-Left", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INTERACT_LEFT_ALL.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INTERACT_LEFT_ALL)));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_DOOR" : "324"), 1, false, false, "&e&lInteract-Right", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INTERACT_RIGHT_ALL.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INTERACT_RIGHT_ALL)));
+            commandPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, false, "&e&lInventory-Swap-Cursor", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INVENTORY_SWAP_CURSOR.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INVENTORY_SWAP_CURSOR)));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SNOWBALL" : "SNOW_BALL"), 8, false, false, "&e&lInventory-Middle", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INVENTORY_MIDDLE.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INVENTORY_MIDDLE)));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTED_GOLDEN_APPLE" : "322:1"), 1, false, false, "&e&lInventory-Creative", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INVENTORY_CREATIVE.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INVENTORY_CREATIVE)));
+            commandPane.addButton(new Button(ItemHandler.getItem("ENDER_CHEST", 1, false, false, "&e&lInventory-Left", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INVENTORY_LEFT.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INVENTORY_LEFT)));
+            commandPane.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, false, "&e&lInventory-Right", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INVENTORY_RIGHT.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INVENTORY_RIGHT)));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "STONE_SLAB" : "44"), 2, false, false, "&e&lInventory-Shift-Left", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INVENTORY_SHIFT_LEFT.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INVENTORY_SHIFT_LEFT)));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COBBLESTONE_SLAB" : "44:3"), 2, false, false, "&e&lInventory-Shift-Right", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INVENTORY_SHIFT_RIGHT.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INVENTORY_SHIFT_RIGHT)));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_SIGN" : "323"), 1, false, false, "&e&lOn-Join", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.ON_JOIN.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.ON_JOIN)));
+            commandPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, false, "&e&lOn-Damage", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.ON_DAMAGE.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.ON_DAMAGE)));
+            commandPane.addButton(new Button(ItemHandler.getItem("DIAMOND_SWORD", 1, false, true, "&e&lOn-Hit", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.ON_HIT.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.ON_HIT)));
+            commandPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> commandPane(player, itemMap)));
+            commandPane.addButton(new Button(fillerPaneBItem), 7);
+            commandPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> commandPane(player, itemMap)));
+        });
+        commandPane.open(player);
+    }
+
+    /**
+     * Opens the Pane for the Player.
+     * This Pane is for setting the command action fail messages.
+     *
+     * @param player  - The Player to have the Pane opened.
+     * @param itemMap - The ItemMap currently being modified.
+     */
+    private static void commandFailPane(final Player player, final ItemMap itemMap) {
+        Interface commandPane = new Interface(false, 5, exitButton, GUIName, player);
+        SchedulerUtils.runAsync(() -> {
+            commandPane.addButton(new Button(fillerPaneGItem), 2);
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_DOOR" : "324"), 1, false, false, "&e&lInteract", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_ALL.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_ALL.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.INTERACT_ALL.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.INTERACT_ALL.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                messagesMap.put(Action.INTERACT_ALL.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagesMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(fillerPaneGItem));
+            commandPane.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, false, "&e&lInventory", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_ALL.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_ALL.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.INVENTORY_ALL.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.INVENTORY_ALL.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.INVENTORY_ALL.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(fillerPaneGItem));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PISTON" : "PISTON_BASE"), 1, false, false, "&e&lPhysical", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.PHYSICAL.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.PHYSICAL.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.PHYSICAL.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.PHYSICAL.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.PHYSICAL.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(fillerPaneGItem), 2);
+            commandPane.addButton(new Button(ItemHandler.getItem("DIAMOND_HELMET", 1, false, true, "&e&lOn-Equip", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_EQUIP.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_EQUIP.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.ON_EQUIP.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                        messagesMap.remove(Action.ON_EQUIP.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.ON_EQUIP.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem("IRON_HELMET", 1, false, true, "&e&lUn-Equip", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.UN_EQUIP.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.UN_EQUIP.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.UN_EQUIP.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.UN_EQUIP.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.UN_EQUIP.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem("TORCH", 1, false, false, "&e&lOn-Hold", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_HOLD.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_HOLD.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.ON_HOLD.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.ON_HOLD.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.ON_HOLD.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem("ARROW", 1, false, false, "&e&lOn-Fire", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_FIRE.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_FIRE.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.ON_FIRE.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.ON_FIRE.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.ON_FIRE.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem("HOPPER", 1, false, false, "&e&lOn-Drop", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_DROP.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_DROP.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.ON_DROP.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.ON_DROP.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.ON_DROP.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, true, "&e&lOn-Consume", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_CONSUME.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_CONSUME.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.ON_CONSUME.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.ON_CONSUME.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.ON_CONSUME.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, false, "&e&lOn-Receive", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_RECEIVE.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_RECEIVE.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.ON_RECEIVE.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.ON_RECEIVE.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.ON_RECEIVE.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SKELETON_SKULL" : "397"), 1, false, false, "&e&lOn-Death", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_DEATH.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_DEATH.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.ON_DEATH.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.ON_DEATH.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.ON_DEATH.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PLAYER_HEAD" : "397:3"), 1, false, false, "&e&lOn-Kill", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_KILL.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_KILL.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.ON_KILL.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.ON_KILL.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.ON_KILL.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GLASS" : "20"), 1, false, false, "&e&lInteract-Air", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_AIR.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_AIR.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.INTERACT_AIR.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.INTERACT_AIR.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.INTERACT_AIR.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIGHT_BLUE_STAINED_GLASS" : "95:3"), 1, false, false, "&e&lInteract-Air-Left", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_LEFT_AIR.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_LEFT_AIR.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.INTERACT_LEFT_AIR.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.INTERACT_LEFT_AIR.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.INTERACT_LEFT_AIR.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PINK_STAINED_GLASS" : "95:6"), 1, false, false, "&e&lInteract-Air-Right", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_AIR.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_AIR.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_AIR.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.INTERACT_RIGHT_AIR.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.INTERACT_RIGHT_AIR.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2:4"), 1, false, false, "&e&lInteract-Block", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_BLOCK.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_BLOCK.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.INTERACT_BLOCK.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.INTERACT_BLOCK.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.INTERACT_BLOCK.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "STONE" : "1"), 1, false, false, "&e&lInteract-Block-Left", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_LEFT_BLOCK.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_LEFT_BLOCK.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.INTERACT_LEFT_BLOCK.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.INTERACT_LEFT_BLOCK.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.INTERACT_LEFT_BLOCK.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COBBLESTONE" : "4"), 1, false, false, "&e&lInteract-Block-Right", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_BLOCK.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_BLOCK.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_BLOCK.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.INTERACT_RIGHT_BLOCK.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.INTERACT_RIGHT_BLOCK.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "IRON_DOOR" : "330"), 1, false, false, "&e&lInteract-Left", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_LEFT_ALL.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_LEFT_ALL.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.INTERACT_LEFT_ALL.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.INTERACT_LEFT_ALL.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.INTERACT_LEFT_ALL.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_DOOR" : "324"), 1, false, false, "&e&lInteract-Right", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_ALL.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_ALL.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_ALL.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.INTERACT_RIGHT_ALL.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.INTERACT_RIGHT_ALL.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, false, "&e&lInventory-Swap-Cursor", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_SWAP_CURSOR.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_SWAP_CURSOR.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.INVENTORY_SWAP_CURSOR.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.INVENTORY_SWAP_CURSOR.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.INVENTORY_SWAP_CURSOR.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SNOWBALL" : "SNOW_BALL"), 8, false, false, "&e&lInventory-Middle", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_MIDDLE.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_MIDDLE.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.INVENTORY_MIDDLE.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.INVENTORY_MIDDLE.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.INVENTORY_MIDDLE.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTED_GOLDEN_APPLE" : "322:1"), 1, false, false, "&e&lInventory-Creative", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_CREATIVE.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_CREATIVE.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.INVENTORY_CREATIVE.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.INVENTORY_CREATIVE.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.INVENTORY_CREATIVE.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem("ENDER_CHEST", 1, false, false, "&e&lInventory-Left", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_LEFT.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_LEFT.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.INVENTORY_LEFT.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.INVENTORY_LEFT.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.INVENTORY_LEFT.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, false, "&e&lInventory-Right", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_RIGHT.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_RIGHT.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.INVENTORY_RIGHT.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.INVENTORY_RIGHT.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.INVENTORY_RIGHT.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "STONE_SLAB" : "44"), 2, false, false, "&e&lInventory-Shift-Left", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_SHIFT_LEFT.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_SHIFT_LEFT.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.INVENTORY_SHIFT_LEFT.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.INVENTORY_SHIFT_LEFT.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.INVENTORY_SHIFT_LEFT.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COBBLESTONE_SLAB" : "44:3"), 2, false, false, "&e&lInventory-Shift-Right", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_SHIFT_RIGHT.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_SHIFT_RIGHT.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.INVENTORY_SHIFT_RIGHT.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.INVENTORY_SHIFT_RIGHT.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.INVENTORY_SHIFT_RIGHT.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_SIGN" : "323"), 1, false, false, "&e&lOn-Join", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_JOIN.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_JOIN.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.ON_JOIN.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.ON_JOIN.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.ON_JOIN.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, false, "&e&lOn-Damage", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_DAMAGE.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_DAMAGE.config()) : "NONE")),
+                    event -> {
+                        if (itemMap.getCommandMessages().get(Action.ON_DAMAGE.config()) == null) {
+                            player.closeInventory();
+                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                        } else {
+                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                            messagesMap.remove(Action.ON_DAMAGE.config());
+                            itemMap.setCommandMessages(messagesMap);
+                            commandFailPane(player, itemMap);
+                        }
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.ON_DAMAGE.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem("DIAMOND_SWORD", 1, false, true, "&e&lOn-Hit", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_HIT.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_HIT.config()) : "NONE")),
+            event -> {
+                if (itemMap.getCommandMessages().get(Action.ON_HIT.config()) == null) {
+                    player.closeInventory();
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                    ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                    ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                } else {
+                    final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                    messagesMap.remove(Action.ON_HIT.config());
+                    itemMap.setCommandMessages(messagesMap);
+                    commandFailPane(player, itemMap);
+                }
+            }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                messagessMap.put(Action.ON_HIT.config(), ChatColor.stripColor(event.getMessage()));
+                itemMap.setCommandMessages(messagessMap);
+                commandFailPane(player, itemMap);
+            }));
+            commandPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> commandPane(player, itemMap)));
+            commandPane.addButton(new Button(fillerPaneBItem), 7);
+            commandPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> commandPane(player, itemMap)));
+        });
+        commandPane.open(player);
+    }
+
+    /**
+     * Opens the Pane for the Player.
+     * This Pane is for setting the commands permissions.
+     *
+     * @param player        - The Player to have the Pane opened.
+     * @param itemMap       - The ItemMap currently being modified.
+     * @param commandAction - The command action being referenced.
+     */
+    private static void commandPPane(final Player player, final ItemMap itemMap, final Action commandAction) {
+        Interface permissionsPane = new Interface(true, 2, exitButton, GUIName, player);
+        permissionsPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the command actions menu."), event -> commandPermissionPane(player, itemMap)));
+        SchedulerUtils.runAsync(() -> {
+            permissionsPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, false, "&b&lAdd Permission", "&7", "&7*Permissions(s) that must be met",
+                    "&7in order to execute the", "&7" + commandAction.config().replace("-", " ").replace(".", "") + " item commands.", "&7", "&cNote: &7You can use a ! symbol", "&7to invert the requirement", "&7such as !fish.cakes"),
+                    event -> {
+                        player.closeInventory();
+                        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "PERMISSION").with(Holder.INPUT_EXAMPLE, "fish.cakes");
+                        ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                        ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                    }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "PERMISSION");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final List<String> permissions = itemMap.getCommandPermissions().get(commandAction.config()) != null ? itemMap.getCommandPermissions().get(commandAction.config()) : new ArrayList<>();
+                permissions.add(ChatColor.stripColor(event.getMessage()));
+                final Map<String, List<String>> permissionsMap = itemMap.getCommandPermissions();
+                permissionsMap.put(commandAction.config(), permissions);
+                itemMap.setCommandPermissions(permissionsMap);
+                commandPPane(player, itemMap, commandAction);
+            }));
+            if (itemMap.getCommandPermissions().get(commandAction.config()) != null) {
+                for (String permission : itemMap.getCommandPermissions().get(commandAction.config())) {
+                    permissionsPane.addButton(new Button(ItemHandler.getItem("PAPER", 1, false, false, "&f" + permission, "&7", "&7*Click to remove this permission."),
+                            event -> {
+                                final Map<String, List<String>> commands = itemMap.getCommandPermissions();
+                                final List<String> permissions = commands.get(commandAction.config());
+                                permissions.remove(permission);
+                                if (!permissions.isEmpty()) {
+                                    commands.put(commandAction.config(), permissions);
+                                } else {
+                                    commands.remove(commandAction.config());
+                                }
+                                itemMap.setCommandPermissions(commands);
+                                commandPPane(player, itemMap, commandAction);
+                            }));
+                }
+            }
+        });
+        permissionsPane.open(player);
     }
 
     /**
@@ -6839,29 +7657,6 @@ public class Menu {
         Interface conditionsPane = new Interface(true, 2, exitButton, GUIName, player);
         conditionsPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the command actions menu."), event -> commandActionPane(player, itemMap)));
         SchedulerUtils.runAsync(() -> {
-            final String commandIdentifier = commandAction.config().replace("-", " ").replace(".", "");
-            conditionsPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, (!StringUtils.nullCheck(itemMap.getCommandMessages().get(commandAction.config())).equals("NONE")), false, "&c&l" + String.valueOf(commandIdentifier.charAt(0)).toUpperCase() + commandIdentifier.substring(1) + " Fail Message", "&7", "&7*An optional message to be", "&7sent when the player does not", "&7meet the commands conditions.",
-                    "&7", "&9&lMESSAGE: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(commandAction.config())).equals("NONE") ? itemMap.getCommandMessages().get(commandAction.config()) : "NONE")),
-                    event -> {
-                        if (!StringUtils.nullCheck(itemMap.getCommandMessages().get(commandAction.config())).equals("NONE")) {
-                            Map<String, String> messages = itemMap.getCommandMessages();
-                            messages.put(commandAction.config(), null);
-                            itemMap.setCommandMessages(messages);
-                            commandCPane(player, itemMap, commandAction);
-                        } else {
-                            player.closeInventory();
-                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "COMMAND FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "&cYou do not meet the conditions to execute this item command.");
-                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
-                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
-                        }
-                    }, event -> {
-                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "COMMAND FAIL MESSAGE");
-                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
-                Map<String, String> messages = itemMap.getCommandMessages();
-                messages.put(commandAction.config(), ChatColor.stripColor(event.getMessage()));
-                itemMap.setCommandMessages(messages);
-                commandCPane(player, itemMap, commandAction);
-            }));
             conditionsPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, false, "&b&lAdd Condition", "&7", "&7*Condition(s) that must be met",
                     "&7in order to execute the", "&7" + commandAction.config().replace("-", " ").replace(".", "") + " item commands."),
                     event -> {
@@ -6881,7 +7676,11 @@ public class Menu {
                                 Map<String, List<String>> commands = itemMap.getCommandConditions();
                                 List<String> conditions = commands.get(commandAction.config());
                                 conditions.remove(condition);
-                                commands.put(commandAction.config(), conditions);
+                                if (!conditions.isEmpty()) {
+                                    commands.put(commandAction.config(), conditions);
+                                } else {
+                                    commands.remove(commandAction.config());
+                                }
                                 itemMap.setCommandConditions(commands);
                                 commandCPane(player, itemMap, commandAction);
                             }));
@@ -8524,7 +9323,7 @@ public class Menu {
                     (!StringUtils.nullCheck(itemMap.getMapImage()).equals("NONE") ? "&9&lMap-Image: &a" + itemMap.getMapImage() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getChargeColor() + ""), "NONE") ? "&9&lCharge Color: &a" + itemMap.getChargeColor() : ""),
                     (!StringUtils.nullCheck(patternList.toString()).equals("NONE") ? "&9&lBanner Meta: &a" + patternList : ""), (!StringUtils.nullCheck(armorMeta).equals("NONE") ? "&9&lArmor Meta: &a" + armorMeta : ""), (!Objects.equals(StringUtils.nullCheck(potionList.toString()), "NONE") ? "&9&lPotion-Effects: &a" + potionList : ""), (itemMap.getIngredients() != null && !itemMap.getIngredients().isEmpty() ? "&9&lRecipe: &aYES" : ""),
                     ((!StringUtils.isEmpty(mobs)) ? "&9&lMobs Drop: &a" + mobs.substring(0, mobs.length() - 2) : ""), ((!StringUtils.isEmpty(blocks)) ? "&9&lBlocks Drop: &a" + blocks.substring(0, blocks.length() - 2) : ""),
-                    (!StringUtils.nullCheck(itemMap.getCommandConditions() + "").equals("NONE") ? "&9&lCommand Conditions: &aYES" : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getDisposableConditions() + ""), "NONE") ? "&9&lDisposable Conditions: &aYES" : ""),
+                    (!StringUtils.nullCheck(itemMap.getCommandConditions() + "").equals("NONE") ? "&9&lCommand Conditions: &aYES" : ""), (!StringUtils.nullCheck(itemMap.getCommandPermissions() + "").equals("NONE") ? "&9&lCommand Permissions: &aYES" : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getDisposableConditions() + ""), "NONE") ? "&9&lDisposable Conditions: &aYES" : ""),
                     (!StringUtils.nullCheck(itemMap.getTriggerConditions() + "").equals("NONE") ? "&9&lTrigger Conditions: &aYES" : ""),
                     (!StringUtils.nullCheck(itemMap.getNBTValues() + "").equals("NONE") ? "&9&lNBT Properties: &aYES" : ""), (!StringUtils.nullCheck(itemMap.getContents() + "").equals("NONE") ? "&9&lContents: &aYES" : ""),
                     (!StringUtils.nullCheck(attributeList.toString()).equals("NONE") ? "&9&lAttributes: &a" + attributeList : ""), (!StringUtils.nullCheck(itemMap.getPages() + "").equals("NONE") ? "&9&lBook Pages: &aYES" : ""),
