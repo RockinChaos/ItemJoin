@@ -307,11 +307,19 @@ public class ChatExecutor implements CommandExecutor {
             files.put("lang.yml", Files.asCharSource(new File(ItemJoin.getCore().getPlugin().getDataFolder() + "/" + ItemJoin.getCore().getLang().getFile()), StandardCharsets.UTF_8).read());
             files.put("items.yml", Files.asCharSource(new File(ItemJoin.getCore().getPlugin().getDataFolder() + "/items.yml"), StandardCharsets.UTF_8).read());
             final PasteAPI pasteURI = new PasteAPI(sender, Collections.singletonList("ExploitFixer"), files);
-            final String pasteURL = pasteURI.getPaste();
-            ServerUtils.logInfo(sender.getName() + " has generated a debug paste at " + pasteURL);
-            if (!(sender instanceof ConsoleCommandSender)) {
-                ItemJoin.getCore().getLang().dispatchMessage(sender, "%prefix% &a" + pasteURL, "&eClick me to copy the url.", pasteURL, ClickAction.OPEN_URL);
-            }
+            pasteURI.getPaste(pasteURL -> {
+                if (pasteURL != null) {
+                    ServerUtils.logInfo(sender.getName() + " has generated a debug paste at " + pasteURL);
+                    if (!(sender instanceof ConsoleCommandSender)) {
+                        ItemJoin.getCore().getLang().dispatchMessage(sender, "%prefix% &a" + pasteURL, "&eClick me to copy the url.", pasteURL, ClickAction.OPEN_URL);
+                    }
+                } else {
+                    if (!(sender instanceof ConsoleCommandSender)) {
+                        ItemJoin.getCore().getLang().dispatchMessage(sender, "%prefix% &cFailed to generate the DUMP URL, please try again later.");
+                    }
+                    ServerUtils.logSevere("{ChatExecutor} Failed to generate the DUMP URL, this is not necessarily a bug.");
+                }
+            });
         } catch (Exception e) {
             ServerUtils.logSevere("{ChatExecutor} Failed to execute the DUMP command.");
             ServerUtils.sendSevereTrace(e);
