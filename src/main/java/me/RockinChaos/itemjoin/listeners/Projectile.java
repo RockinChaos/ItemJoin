@@ -20,14 +20,12 @@ package me.RockinChaos.itemjoin.listeners;
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
-import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -43,32 +41,44 @@ import java.util.HashMap;
 
 public class Projectile implements Listener {
 
-    private final HashMap<Integer, ItemStack> arrowList = new HashMap<>();
+    private final HashMap<Integer, ItemStack> projectileList = new HashMap<>();
 
     /**
-     * Refills the players arrows item to its original stack size when consuming the item.
+     * Refills the players projectile item to its original stack size when consuming the item.
      *
      * @param event - EntityShootBowEvent.
      */
     @EventHandler(ignoreCancelled = true)
-    private void onArrowFire(EntityShootBowEvent event) {
-        LivingEntity entity = event.getEntity();
-        if (ServerUtils.hasSpecificUpdate("1_16") && entity instanceof Player && event.getBow() != null && event.getBow().getType() == Material.BOW) {
-            ItemStack item = (event.getConsumable() != null ? event.getConsumable().clone() : event.getConsumable());
-            Player player = (Player) event.getEntity();
-            this.arrowList.put(event.getProjectile().getEntityId(), item);
-            if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
-                LegacyAPI.setConsumeItem(event, false);
-                PlayerHandler.updateInventory(player, 1L);
+    private void onProjectileFire(EntityShootBowEvent event) {
+        final LivingEntity entity = event.getEntity();
+        if (ServerUtils.hasSpecificUpdate("1_16") && entity instanceof Player && event.getBow() != null) {
+            final ItemStack consumable = (event.getConsumable() != null ? event.getConsumable().clone() : event.getConsumable());
+            final Player player = (Player) event.getEntity();
+            this.projectileList.put(event.getProjectile().getEntityId(), consumable);
+            if (!event.getBow().getType().name().equalsIgnoreCase("CROSSBOW") && !ItemUtilities.getUtilities().isAllowed(player, consumable, "count-lock")) {
+                SchedulerUtils.runLater(1L, () -> {
+                    boolean setConsumable = false;
+                    for (final ItemStack item : player.getInventory()) {
+                        if (item != null && item.isSimilar(consumable)) {
+                            item.setAmount(item.getAmount() + consumable.getAmount());
+                            setConsumable = true;
+                            ServerUtils.logDebug("{Projectile} Added " + consumable.getAmount() + "x of " + consumable.getType() + " to existing stack in " + player.getName() + "'s inventory.");
+                            break;
+                        }
+                    }
+                    if (!setConsumable) {
+                        ItemUtilities.getUtilities().getItemMap(consumable).giveTo(player);
+                    }
+                });
             }
         } else if (entity instanceof Player) {
-            HashMap<Integer, ItemStack> map = new HashMap<>();
-            Player player = (Player) event.getEntity();
+            final HashMap<Integer, ItemStack> map = new HashMap<>();
+            final Player player = (Player) event.getEntity();
             for (int i = 0; i < player.getInventory().getSize(); i++) {
                 final ItemStack item = player.getInventory().getItem(i);
                 if (item != null && item.getType() == Material.ARROW && event.getProjectile().getType().name().equalsIgnoreCase("ARROW")) {
-                    ItemStack cloneStack = item.clone();
-                    ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
+                    final ItemStack cloneStack = item.clone();
+                    final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
                     if (itemMap != null) {
                         cloneStack.setAmount(itemMap.getCount(player));
                     }
@@ -79,7 +89,7 @@ public class Projectile implements Listener {
                 for (Integer key : map.keySet()) {
                     final ItemStack item = player.getInventory().getItem(key);
                     if (item == null || item.getAmount() != map.get(key).getAmount()) {
-                        this.arrowList.put(event.getProjectile().getEntityId(), map.get(key));
+                        this.projectileList.put(event.getProjectile().getEntityId(), map.get(key));
                         if (!ItemUtilities.getUtilities().isAllowed(player, map.get(key), "count-lock")) {
                             player.getInventory().setItem(key, map.get(key));
                         }
@@ -91,18 +101,18 @@ public class Projectile implements Listener {
     }
 
     /**
-     * Teleports the Player to the custom arrow's landed position.
+     * Teleports the Player to the custom projectile's landed position.
      *
      * @param event - ProjectileHitEvent
      */
     @EventHandler(priority = EventPriority.NORMAL)
-    public void onArrowHit(ProjectileHitEvent event) {
+    public void onProjectileHit(ProjectileHitEvent event) {
         final org.bukkit.entity.Projectile projectile = event.getEntity();
-        if (projectile instanceof Arrow && projectile.getShooter() instanceof Player) {
-            if (this.arrowList.get(projectile.getEntityId()) != null && !ItemUtilities.getUtilities().isAllowed((Player) projectile.getShooter(), this.arrowList.get(projectile.getEntityId()), "teleport")) {
+        if (projectile.getShooter() instanceof Player) {
+            if (this.projectileList.get(projectile.getEntityId()) != null && !ItemUtilities.getUtilities().isAllowed((Player) projectile.getShooter(), this.projectileList.get(projectile.getEntityId()), "teleport")) {
                 final Player player = (Player) projectile.getShooter();
                 final Location location = projectile.getLocation();
-                final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(this.arrowList.get(projectile.getEntityId()));
+                final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(this.projectileList.get(projectile.getEntityId()));
                 location.setPitch(player.getLocation().getPitch());
                 location.setYaw(player.getLocation().getYaw());
                 player.teleport(location);
@@ -110,14 +120,14 @@ public class Projectile implements Listener {
                     try {
                         projectile.getWorld().playEffect(projectile.getLocation(), Effect.valueOf(itemMap.getTeleportEffect()), 15);
                     } catch (Exception e) {
-                        ServerUtils.logSevere("The defined teleport-effect " + itemMap.getTeleportEffect() + " for the item " + itemMap.getConfigName() + " is not valid!");
+                        ServerUtils.logSevere("{Projectile} The defined teleport-effect " + itemMap.getTeleportEffect() + " for the item " + itemMap.getConfigName() + " is not valid!");
                     }
                 }
                 if (itemMap.getTeleportSound() != null && !itemMap.getTeleportSound().isEmpty()) {
                     try {
                         projectile.getWorld().playSound(projectile.getLocation(), Sound.valueOf(itemMap.getTeleportSound()), (float) ((double) itemMap.getTeleportVolume()), (float) ((double) itemMap.getTeleportPitch()));
                     } catch (Exception e) {
-                        ServerUtils.logSevere("The defined teleport-sound " + itemMap.getTeleportSound() + " for the item " + itemMap.getConfigName() + " is not valid!");
+                        ServerUtils.logSevere("{Projectile} The defined teleport-sound " + itemMap.getTeleportSound() + " for the item " + itemMap.getConfigName() + " is not valid!");
                     }
                 }
                 projectile.remove();
@@ -126,7 +136,7 @@ public class Projectile implements Listener {
     }
 
     /**
-     * Refills the custom arrow item to its original stack size when using a crossbow.
+     * Refills the custom projectile item to its original stack size when using a crossbow.
      *
      * @param event - PlayerInteractEvent
      */
@@ -161,17 +171,17 @@ public class Projectile implements Listener {
     public void crossyAction(Player player, HashMap<Integer, ItemStack> map, int tries) {
         if (tries != 0) {
             SchedulerUtils.runLater(26L, () -> {
-                boolean arrowReturned = false;
+                boolean projectileReturned = false;
                 for (Integer key : map.keySet()) {
                     final ItemStack item = player.getInventory().getItem(key);
                     if (item == null || item.getAmount() != map.get(key).getAmount()) {
                         if (!ItemUtilities.getUtilities().isAllowed(player, map.get(key), "count-lock")) {
                             player.getInventory().setItem(key, map.get(key));
-                            arrowReturned = true;
+                            projectileReturned = true;
                         }
                     }
                 }
-                if (arrowReturned) {
+                if (projectileReturned) {
                     PlayerHandler.updateInventory(player, 1L);
                 } else {
                     this.crossyAction(player, map, (tries - 1));
