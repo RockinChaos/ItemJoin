@@ -2627,14 +2627,16 @@ public class ItemMap implements Cloneable {
      */
     public boolean hasPermission(final Player player, final World world) {
         final String customPerm = PermissionsHandler.customPermissions(this.permissionNode, world.getName() + "." + this.configName);
+        final boolean isNeeded = !customPerm.startsWith("!");
+        final String permissionString = (isNeeded ? customPerm : customPerm.substring(1));
+        final boolean hasPermission = player.isPermissionSet(permissionString) && player.hasPermission(permissionString);
+        final boolean hasCustomPermission = (!isNeeded && !hasPermission) || (isNeeded && hasPermission);
         if (!this.isPermissionNeeded() && !player.isOp() || (!this.isOPPermissionNeeded() && player.isOp())) {
             return true;
         } else if (this.isOPPermissionNeeded() && player.isOp()) {
-            return player.isPermissionSet(customPerm) && player.hasPermission(customPerm) && (!player.isPermissionSet("itemjoin." + world.getName() + ".*")
-                    || (player.isPermissionSet("itemjoin." + world.getName() + ".*") && player.hasPermission("itemjoin." + world.getName() + ".*")))
-                    || ((player.isPermissionSet("itemjoin." + world.getName() + ".*") && player.hasPermission("itemjoin." + world.getName() + ".*")) || (player.isPermissionSet(customPerm) && player.hasPermission(customPerm)));
+            return hasCustomPermission || (player.isPermissionSet("itemjoin." + world.getName() + ".*") && player.hasPermission("itemjoin." + world.getName() + ".*"));
         }
-        return (player.isPermissionSet("itemjoin." + world.getName() + ".*") && player.hasPermission("itemjoin." + world.getName() + ".*")) || (player.isPermissionSet(customPerm) && player.hasPermission(customPerm));
+        return (player.isPermissionSet("itemjoin." + world.getName() + ".*") && player.hasPermission("itemjoin." + world.getName() + ".*")) || hasCustomPermission;
     }
 
     /**

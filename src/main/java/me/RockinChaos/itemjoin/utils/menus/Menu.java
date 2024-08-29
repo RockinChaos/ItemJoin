@@ -940,8 +940,8 @@ public class Menu {
                     (!StringUtils.nullCheck(itemMap.getItemFlags()).equals("NONE") ? "&a" + itemflagsList : "NONE")), event -> flagPane(player, itemMap)));
             creatingPane.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, false, "&b&lTriggers", "&7", "&7*When the players act upon these", "&7events, the item will be given.", "&9&lTRIGGERS: &a" +
                     (!StringUtils.nullCheck(itemMap.getTriggers()).equals("NONE") ? "&a" + triggersList : "NONE")), event -> triggerPane(player, itemMap)));
-            creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "REDSTONE_TORCH" : "76"), 1, false, false, "&b&lPermission Node", "&7", "&7*Custom permission node that", "&7will be required by a permission", "&7plugin to receive the item.", "&7&lNote: &7Do NOT include",
-                    "&7any spaces or special characters.", "&7Setting this bypasses the", "&7config.yml Permissions Settings.", "&9&lPERMISSION-NODE: &a" + StringUtils.nullCheck(itemMap.getPermissionNode())), event -> {
+            creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "REDSTONE_TORCH" : "76"), 1, false, false, "&b&lPermission Node", "&7", "&7*Custom permission node that", "&7will be required by a permission", "&7plugin to receive the item.", "&7", "&c&lNote: &7You can use a &c&l! &7symbol", "&7to invert the requirement such", "&7as !fish.cakes, do NOT include any",
+                    "&7other special characters or spaces.", "&7", "&7Setting this bypasses the", "&7config.yml Permissions Settings.", "&7", "&9&lPERMISSION-NODE: &a" + StringUtils.nullCheck(itemMap.getPermissionNode())), event -> {
                 if (!StringUtils.nullCheck(itemMap.getPermissionNode()).equals("NONE")) {
                     itemMap.setPerm(null);
                     creatingPane(player, itemMap);
@@ -7608,7 +7608,7 @@ public class Menu {
         permissionsPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the command actions menu."), event -> commandPermissionPane(player, itemMap)));
         SchedulerUtils.runAsync(() -> {
             permissionsPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, false, "&b&lAdd Permission", "&7", "&7*Permissions(s) that must be met",
-                    "&7in order to execute the", "&7" + commandAction.config().replace("-", " ").replace(".", "") + " item commands.", "&7", "&cNote: &7You can use a ! symbol", "&7to invert the requirement", "&7such as !fish.cakes"),
+                    "&7in order to execute the", "&7" + commandAction.config().replace("-", " ").replace(".", "") + " item commands.", "&7", "&c&lNote: &7You can use a &c&l! &7symbol", "&7to invert the requirement", "&7such as !fish.cakes"),
                     event -> {
                         player.closeInventory();
                         final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "PERMISSION").with(Holder.INPUT_EXAMPLE, "fish.cakes");
