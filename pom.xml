@@ -11,7 +11,7 @@
     <description>Get custom items on join.</description>
     <url>https://www.spigotmc.org/resources/itemjoin.12661/</url>
 
-    <version>6.0.8-SNAPSHOT</version>
+    <version>6.1.0-SNAPSHOT</version>
 
     <properties>
         <chaoscore.version>1.0.8-SNAPSHOT</chaoscore.version>
