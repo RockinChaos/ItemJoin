@@ -3345,7 +3345,7 @@ public class Menu {
         Interface texturePane = new Interface(true, 6, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
             texturePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> dataPane(player, itemMap)));
-            texturePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Texture", "&7", "&7*Click to set a custom texture", "&7value for the item."), event -> {
+            texturePane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, false, "&e&lCustom Texture", "&7", "&7*Click to set a custom texture", "&7value for the item."), event -> {
                 player.closeInventory();
                 final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "DURABILITY DATA").with(Holder.INPUT_EXAMPLE, "1193");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
@@ -3363,7 +3363,15 @@ public class Menu {
             }));
             for (int i = 1; i <= 2000; i++) {
                 final int k = i;
-                texturePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PINK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:6"), 1, false, false, "&9&lData: &a&l" + k, "&7", "&7*Click to set the", "&7durability data of the item."), event -> {
+                final ItemStack item = ItemHandler.getItem(itemMap.getMaterial().name(), 1, false, false, "&9&lData: &a&l" + k, "&7", "&7*Click to set the", "&7durability data of the item.");
+                final ItemMeta itemMeta = item.getItemMeta();
+                if (ServerUtils.hasSpecificUpdate("1_13") && itemMeta != null) {
+                    ((Damageable) itemMeta).setDamage(k);
+                    item.setItemMeta(itemMeta);
+                } else {
+                    LegacyAPI.setDurability(item, (short)k);
+                }
+                texturePane.addButton(new Button(item, event -> {
                     itemMap.setData(k);
                     dataPane(player, itemMap);
                 }));
@@ -3383,7 +3391,7 @@ public class Menu {
         Interface texturePane = new Interface(true, 6, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
             texturePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> dataPane(player, itemMap)));
-            texturePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Model Data", "&7", "&7*Click to set the custom mode data", "&7value for the item."), event -> {
+            texturePane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, false, "&e&lCustom Model Data", "&7", "&7*Click to set the custom mode data", "&7value for the item."), event -> {
                 player.closeInventory();
                 final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "MODEL DATA").with(Holder.INPUT_EXAMPLE, "1193");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
@@ -3401,7 +3409,13 @@ public class Menu {
             }));
             for (int i = 1; i <= 2000; i++) {
                 final int k = i;
-                texturePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PINK_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:6"), 1, false, false, "&9&lModel Data: &a&l" + k, "&7", "&7*Click to set the", "&7custom model data for the item."), event -> {
+                final ItemStack item = ItemHandler.getItem(itemMap.getMaterial().name(), 1, false, false, "&9&lModel Data: &a&l" + k, "&7", "&7*Click to set the", "&7custom model data for the item.");
+                final ItemMeta itemMeta = item.getItemMeta();
+                if (itemMeta != null) {
+                    itemMeta.setCustomModelData(k);
+                    item.setItemMeta(itemMeta);
+                }
+                texturePane.addButton(new Button(item, event -> {
                     itemMap.setModelData(String.valueOf(k));
                     dataPane(player, itemMap);
                 }));
