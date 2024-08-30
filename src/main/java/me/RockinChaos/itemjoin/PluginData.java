@@ -507,7 +507,7 @@ public class PluginData {
         {
             new ItemDesigner();
             {
-                runSingleAsync(() -> {
+                run(() -> {
                     ItemJoin.getCore().getData().setStarted(true);
                     forOnlinePlayers(player -> ItemUtilities.getUtilities().setStatistics(player));
                     this.setPages();

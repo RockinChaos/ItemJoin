@@ -25,7 +25,6 @@ import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -225,7 +224,7 @@ public class Drops implements Listener {
                     cycleTask.set(SchedulerUtils.runAsyncAtInterval(20L, 40L, () -> {
                         if (player.isOnline() && !player.isDead() && PlayerHandler.isCraftingInv(player)) {
                             handleKeepItem(player, stack, setSlot, "top_inventory");
-                            Bukkit.getServer().getScheduler().cancelTask(cycleTask.get());
+                            SchedulerUtils.cancelTask(cycleTask.get());
                         }
                     }));
                 }

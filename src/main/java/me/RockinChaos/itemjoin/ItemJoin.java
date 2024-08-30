@@ -25,7 +25,6 @@ import me.RockinChaos.core.utils.sql.Database;
 import me.RockinChaos.itemjoin.api.ItemJoinAPI;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.menus.Menu;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class ItemJoin extends JavaPlugin {
@@ -77,7 +76,7 @@ public class ItemJoin extends JavaPlugin {
      */
     @Override
     public void onDisable() {
-        Bukkit.getScheduler().cancelTasks(this);
+        SchedulerUtils.cancelTasks();
         Menu.closeMenu();
         PluginData.getInfo().saveCooldowns();
         PluginData.getInfo().purgeCraftItems(true);

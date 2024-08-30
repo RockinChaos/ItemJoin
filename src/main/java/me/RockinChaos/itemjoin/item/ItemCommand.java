@@ -280,7 +280,7 @@ public class ItemCommand {
      * Cancels the tasks for onHold and onReceive.
      */
     private void cancelTask() {
-        Bukkit.getServer().getScheduler().cancelTask(this.cycleTask);
+        SchedulerUtils.cancelTask(this.cycleTask);
     }
 
     /**
