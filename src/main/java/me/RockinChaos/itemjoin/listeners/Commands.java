@@ -19,10 +19,9 @@ package me.RockinChaos.itemjoin.listeners;
 
 import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.PlayerHandler;
-import me.RockinChaos.core.utils.CompatUtils;
-import me.RockinChaos.core.utils.SchedulerUtils;
-import me.RockinChaos.core.utils.ServerUtils;
-import me.RockinChaos.core.utils.StringUtils;
+import me.RockinChaos.core.utils.*;
+import me.RockinChaos.core.utils.keys.CompositeKey;
+import me.RockinChaos.core.utils.keys.PrimaryKey;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
@@ -39,19 +38,30 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType.SlotType;
+import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class Commands implements Listener {
 
-    private final HashMap<Integer, ItemStack> projectileList = new HashMap<>();
-    private final HashMap<ItemStack, Long> interactDupe = new HashMap<>();
-    private final HashMap<String, Boolean> itemDrop = new HashMap<>();
+    /**
+     * Checks for Creative "Destroy Item" and attempts to prevent commands from being executed.
+     * Another yet unnecessary fix to resolve the horribly designed Creative Mode.
+     *
+     * @param event - PrepareItemCraftEvent
+     */
+    @EventHandler(priority = EventPriority.LOW)
+    private void onCreativeCraft(PrepareItemCraftEvent event) {
+        final Player player = CompatUtils.getPlayer(event.getView());
+        if (PlayerHandler.isCreativeMode(player) && PlayerHandler.isCraftingInv(player)) {
+            TimerUtils.setExpiry("cc_destroy", player, 20);
+        }
+    }
 
     /**
      * Runs the inventory commands for the custom item upon clicking it.
@@ -60,11 +70,19 @@ public class Commands implements Listener {
      */
     @EventHandler()
     private void onInventory(InventoryClickEvent event) {
-        final ItemStack item = event.getCurrentItem();
         final Player player = (Player) event.getWhoClicked();
+        final ItemStack item = event.getCurrentItem() != null && event.getCurrentItem().getType() != Material.AIR ? event.getCurrentItem().clone() : (event.getCursor() != null && event.getCursor().getType() != Material.AIR ? event.getCursor().clone() : event.getCurrentItem());
         final String action = event.getAction().name();
         final String slot = (event.getSlotType().name().equalsIgnoreCase("CRAFTING") ? "CRAFTING[" + event.getSlot() + "]" : String.valueOf(event.getSlot()));
-        this.runCommands(player, null, item, action, event.getClick().name(), slot);
+        if (!PlayerHandler.isCreativeMode(player)) {
+            this.runCommands(player, null, item, action, event.getClick().name(), slot);
+        } else {
+            SchedulerUtils.run(() -> {
+                if (TimerUtils.isExpired("cc_destroy", player)) {
+                    this.runCommands(player, null, item, action, "CREATIVE", slot);
+                }
+            });
+        }
     }
 
     /**
@@ -314,7 +332,7 @@ public class Commands implements Listener {
      * @param event - ProjectileLaunchEvent
      */
     @EventHandler(ignoreCancelled = true)
-    public void onProjectileLaunch(final ProjectileLaunchEvent event) {
+    public void onProjectileLaunch(ProjectileLaunchEvent event) {
         final Projectile projectile = event.getEntity();
         final Player player = (projectile.getShooter() instanceof Player ? (Player) projectile.getShooter() : null);
         if (player != null) {
@@ -322,7 +340,7 @@ public class Commands implements Listener {
             if (item.getAmount() == 0) {
                 item.setAmount(1);
             }
-            this.projectileList.put(projectile.getEntityId(), item.clone());
+            TimerUtils.setExpiry("pj_teleport", new PrimaryKey(projectile.getEntityId()).addMetaData("projectile", item.clone()), 2, TimeUnit.MINUTES);
         }
     }
 
@@ -344,10 +362,10 @@ public class Commands implements Listener {
             }
         }
         final Player altPlayer = ((hitEntity instanceof Player) ? (Player) hitEntity : null);
-        final ItemStack item = this.projectileList.containsKey(event.getEntity().getEntityId()) ? this.projectileList.get(event.getEntity().getEntityId()).clone() : null;
-        this.projectileList.remove(event.getEntity().getEntityId());
-        if (player != null && hitEntity != null) {
+        final Object projectile = TimerUtils.getAlive("pj_teleport", new PrimaryKey(event.getEntity().getEntityId()));
+        if (player != null && hitEntity != null && projectile != null) {
             final int slot = player.getInventory().getHeldItemSlot();
+            final ItemStack item = ((ItemStack)((PrimaryKey)projectile).getMetaData("projectile"));
             if (item != null && item.getType() != Material.AIR && !PlayerHandler.isMenuClick(player, Action.LEFT_CLICK_AIR)) {
                 this.runCommands(player, altPlayer, item, "ON_HIT", "HIT", Integer.toString(slot));
             }
@@ -410,12 +428,11 @@ public class Commands implements Listener {
         final Player player = event.getPlayer();
         final ItemStack item = (event.getItem() != null ? event.getItem().clone() : (event.getAction() == Action.PHYSICAL ? PlayerHandler.getMainHandItem(player) : event.getItem()));
         final String action = event.getAction().name();
-        if (((PlayerHandler.isAdventureMode(player) && !action.contains("LEFT") || !PlayerHandler.isAdventureMode(player))) && !this.isDropEvent(event.getPlayer())) {
+        if (((PlayerHandler.isAdventureMode(player) && !action.contains("LEFT") || !PlayerHandler.isAdventureMode(player))) && TimerUtils.isExpired("dd_drop", player)) {
             final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player));
             if (!PlayerHandler.isMenuClick(player, event.getAction()) && itemMap != null && itemMap.isSimilar(player, item)) {
-                long dupeDuration = !this.interactDupe.isEmpty() && this.interactDupe.get(item) != null ? System.currentTimeMillis() - this.interactDupe.get(item) : -1;
-                if (dupeDuration == -1 || dupeDuration > 30) {
-                    this.interactDupe.put(item, System.currentTimeMillis());
+                if (TimerUtils.isExpired("dd_interact", new CompositeKey(player, item))) {
+                    TimerUtils.setExpiry("dd_interact", new CompositeKey(player, item), 30, TimeUnit.MILLISECONDS);
                     this.runCommands(player, null, item, action, (event.getAction() == Action.PHYSICAL ? "INTERACTED" : action.split("_")[0]), String.valueOf(player.getInventory().getHeldItemSlot()));
                 }
             }
@@ -431,26 +448,20 @@ public class Commands implements Listener {
     private void onSwingArm(PlayerAnimationEvent event) {
         final Player player = event.getPlayer();
         final ItemStack item = PlayerHandler.getHandItem(player);
-        if (PlayerHandler.isAdventureMode(player) && !this.isDropEvent(event.getPlayer()) && (!PlayerHandler.isMenuClick(player, Action.LEFT_CLICK_AIR) || PlayerHandler.isMenuClick(player, Action.LEFT_CLICK_BLOCK))) {
+        if (PlayerHandler.isAdventureMode(player) && TimerUtils.isExpired("dd_drop", player) && (!PlayerHandler.isMenuClick(player, Action.LEFT_CLICK_AIR) || PlayerHandler.isMenuClick(player, Action.LEFT_CLICK_BLOCK))) {
             this.runCommands(player, null, item, "LEFT_CLICK_AIR", "LEFT", String.valueOf(player.getInventory().getHeldItemSlot()));
         }
     }
 
     /**
-     * Places the player dropping an item into a temporary hashmap to be noted as,
-     * having recently dropped an item. This is to prevent command execution when dropping an item using the item drop keybind.
+     * Sets a timer for the player dropping an item to prevent any duplicate command execution, typically because of the hand swing animation.
      *
      * @param event - PlayerDropItemEvent
      */
     @EventHandler()
     private void onHandDrop(PlayerDropItemEvent event) {
-        if (!this.isDropEvent(event.getPlayer())) {
-            this.itemDrop.put(PlayerHandler.getPlayerID(event.getPlayer()), true);
-            SchedulerUtils.runLater(1L, () -> {
-                if (this.isDropEvent(event.getPlayer())) {
-                    this.itemDrop.remove(PlayerHandler.getPlayerID(event.getPlayer()));
-                }
-            });
+        if (TimerUtils.isExpired("dd_drop", event.getPlayer())) {
+            TimerUtils.setExpiry("dd_drop", event.getPlayer(), 900, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -482,7 +493,15 @@ public class Commands implements Listener {
                 (ItemHandler.isSkull(item.getType()) || StringUtils.splitIgnoreCase(item.getType().name(), "HEAD", "_") ? "SKULL_HELMET".split("_") : item.getType().name().split("_")));
         if (itemType.length >= 2 && (itemType[1] != null && !itemType[1].isEmpty()
                 && (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") || itemType[1].equalsIgnoreCase(StringUtils.getArmorSlot(slot, false))))) {
-            this.runCommands(player, null, item, action, (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") ? "EQUIPPED" : clickType), slot);
+            if (!PlayerHandler.isCreativeMode(player)) {
+                this.runCommands(player, null, item, action, (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") ? "EQUIPPED" : clickType), slot);
+            } else {
+                SchedulerUtils.run(() -> {
+                    if (TimerUtils.isExpired("cc_destroy", player)) {
+                        this.runCommands(player, null, item, action, (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") ? "EQUIPPED" : clickType), slot);
+                    }
+                });
+            }
         }
     }
 
@@ -502,17 +521,5 @@ public class Commands implements Listener {
                 itemMap.executeCommands(player, altPlayer, item, action, clickType, (slot == null ? itemMap.getSlot() : slot));
             }
         });
-    }
-
-    /**
-     * Checks if the player recently attempted to drop an item.
-     *
-     * @param player - The player being checked.
-     * @return If the player has dropped the item.
-     */
-    private boolean isDropEvent(final Player player) {
-        return !((this.itemDrop.get(PlayerHandler.getPlayerID(player)) == null
-                || (this.itemDrop.get(PlayerHandler.getPlayerID(player)) != null
-                && !this.itemDrop.get(PlayerHandler.getPlayerID(player)))));
     }
 }
