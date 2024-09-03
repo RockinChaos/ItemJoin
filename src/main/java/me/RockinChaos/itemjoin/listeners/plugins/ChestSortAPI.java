@@ -17,6 +17,7 @@
  */
 package me.RockinChaos.itemjoin.listeners.plugins;
 
+import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.CompatUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.itemjoin.PluginData;
@@ -51,9 +52,16 @@ public class ChestSortAPI implements Listener {
                 event.setCancelled(true);
             } else {
                 try {
-                    for (ItemStack item : event.getInventory().getContents()) {
+                    for (ItemStack item : player.getInventory().getContents()) {
                         if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-modify")) {
                             event.setUnmovable(item);
+                        }
+                    }
+                    if (!PlayerHandler.isCraftingInv(player)) {
+                        for (ItemStack item : CompatUtils.getTopInventory(player)) {
+                            if (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-modify")) {
+                                event.setUnmovable(item);
+                            }
                         }
                     }
                 } catch (NoSuchMethodError ignored) {
