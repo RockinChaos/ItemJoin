@@ -356,10 +356,12 @@ public class PluginData {
             for (final World world : Bukkit.getWorlds()) {
                 final List<String> listItems = new ArrayList<>();
                 listCount++;
-                for (final ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
-                    if (!listItems.contains(itemMap.getConfigName()) && itemMap.inWorld(world)) {
-                        listCount++;
-                        listItems.add(itemMap.getConfigName());
+                synchronized (ItemUtilities.getUtilities().getItems()) {
+                    for (final ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
+                        if (!listItems.contains(itemMap.getConfigName()) && itemMap.inWorld(world)) {
+                            listCount++;
+                            listItems.add(itemMap.getConfigName());
+                        }
                     }
                 }
             }
