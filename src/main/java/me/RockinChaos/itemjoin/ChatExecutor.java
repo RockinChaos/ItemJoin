@@ -519,33 +519,34 @@ public class ChatExecutor implements CommandExecutor {
      * @param args   - The player name having their data purged.
      */
     private void purge(final CommandSender sender, final String table, final String args) {
-        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.TARGET_PLAYER, args).with(Holder.PURGE_DATA, table);
-        OfflinePlayer foundPlayer = null;
-        if (!table.equalsIgnoreCase("Database")) {
-            placeHolders.with(Holder.COMMAND, "/ij purge " + table + (table.equalsIgnoreCase("map-ids") ? " <image>" : " <player>"));
-            if (!table.equalsIgnoreCase("map-ids")) {
-                foundPlayer = LegacyAPI.getOfflinePlayer(args);
-            }
-            if (!table.equalsIgnoreCase("map-ids") && foundPlayer == null && !args.equalsIgnoreCase("ALL")) {
-                ItemJoin.getCore().getLang().sendLangMessage("commands.default.noTarget", sender, placeHolders);
-                return;
-            }
-        } else {
-            placeHolders.with(Holder.COMMAND, "/ij purge");
-        }
+        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.PURGE_DATA, table).with(Holder.TARGET_PLAYER, args).with(Holder.COMMAND, (table.equalsIgnoreCase("Database") ? "/ij purge" : "/ij purge " + table + (table.equalsIgnoreCase("map-ids") ? " <image>" : " <player>")));
+        final List<String> handledPlayers = new ArrayList<>();
+        final boolean[] hasFailed = { false };
         if (this.confirmationRequests.get(table + sender.getName()) != null && this.confirmationRequests.get(table + sender.getName()).equals(true)) {
             if (!table.equalsIgnoreCase("Database")) {
-                final String playerId = PlayerHandler.getPlayerID(PlayerHandler.getPlayerString(args));
-                DataObject dataObject = (table.replace("-", "_").equalsIgnoreCase("map_ids")
-                        ? new DataObject(Table.MAP_IDS, null, "", args, "") : (table.replace("-", "_").equalsIgnoreCase("first_join")
-                        ? new DataObject(Table.FIRST_JOIN, playerId, "", "", "") : (table.replace("-", "_").equalsIgnoreCase("first_world")
-                        ? new DataObject(Table.FIRST_WORLD, playerId, "", "", "") : (table.replace("-", "_").equalsIgnoreCase("ip_limits")
-                        ? new DataObject(Table.IP_LIMITS, playerId, "", "", "") : (table.replace("-", "_").equalsIgnoreCase("enabled_players")
-                        ? new DataObject(Table.ENABLED_PLAYERS, playerId, "", "", "", "") : (table.replace("-", "_").equalsIgnoreCase("first_commands")
-                        ? new DataObject(Table.FIRST_COMMANDS, playerId, "", "", "") : null))))));
-                if (dataObject != null) {
-                    ItemJoin.getCore().getSQL().removeData(dataObject);
-                }
+                PlayerHandler.forSelectedEntities(sender, !args.equalsIgnoreCase("ALL") && !args.equalsIgnoreCase("All Players") ? args : null, argsPlayer -> {
+                    if (!table.equalsIgnoreCase("map-ids") && argsPlayer == null && !args.equalsIgnoreCase("ALL") && !args.equalsIgnoreCase("All Players")) {
+                        placeHolders.with(Holder.TARGET_PLAYER, args);
+                        ItemJoin.getCore().getLang().sendLangMessage("commands.default.noTarget", sender, placeHolders);
+                        hasFailed[0] = true;
+                        return;
+                    }
+                    final String playerId = PlayerHandler.getPlayerID(argsPlayer);
+                    placeHolders.with(Holder.TARGET_PLAYER, argsPlayer != null ? argsPlayer.getName() : "NULL");
+                    DataObject dataObject = (table.replace("-", "_").equalsIgnoreCase("map_ids")
+                            ? new DataObject(Table.MAP_IDS, null, "", args, "") : (table.replace("-", "_").equalsIgnoreCase("first_join")
+                            ? new DataObject(Table.FIRST_JOIN, playerId, "", "", "") : (table.replace("-", "_").equalsIgnoreCase("first_world")
+                            ? new DataObject(Table.FIRST_WORLD, playerId, "", "", "") : (table.replace("-", "_").equalsIgnoreCase("ip_limits")
+                            ? new DataObject(Table.IP_LIMITS, playerId, "", "", "") : (table.replace("-", "_").equalsIgnoreCase("enabled_players")
+                            ? new DataObject(Table.ENABLED_PLAYERS, playerId, "", "", "", "") : (table.replace("-", "_").equalsIgnoreCase("first_commands")
+                            ? new DataObject(Table.FIRST_COMMANDS, playerId, "", "", "") : null))))));
+                    if (dataObject != null) {
+                        ItemJoin.getCore().getSQL().removeData(dataObject);
+                    }
+                    if ((argsPlayer != null && !handledPlayers.contains(argsPlayer.getName())) || !handledPlayers.contains("All Players")) {
+                        handledPlayers.add(argsPlayer != null ? argsPlayer.getName() : "All Players");
+                    }
+                });
             } else {
                 ItemJoin.getCore().getData().setStarted(false);
                 ItemJoin.getCore().getSQL().purgeDatabase();
