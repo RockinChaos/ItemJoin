@@ -113,7 +113,7 @@ public class Legacy_Stackable implements Listener {
                 event.setCancelled(false);
             }
             PlayerHandler.updateInventory(player, 1L);
-        } else if (action != InventoryAction.PLACE_ONE && action != InventoryAction.COLLECT_TO_CURSOR && cursorItem != null && cursorItem.getType() != Material.AIR && (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR)) {
+        } else if (action != InventoryAction.PLACE_ONE && action != InventoryAction.COLLECT_TO_CURSOR && cursorItem.getType() != Material.AIR && (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR)) {
             final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(cursorItem);
             final ItemStack openCursor = CompatUtils.getCursor(player);
             if (itemMap != null && openCursor.getType() != Material.AIR && !ItemUtilities.getUtilities().isAllowed(player, cursorItem, "stackable")) {

@@ -872,7 +872,7 @@ public class Menu {
             StringBuilder patternString = new StringBuilder();
             if (!StringUtils.nullCheck(itemMap.getBannerPatterns().toString()).equals("NONE")) {
                 for (Pattern patterns : itemMap.getBannerPatterns()) {
-                    patternString.append(patterns.getColor()).append(":").append(patterns.getPattern().name().toUpperCase()).append(", ");
+                    patternString.append(patterns.getColor()).append(":").append(ItemHandler.getPatternName(patterns)).append(", ");
                 }
                 for (String split : StringUtils.softSplit(StringUtils.nullCheck(patternString.substring(0, patternString.length())))) {
                     patternList.append("&a").append(split).append(" /n ");
@@ -6976,7 +6976,7 @@ public class Menu {
         SchedulerUtils.runAsync(() -> {
             commandPane.addButton(new Button(fillerPaneGItem), 2);
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_DOOR" : "324"), 1, false, false, "&e&lInteract", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_ALL.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_ALL.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_ALL.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_ALL.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.INTERACT_ALL.config()) == null) {
                             player.closeInventory();
@@ -6999,7 +6999,7 @@ public class Menu {
             }));
             commandPane.addButton(new Button(fillerPaneGItem));
             commandPane.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, false, "&e&lInventory", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_ALL.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_ALL.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_ALL.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_ALL.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.INVENTORY_ALL.config()) == null) {
                             player.closeInventory();
@@ -7022,7 +7022,7 @@ public class Menu {
             }));
             commandPane.addButton(new Button(fillerPaneGItem));
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PISTON" : "PISTON_BASE"), 1, false, false, "&e&lPhysical", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.PHYSICAL.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.PHYSICAL.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.PHYSICAL.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.PHYSICAL.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.PHYSICAL.config()) == null) {
                             player.closeInventory();
@@ -7045,7 +7045,7 @@ public class Menu {
             }));
             commandPane.addButton(new Button(fillerPaneGItem), 2);
             commandPane.addButton(new Button(ItemHandler.getItem("DIAMOND_HELMET", 1, false, true, "&e&lOn-Equip", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_EQUIP.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_EQUIP.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_EQUIP.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_EQUIP.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.ON_EQUIP.config()) == null) {
                             player.closeInventory();
@@ -7067,7 +7067,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem("IRON_HELMET", 1, false, true, "&e&lUn-Equip", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.UN_EQUIP.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.UN_EQUIP.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.UN_EQUIP.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.UN_EQUIP.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.UN_EQUIP.config()) == null) {
                             player.closeInventory();
@@ -7089,7 +7089,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem("TORCH", 1, false, false, "&e&lOn-Hold", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_HOLD.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_HOLD.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_HOLD.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_HOLD.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.ON_HOLD.config()) == null) {
                             player.closeInventory();
@@ -7111,7 +7111,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem("ARROW", 1, false, false, "&e&lOn-Fire", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_FIRE.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_FIRE.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_FIRE.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_FIRE.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.ON_FIRE.config()) == null) {
                             player.closeInventory();
@@ -7133,7 +7133,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem("HOPPER", 1, false, false, "&e&lOn-Drop", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_DROP.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_DROP.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_DROP.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_DROP.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.ON_DROP.config()) == null) {
                             player.closeInventory();
@@ -7155,7 +7155,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem("POTION", 1, false, true, "&e&lOn-Consume", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_CONSUME.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_CONSUME.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_CONSUME.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_CONSUME.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.ON_CONSUME.config()) == null) {
                             player.closeInventory();
@@ -7177,7 +7177,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem("EMERALD", 1, false, false, "&e&lOn-Receive", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_RECEIVE.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_RECEIVE.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_RECEIVE.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_RECEIVE.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.ON_RECEIVE.config()) == null) {
                             player.closeInventory();
@@ -7199,7 +7199,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SKELETON_SKULL" : "397"), 1, false, false, "&e&lOn-Death", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_DEATH.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_DEATH.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_DEATH.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_DEATH.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.ON_DEATH.config()) == null) {
                             player.closeInventory();
@@ -7221,7 +7221,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PLAYER_HEAD" : "397:3"), 1, false, false, "&e&lOn-Kill", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_KILL.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_KILL.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_KILL.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_KILL.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.ON_KILL.config()) == null) {
                             player.closeInventory();
@@ -7243,7 +7243,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GLASS" : "20"), 1, false, false, "&e&lInteract-Air", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_AIR.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_AIR.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_AIR.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_AIR.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.INTERACT_AIR.config()) == null) {
                             player.closeInventory();
@@ -7265,7 +7265,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIGHT_BLUE_STAINED_GLASS" : "95:3"), 1, false, false, "&e&lInteract-Air-Left", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_LEFT_AIR.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_LEFT_AIR.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_LEFT_AIR.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_LEFT_AIR.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.INTERACT_LEFT_AIR.config()) == null) {
                             player.closeInventory();
@@ -7287,7 +7287,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "PINK_STAINED_GLASS" : "95:6"), 1, false, false, "&e&lInteract-Air-Right", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_AIR.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_AIR.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_AIR.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_AIR.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_AIR.config()) == null) {
                             player.closeInventory();
@@ -7309,7 +7309,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRASS_BLOCK" : "2:4"), 1, false, false, "&e&lInteract-Block", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_BLOCK.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_BLOCK.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_BLOCK.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_BLOCK.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.INTERACT_BLOCK.config()) == null) {
                             player.closeInventory();
@@ -7331,7 +7331,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "STONE" : "1"), 1, false, false, "&e&lInteract-Block-Left", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_LEFT_BLOCK.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_LEFT_BLOCK.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_LEFT_BLOCK.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_LEFT_BLOCK.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.INTERACT_LEFT_BLOCK.config()) == null) {
                             player.closeInventory();
@@ -7353,7 +7353,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COBBLESTONE" : "4"), 1, false, false, "&e&lInteract-Block-Right", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_BLOCK.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_BLOCK.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_BLOCK.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_BLOCK.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_BLOCK.config()) == null) {
                             player.closeInventory();
@@ -7375,7 +7375,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "IRON_DOOR" : "330"), 1, false, false, "&e&lInteract-Left", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_LEFT_ALL.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_LEFT_ALL.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_LEFT_ALL.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_LEFT_ALL.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.INTERACT_LEFT_ALL.config()) == null) {
                             player.closeInventory();
@@ -7397,7 +7397,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_DOOR" : "324"), 1, false, false, "&e&lInteract-Right", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_ALL.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_ALL.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_ALL.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_ALL.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.INTERACT_RIGHT_ALL.config()) == null) {
                             player.closeInventory();
@@ -7419,7 +7419,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, false, "&e&lInventory-Swap-Cursor", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_SWAP_CURSOR.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_SWAP_CURSOR.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_SWAP_CURSOR.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_SWAP_CURSOR.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.INVENTORY_SWAP_CURSOR.config()) == null) {
                             player.closeInventory();
@@ -7441,7 +7441,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SNOWBALL" : "SNOW_BALL"), 8, false, false, "&e&lInventory-Middle", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_MIDDLE.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_MIDDLE.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_MIDDLE.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_MIDDLE.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.INVENTORY_MIDDLE.config()) == null) {
                             player.closeInventory();
@@ -7463,7 +7463,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTED_GOLDEN_APPLE" : "322:1"), 1, false, false, "&e&lInventory-Creative", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_CREATIVE.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_CREATIVE.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_CREATIVE.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_CREATIVE.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.INVENTORY_CREATIVE.config()) == null) {
                             player.closeInventory();
@@ -7485,7 +7485,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem("ENDER_CHEST", 1, false, false, "&e&lInventory-Left", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_LEFT.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_LEFT.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_LEFT.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_LEFT.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.INVENTORY_LEFT.config()) == null) {
                             player.closeInventory();
@@ -7507,7 +7507,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem("CHEST", 1, false, false, "&e&lInventory-Right", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_RIGHT.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_RIGHT.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_RIGHT.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_RIGHT.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.INVENTORY_RIGHT.config()) == null) {
                             player.closeInventory();
@@ -7529,7 +7529,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "STONE_SLAB" : "44"), 2, false, false, "&e&lInventory-Shift-Left", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_SHIFT_LEFT.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_SHIFT_LEFT.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_SHIFT_LEFT.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_SHIFT_LEFT.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.INVENTORY_SHIFT_LEFT.config()) == null) {
                             player.closeInventory();
@@ -7551,7 +7551,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COBBLESTONE_SLAB" : "44:3"), 2, false, false, "&e&lInventory-Shift-Right", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_SHIFT_RIGHT.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_SHIFT_RIGHT.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_SHIFT_RIGHT.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_SHIFT_RIGHT.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.INVENTORY_SHIFT_RIGHT.config()) == null) {
                             player.closeInventory();
@@ -7573,7 +7573,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "OAK_SIGN" : "323"), 1, false, false, "&e&lOn-Join", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_JOIN.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_JOIN.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_JOIN.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_JOIN.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.ON_JOIN.config()) == null) {
                             player.closeInventory();
@@ -7595,7 +7595,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, false, "&e&lOn-Damage", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_DAMAGE.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_DAMAGE.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_DAMAGE.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_DAMAGE.config()) : "NONE")),
                     event -> {
                         if (itemMap.getCommandMessages().get(Action.ON_DAMAGE.config()) == null) {
                             player.closeInventory();
@@ -7617,7 +7617,7 @@ public class Menu {
                 commandFailPane(player, itemMap);
             }));
             commandPane.addButton(new Button(ItemHandler.getItem("DIAMOND_SWORD", 1, false, true, "&e&lOn-Hit", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_HIT.config()) + "").equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_HIT.config()) : "NONE")),
+                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.ON_HIT.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.ON_HIT.config()) : "NONE")),
             event -> {
                 if (itemMap.getCommandMessages().get(Action.ON_HIT.config()) == null) {
                     player.closeInventory();
@@ -8459,18 +8459,18 @@ public class Menu {
         Interface bannerPane = new Interface(true, 6, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
             bannerPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
-            for (PatternType pattern : PatternType.values()) {
+            for (PatternType pattern : ItemHandler.getPatterns()) {
                 String patternString = "NONE";
                 if (!StringUtils.nullCheck(itemMap.getBannerPatterns().toString()).equals("NONE")) {
                     for (Pattern patterns : itemMap.getBannerPatterns()) {
                         if (patterns.getPattern() == pattern) {
-                            patternString = patterns.getColor() + ":" + patterns.getPattern().name().toUpperCase();
+                            patternString = patterns.getColor() + ":" + ItemHandler.getPatternName(patterns);
                             break;
                         }
                     }
                 }
                 final String checkPattern = patternString;
-                bannerPane.addButton(new Button(ItemHandler.getItem("PAPER", 1, (!checkPattern.equals("NONE")), false, "&f" + pattern.name(), "&7", "&7*Click to add this as", "&7a banner pattern.", (!checkPattern.equals("NONE") ?
+                bannerPane.addButton(new Button(ItemHandler.getItem("PAPER", 1, (!checkPattern.equals("NONE")), false, "&f" + ItemHandler.getPatternName(pattern), "&7", "&7*Click to add this as", "&7a banner pattern.", (!checkPattern.equals("NONE") ?
                         "&9&lInformation: &a" + checkPattern : "")), event -> {
                     if (!checkPattern.equals("NONE")) {
                         List<Pattern> patternList = itemMap.getBannerPatterns();
@@ -8543,7 +8543,7 @@ public class Menu {
                         }
                     }
                     final String checkPotion = potionString;
-                    potionPane.addButton(new Button(ItemHandler.getItem("GLASS_BOTTLE", 1, (!checkPotion.equals("NONE")), false, "&f" + ((ServerUtils.hasPreciseUpdate("1_20_3") ? potion.getKey().getKey() : LegacyAPI.getEffectName(potion))), "&7", "&7*Add this potion effect", "&7to the item.",
+                    potionPane.addButton(new Button(ItemHandler.getItem("GLASS_BOTTLE", 1, (!checkPotion.equals("NONE")), false, "&f" + ((ServerUtils.hasPreciseUpdate("1_20_3") ? potion.getKey().getKey() : LegacyAPI.getEffectName(potion))).toUpperCase(), "&7", "&7*Add this potion effect", "&7to the item.",
                             (!checkPotion.equals("NONE") ? "&9&lInformation: &a" + checkPotion : "")), event -> {
                         if (!checkPotion.equals("NONE")) {
                             List<PotionEffect> potionEffects = itemMap.getPotionEffect();
@@ -9310,7 +9310,7 @@ public class Menu {
         StringBuilder patternString = new StringBuilder();
         if (!StringUtils.nullCheck(itemMap.getBannerPatterns().toString()).equals("NONE")) {
             for (Pattern patterns : itemMap.getBannerPatterns()) {
-                patternString.append(patterns.getColor()).append(":").append(patterns.getPattern().name().toUpperCase()).append(", ");
+                patternString.append(patterns.getColor()).append(":").append(ItemHandler.getPatternName(patterns)).append(", ");
             }
             if (patternString.length() >= 2) {
                 for (String split : StringUtils.softSplit(StringUtils.nullCheck(patternString.substring(0, patternString.length() - 2)))) {

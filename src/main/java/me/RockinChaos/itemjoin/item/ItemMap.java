@@ -4790,8 +4790,9 @@ public class ItemMap implements Cloneable {
             return true;
         }
         if (this.enabledWorlds != null) {
-            synchronized ("IJ_MAP") {
-                for (String enabledWorld : this.enabledWorlds) {
+            final List<String> enabledWorlds = this.enabledWorlds;
+            synchronized (enabledWorlds) {
+                for (String enabledWorld : enabledWorlds) {
                     if (enabledWorld.equalsIgnoreCase(world.getName())
                             || enabledWorld.equalsIgnoreCase("ALL")
                             || enabledWorld.equalsIgnoreCase("GLOBAL")
@@ -6281,7 +6282,7 @@ public class ItemMap implements Cloneable {
         if (this.bannerPatterns != null && !this.bannerPatterns.isEmpty()) {
             StringBuilder bannerList = new StringBuilder();
             for (Pattern pattern : this.bannerPatterns) {
-                bannerList.append(pattern.getColor().name()).append(pattern.getPattern().name()).append(", ");
+                bannerList.append(pattern.getColor().name()).append(ItemHandler.getPatternName(pattern)).append(", ");
             }
             itemData.set("items." + this.configName + ".banner-meta", bannerList.substring(0, bannerList.length() - 2));
         }

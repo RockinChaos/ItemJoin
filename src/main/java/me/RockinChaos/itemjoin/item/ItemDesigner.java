@@ -1142,7 +1142,12 @@ public class ItemDesigner {
                 PatternType Pattern = null;
                 try {
                     Color = DyeColor.valueOf(bannerSection[0].toUpperCase());
-                    Pattern = PatternType.valueOf(bannerSection[1].toUpperCase());
+                    if (ServerUtils.hasPreciseUpdate("1_20_6")) {
+                        final NamespacedKey key = NamespacedKey.minecraft(bannerSection[1].toLowerCase());
+                        Pattern = Registry.BANNER_PATTERN.get(key);
+                    } else {
+                        Pattern = LegacyAPI.getPattern(bannerSection[1]);
+                    }
                 } catch (Exception ignored) {
                 }
                 if (Color != null && Pattern != null) {
