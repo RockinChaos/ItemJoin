@@ -113,7 +113,7 @@ commands:
     toggleEnable: '%prefix% &aYou have enabled the item &b%item%&a and it will now be given.'
     togglePlayerFailed: '%prefix% &cYou cannot enable the item %item% as all items are disabled for you globally!'
   disabled:
-    forPlayer: '%prefix% &aYou have &edisabled &ball items &afor &e%player%&a.'
+    forPlayer: '%prefix% &aYou have &edisabled &ball items &afor &e%target_player%&a.'
     forTarget: '%prefix% &a%player% has &edisabled &ball items &afor you.'
     forPlayerFailed: '%prefix% &cItems have already been &edisabled &cfor &e%player%&c.'
     forPlayerWorld: '%prefix% &aYou have &edisabled &7[&e%world%&7] items &afor &e%player%&a.'

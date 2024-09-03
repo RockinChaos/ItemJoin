@@ -113,7 +113,7 @@ commands:
     toggleEnable: '%prefix% &aJe hebt het item &b%item%&a ingeschakeld en het wordt nu gegeven.'
     togglePlayerFailed: '%prefix% &cU kunt het item %item% niet inschakelen omdat alle items wereldwijd voor u zijn uitgeschakeld!'
   disabled:
-    forPlayer: '%prefix% &aJe hebt &balle items &euitgeschakeld &avoor &e%player%&a.'
+    forPlayer: '%prefix% &aJe hebt &balle items &euitgeschakeld &avoor &e%target_player%&a.'
     forTarget: '%prefix% &a%player% heeft &balle items &euitgeschakeld &avoor you.'
     forPlayerFailed: '%prefix% &cItems zijn al &euitschakeld &cvoor &e%player%&c.'
     forPlayerWorld: '%prefix% &aJe hebt &7[&e%world%&7] items &euitgeschakeld &avoor &e%player%&a.'

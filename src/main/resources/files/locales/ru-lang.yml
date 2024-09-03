@@ -113,7 +113,7 @@ commands:
     toggleEnable: '%prefix% &aВы включили элемент &b%item%&a, и теперь он будет предоставлен.'
     togglePlayerFailed: '%prefix% &cВы не можете включить элемент %item%, так как все элементы отключены для вас глобально!'
   disabled:
-    forPlayer: '%prefix% &fВы &cвыключили &fвсе предметы игроку &f&l%player%'
+    forPlayer: '%prefix% &fВы &cвыключили &fвсе предметы игроку &f&l%target_player%'
     forTarget: '%prefix% &f&l%player% &aвыключил &fвам все предметы'
     forPlayerFailed: '%prefix% &fПредметы уже &cвыключены &fу игрока &f&l%player%'
     forPlayerWorld: '%prefix% &fВы &cвыключили &fпредметы в мире &7[&e&l%world%&7] &aигроку &f&l%player%'

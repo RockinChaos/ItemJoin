@@ -113,7 +113,7 @@ commands:
     toggleEnable: '%prefix% &aHai abilitato l''elemento &b%item%&a e ora ti verrà fornito.'
     togglePlayerFailed: '%prefix% &cNon puoi abilitare l''elemento %item% poiché tutti gli elementi sono disabilitati per te a livello globale!'
   disabled:
-    forPlayer: '%prefix% &aHai &edisabilitato gli &boggetti palla &aper &e%player%&a.'
+    forPlayer: '%prefix% &aHai &edisabilitato gli &boggetti palla &aper &e%target_player%&a.'
     forTarget: '%prefix% &a%player% ha &edisabilitato gli &boggetti palla &aper te.'
     forPlayerFailed: '%prefix% &cGli elementi sono già stati &edisabilitati &cper &e%player%&c.'
     forPlayerWorld: '%prefix% &aHai &edisattivato &7[&e%world%&7] elementi &aper &e%player%&a.'

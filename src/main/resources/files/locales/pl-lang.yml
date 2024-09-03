@@ -114,7 +114,7 @@ commands:
     toggleEnable: '%prefix% &aWłączyłeś przedmiot &b%item%&a i teraz będzie on rozdawany.'
     togglePlayerFailed: '%prefix% &cNie możesz włączyć przedmiotu %item%, ponieważ wszystkie przedmioty są wyłączone dla Ciebie globalnie!'
   disabled:
-    forPlayer: '%prefix% &aWyłączyłeś &ewszystkie przedmioty &adla &e%player%&a.'
+    forPlayer: '%prefix% &aWyłączyłeś &ewszystkie przedmioty &adla &e%target_player%&a.'
     forTarget: '%prefix% &a%player% wyłączył &ewszystkie przedmioty &adla Ciebie.'
     forPlayerFailed: '%prefix% &cPrzedmioty zostały już &ewyłączone &cdla &e%player%&c.'
     forPlayerWorld: '%prefix% &aWyłączyłeś &7[&e%world%&7] przedmioty &adla &e%player%&a.'

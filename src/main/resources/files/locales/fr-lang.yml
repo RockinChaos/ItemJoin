@@ -113,7 +113,7 @@ commands:
     toggleEnable: '%prefix% &aVous avez activé l''élément &b%item%&a et il vous sera désormais attribué.'
     togglePlayerFailed: '%prefix% &cVous ne pouvez pas activer l’élément %item% car tous les éléments sont désactivés pour vous globalement !'
   disabled:
-    forPlayer: '%prefix% &aVous avez &edésactivé &btous les items &apour &e%player%&a.'
+    forPlayer: '%prefix% &aVous avez &edésactivé &btous les items &apour &e%target_player%&a.'
     forTarget: '%prefix% &a%player% a &edésactivé &btous les items &apour vous.'
     forPlayerFailed: '%prefix% &cLes Items ont déjà été &edésactivé &cpour &e%player%&c.'
     forPlayerWorld: '%prefix% &aVous avez &edésactivé les items dans &7[&e%world%&7] &apour &e%player%&a.'

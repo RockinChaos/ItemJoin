@@ -113,7 +113,7 @@ commands:
     toggleEnable: '%prefix% &aVocê ativou o item &b%item%&a e agora ele será fornecido.'
     togglePlayerFailed: '%prefix% &cVocê não pode habilitar o item %item% quando todos os itens estão desabilitados para você mundialmente!'
   disabled:
-    forPlayer: '%prefix% &aVocê &edesabilitou &btodos os itens &apara &e%player%&a.'
+    forPlayer: '%prefix% &aVocê &edesabilitou &btodos os itens &apara &e%target_player%&a.'
     forTarget: '%prefix% &a%player% foram &edesabilitados &btodos os itens &apara você.'
     forPlayerFailed: '%prefix% &cOs itens já foram &edesabilitados &cpara &e%player%&c.'
     forPlayerWorld: '%prefix% &aVocê &edesabilitou os itens &7[&e%world%&7] &apara &e%player%&a.'
