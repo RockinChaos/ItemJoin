@@ -33,10 +33,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class ChatTab implements TabCompleter {
 
@@ -67,6 +64,7 @@ public class ChatTab implements TabCompleter {
             if (args.length == 2) {
                 commands.addAll(Arrays.asList("map-ids", "first-join", "first-world", "ip-limits", "enabled-players", "first-commands"));
             } else if (!args[1].equalsIgnoreCase("map-ids")) {
+                commands.addAll(Arrays.asList("@a", "@e", "@p", "@r", "@s"));
                 PlayerHandler.forOfflinePlayers(player -> commands.add(player.getName()));
                 PlayerHandler.forOnlinePlayers(player -> commands.add(player.getName()));
             } else {
@@ -85,6 +83,7 @@ public class ChatTab implements TabCompleter {
         } else if ((args.length == 2 || args.length == 3) && (args[0].equalsIgnoreCase("disable") || args[0].equalsIgnoreCase("enable"))) {
             if (args.length == 2 && ((PermissionsHandler.hasPermission(sender, "itemjoin.enable.others") && args[0].equalsIgnoreCase("enable"))
                     || (PermissionsHandler.hasPermission(sender, "itemjoin.disable.others") && args[0].equalsIgnoreCase("disable")))) {
+                commands.addAll(Arrays.asList("@a", "@e", "@p", "@r", "@s"));
                 PlayerHandler.forOnlinePlayers(player -> commands.add(player.getName()));
             } else {
                 for (World world : Bukkit.getServer().getWorlds()) {
@@ -100,6 +99,7 @@ public class ChatTab implements TabCompleter {
                     || (PermissionsHandler.hasPermission(sender, "itemjoin.remove.others") && (args[0].equalsIgnoreCase("remove") || args[0].equalsIgnoreCase("removeOnline"))))) {
                 commands.addAll(Arrays.asList("2", "4", "8", "16"));
                 if (!args[0].equalsIgnoreCase("getOnline") && !args[0].equalsIgnoreCase("removeOnline")) {
+                    commands.addAll(Arrays.asList("@a", "@e", "@p", "@r", "@s"));
                     PlayerHandler.forOnlinePlayers(player -> commands.add(player.getName()));
                 }
             } else if (args.length == 4 && !StringUtils.isInt(args[2]) && !args[0].equalsIgnoreCase("getOnline") && !args[0].equalsIgnoreCase("removeOnline") && ((PermissionsHandler.hasPermission(sender, "itemjoin.get.others")
@@ -108,6 +108,7 @@ public class ChatTab implements TabCompleter {
             }
         } else if (args.length == 2 && (args[0].equalsIgnoreCase("getAll") && PermissionsHandler.hasPermission(sender, "itemjoin.get.others") || args[0].equalsIgnoreCase("removeAll")
                 && PermissionsHandler.hasPermission(sender, "itemjoin.remove.others"))) {
+            commands.addAll(Arrays.asList("@a", "@e", "@p", "@r", "@s"));
             PlayerHandler.forOnlinePlayers(player -> commands.add(player.getName()));
         } else if (args.length == 2 && (args[0].equalsIgnoreCase("query") && PermissionsHandler.hasPermission(sender, "itemjoin.query"))) {
             for (ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
