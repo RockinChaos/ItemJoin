@@ -489,10 +489,8 @@ public class ChatExecutor implements CommandExecutor {
                     probable = (ItemMap) ItemJoin.getCore().getChances().getRandom(((Player) sender));
                 }
                 for (final ItemMap item : ItemUtilities.getUtilities().getItems()) {
-                    if ((item.getPermissionNode() == null || !customPermissions.contains(item.getPermissionNode())) && item.inWorld(world) && ((probable != null && item.getConfigName().equals(probable.getConfigName())) || item.getProbability() == -1)) {
-                        if (item.getPermissionNode() != null) {
-                            customPermissions.add(item.getPermissionNode());
-                        }
+                    if ((!customPermissions.contains(PermissionsHandler.customPermissions(item.getPermissionNode(), world.getName() + "." + item.getConfigName()))) && item.inWorld(world) && ((probable != null && item.getConfigName().equals(probable.getConfigName())) || item.getProbability() == -1)) {
+                        customPermissions.add(PermissionsHandler.customPermissions(item.getPermissionNode(), world.getName() + "." + item.getConfigName()));
                         if (item.hasPermission(((Player) sender), world)) {
                             inputMessage.add("&a[✔] " + PermissionsHandler.customPermissions(item.getPermissionNode(), world.getName() + "." + item.getConfigName()));
                         } else {
