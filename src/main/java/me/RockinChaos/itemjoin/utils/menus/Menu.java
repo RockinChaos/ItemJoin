@@ -892,7 +892,7 @@ public class Menu {
             creatingPane.addButton(new Button(ItemHandler.getItem("GLASS", 1, false, false, "&c&lSlot", "&7", "&7*Set the slot that the", "&7item will be given in.", (itemMap.getMultipleSlots() != null &&
                     !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSLOT: &a" + itemMap.getSlot().toUpperCase())), event -> switchPane(player, itemMap, 1)));
             creatingPane.addButton(new Button(ItemHandler.getItem("DIAMOND", itemMap.getCount(player), false, false, "&b&lCount", "&7", "&7*Set the amount of the", "&7item to be given.", "&9&lCOUNT: &a" +
-                    itemMap.getCount(player)), event -> countPane(player, itemMap)));
+                    (itemMap.getCount(player) != 1 ? itemMap.getRawCount() : "1")), event -> countPane(player, itemMap)));
             creatingPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, false, "&b&lName", "&7", "&7*Set the name of the item.", "&9&lNAME: &f" + StringUtils.nullCheck(itemMap.getCustomName())), event -> { // false - Temp identifier
                 final InventoryHolder inventoryHolder = event.getInventory().getHolder();
                 if (itemMap.getDynamicNames() != null && itemMap.isAnimated()) {
@@ -3269,6 +3269,32 @@ public class Menu {
         Interface countPane = new Interface(true, 6, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
             countPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
+            countPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Count", "&7", "&7*Click to set a custom count", "&7value for the item.", "&7", "&c&lNote: &7You can use placeholders", "&7as long as they parse to a number."), event -> {
+                player.closeInventory();
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ITEM COUNT").with(Holder.INPUT_EXAMPLE, "48");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+            }, event -> {
+                final String count = ChatColor.stripColor(event.getMessage());
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, count);
+                if (StringUtils.isInt(count)) {
+                    itemMap.setCount(count);
+                    final PlaceHolder placeHolder = new PlaceHolder().with(Holder.INPUT, "ITEM COUNT");
+                    ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolder);
+                } else if (count.contains("%")) {
+                    final String translateCount = StringUtils.translateLayout(count, player).replaceAll("[^\\d.]", "").replace("-", "").replace(".", "").replace(" ", "");
+                    if (StringUtils.isInt(translateCount)) {
+                        itemMap.setCount(count);
+                        final PlaceHolder placeHolder = new PlaceHolder().with(Holder.INPUT, "ITEM COUNT");
+                        ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolder);
+                    } else {
+                        ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
+                    }
+                } else {
+                    ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
+                }
+                creatingPane(event.getPlayer(), itemMap);
+            }));
             for (int i = 1; i <= 64; i++) {
                 final int k = i;
                 countPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), k, false, false, "&9&lCount: &a&l" + k, "&7", "&7*Click to set the", "&7count of the item."), event -> {
@@ -3531,9 +3557,9 @@ public class Menu {
                 }
             }));
             commandPane.addButton(new Button(ItemHandler.getItem("DIAMOND", 1, false, false, "&a&lCost", "&7", "&7*Amount that the player will", "&7be charged upon successfully", "&7executing the commands.", "&7", "&9&lCOMMANDS-COST: &a" +
-                    (StringUtils.nullCheck(itemMap.getCommandCost() + "&7"))), event -> {
-                if (!StringUtils.nullCheck(itemMap.getCommandCost() + "&7").equals("NONE")) {
-                    itemMap.setCommandCost(0);
+                    (StringUtils.nullCheck(itemMap.getRawCost() + "&7"))), event -> {
+                if (!StringUtils.nullCheck(itemMap.getRawCost() + "&7").equals("NONE")) {
+                    itemMap.setCommandCost("0");
                     commandPane(player, itemMap);
                 } else {
                     costPane(player, itemMap);
@@ -4156,26 +4182,36 @@ public class Menu {
         Interface costPane = new Interface(true, 6, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
             costPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> commandPane(player, itemMap)));
-            costPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Cost", "&7", "&7*Click to set a custom commands-cost", "&7value for the item."), event -> {
+            costPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Cost", "&7", "&7*Click to set a custom commands-cost", "&7value for the item.", "&7", "&c&lNote: &7You can use placeholders", "&7as long as they parse to a number."), event -> {
                 player.closeInventory();
                 final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "COMMAND COST").with(Holder.INPUT_EXAMPLE, "340");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
-                if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
-                    itemMap.setCommandCost(Integer.parseInt(ChatColor.stripColor(event.getMessage())));
-                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "COMMAND COST");
-                    ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                final String cost = ChatColor.stripColor(event.getMessage());
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, cost);
+                if (StringUtils.isInt(cost) || StringUtils.isDouble(cost)) {
+                    itemMap.setCommandCost(cost);
+                    final PlaceHolder placeHolder = new PlaceHolder().with(Holder.INPUT, "COMMAND COST");
+                    ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolder);
+                } else if (cost.contains("%")) {
+                    final String translateCost = StringUtils.translateLayout(cost, player).replaceAll("[^\\d.]", "").replace("-", "").replace(".", "").replace(" ", "");
+                    if (StringUtils.isInt(translateCost) || StringUtils.isDouble(translateCost)) {
+                        itemMap.setCommandCost(cost);
+                        final PlaceHolder placeHolder = new PlaceHolder().with(Holder.INPUT, "COMMAND COST");
+                        ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolder);
+                    } else {
+                        ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
+                    }
                 } else {
-                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, ChatColor.stripColor(event.getMessage()));
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                 }
                 commandPane(event.getPlayer(), itemMap);
             }));
-            for (int i = 0; i <= 64; i++) {
+            for (int i = 0; i <= 384; i++) {
                 final int k = i;
-                costPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), (k == 0 ? 1 : k), false, false, "&9&lCost: &a$&l" + k, "&7", "&7*Click to set the", "&7commands-cost of the item."), event -> {
-                    itemMap.setCommandCost(k);
+                costPane.addButton(new Button(ItemHandler.getItem(k == 0 ? (ServerUtils.hasSpecificUpdate("1_13") ? "LIME_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:5") : (ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), (k == 0 ? 1 : k), false, false, "&9&lCost: &a$&l" + k, "&7", "&7*Click to set the", "&7commands-cost of the item."), event -> {
+                    itemMap.setCommandCost(String.valueOf(k));
                     commandPane(player, itemMap);
                 }));
             }
@@ -9320,7 +9356,7 @@ public class Menu {
                     (itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot().toUpperCase()), (itemMap.getCount(player) != 1 && itemMap.getCount(player) != 0) ? "&9&lCount: &a" + itemMap.getCount(player) : "",
                     ((!StringUtils.nullCheck(itemMap.getCustomName()).equals("NONE") && (!itemMaterial.equalsIgnoreCase(itemMap.getCustomName()))) ? "&9&lName: &a" + itemMap.getCustomName() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getCustomLore().toString()), "NONE") ? "&9&lLore: &a" + (StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").length() > 40 ? StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").substring(0, 40) : StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",")) : ""),
                     (!StringUtils.nullCheck(itemMap.getDurability() + "&7").equals("NONE") ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getData() + "&7"), "NONE") ? "&9&lTexture Data: &a" + itemMap.getData() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getModelData() + "&7"), "NONE") ? "&9&LModel Data: &a" + itemMap.getModelData() : ""), (useCommands ? "&9&lCommands: &aYES" : ""), (useToggle ? "&9&lToggleable: &aYES" : ""),
-                    (!StringUtils.nullCheck(itemMap.getItemCost()).equals("NONE") ? "&9&lCommands-Item: &a" + itemMap.getItemCost() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getCommandCost() + "&7"), "NONE") ? "&9&lCommands-Cost: &a" + itemMap.getCommandCost() : ""),
+                    (!StringUtils.nullCheck(itemMap.getItemCost()).equals("NONE") ? "&9&lCommands-Item: &a" + itemMap.getItemCost() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getCommandCost(player) + "&7"), "NONE") ? "&9&lCommands-Cost: &a" + itemMap.getCommandCost(player) : ""),
                     (!StringUtils.nullCheck(itemMap.getCommandReceive() + "&7").equals("NONE") ? "&9&lCommands-Receive: &a" + itemMap.getCommandReceive() : ""),
                     (!StringUtils.nullCheck(itemMap.getCommandSequence() + "").equals("NONE") ? "&9&lCommands-Sequence: &a" + itemMap.getCommandSequence() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getCommandCooldown() + "&7"), "NONE") ? "&9&lCommands-Cooldown: &a" + itemMap.getCommandCooldown() + " second(s)" : ""),
                     (!StringUtils.nullCheck(itemMap.getCooldownMessage()).equals("NONE") ? "&9&lCooldown-Message: &a" + itemMap.getCooldownMessage() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getCommandSound() + ""), "NONE") ? "&9&lCommands-Sound: &a" + itemMap.getCommandSound() : ""),

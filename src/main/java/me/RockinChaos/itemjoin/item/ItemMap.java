@@ -159,7 +159,7 @@ public class ItemMap implements Cloneable {
     private Double commandSoundPitch = 1.0;
     private String commandParticle;
     private String itemCost;
-    private Integer cost = 0;
+    private String cost = "0";
     private Integer warmDelay = 0;
     private boolean subjectRemoval = false;
     private CommandSequence sequence;
@@ -342,13 +342,10 @@ public class ItemMap implements Cloneable {
      */
     private void setCommandCost() {
         final String commandItem = this.nodeLocation.getString("commands-item");
-        final String commandCost = this.nodeLocation.getString("commands-cost");
         if (commandItem != null && !commandItem.isEmpty()) {
             this.itemCost = commandItem;
         }
-        if (StringUtils.isInt(commandCost)) {
-            this.cost = this.nodeLocation.getInt("commands-cost");
-        }
+        this.cost = this.nodeLocation.getString("commands-cost");
     }
 
     /**
@@ -1243,6 +1240,7 @@ public class ItemMap implements Cloneable {
     /**
      * Gets the stack size.
      *
+     * @param player - The player being parsed for the placeholder.
      * @return The stack size.
      */
     public Integer getCount(final Player player) {
@@ -1269,6 +1267,15 @@ public class ItemMap implements Cloneable {
             }
         }
         return countParse;
+    }
+
+    /**
+     * Gets the raw count definition.
+     *
+     * @return The raw count definition.
+     */
+    public String getRawCount() {
+        return this.count;
     }
 
     /**
@@ -1891,9 +1898,34 @@ public class ItemMap implements Cloneable {
     /**
      * Gets the Commands Cost.
      *
+     * @param player - The player being parsed for the placeholder.
      * @return The Commands Cost.
      */
-    public Integer getCommandCost() {
+    public double getCommandCost(final Player player) {
+        double costParse = 0;
+        if (this.cost != null && !this.cost.isEmpty()) {
+            try {
+                final String translateCost = StringUtils.translateLayout(this.cost, player).replaceAll("[^\\d.]", "").replace("-", "").replace(".", "").replace(" ", "");
+                costParse = Double.parseDouble(translateCost);
+                if (costParse < 0) {
+                    costParse = 0;
+                }
+            } catch (Exception e) {
+                ServerUtils.sendDebugTrace(e);
+                ServerUtils.logSevere("{ItemMap} The commands-cost set for the item " + this.configName + " is set to " + this.cost + " but this is not a valid integer!");
+                ServerUtils.logSevere("{ItemMap} Check that the set value is an integer or placeholder that parses to an integer.");
+                ServerUtils.logSevere("{ItemMap} The commands-cost for the item " + this.configName + " will now default to 0.");
+            }
+        }
+        return costParse;
+    }
+
+    /**
+     * Gets the raw Commands Cost definition.
+     *
+     * @return The raw Commands Cost definition.
+     */
+    public String getRawCost() {
         return this.cost;
     }
 
@@ -1902,7 +1934,7 @@ public class ItemMap implements Cloneable {
      *
      * @param cost - The Commands Cost to be set.
      */
-    public void setCommandCost(final Integer cost) {
+    public void setCommandCost(final String cost) {
         this.cost = cost;
     }
 
@@ -5350,30 +5382,32 @@ public class ItemMap implements Cloneable {
      * @return If the Player has the required economy balance to execute the command.
      */
     private boolean isPlayerChargeable(final Player player, final boolean materialCost) {
-        if (ItemJoin.getCore().getDependencies().getVault().vaultEnabled() && !materialCost && !(this.cost < 0)) {
+        if (ItemJoin.getCore().getDependencies().getVault().vaultEnabled() && !materialCost && !(this.getCommandCost(player) < 0)) {
+            final double commandCost = this.getCommandCost(player);
             double balance = 0.0;
             try {
                 balance = ItemJoin.getCore().getDependencies().getVault().getBalance(player);
             } catch (NullPointerException ignored) {
             }
-            final boolean balCost = (balance >= this.cost);
-            if (balCost || this.cost <= 0) {
+            final boolean balCost = (balance >= commandCost);
+            if (balCost || commandCost == 0) {
                 return true;
             } else {
-                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.COST, this.cost.toString()).with(Holder.BALANCE, String.valueOf(balance));
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.COST, String.valueOf(commandCost)).with(Holder.BALANCE, String.valueOf(balance));
                 ItemJoin.getCore().getLang().sendLangMessage("general.econFailed", player, placeHolders);
                 return false;
             }
         } else if (materialCost) {
+            int commandCost = (int) Math.ceil(this.getCommandCost(player));
             Material mat = ItemHandler.getMaterial(this.itemCost, null);
             int foundAmount = 0;
             for (ItemStack playerInventory : player.getInventory().getContents()) {
                 if (playerInventory != null && playerInventory.getType() == mat) {
-                    if (playerInventory.getAmount() >= this.cost) {
+                    if (playerInventory.getAmount() >= commandCost) {
                         return true;
                     } else {
                         foundAmount += playerInventory.getAmount();
-                        if (foundAmount >= this.cost) {
+                        if (foundAmount >= commandCost) {
                             return true;
                         }
                     }
@@ -5381,11 +5415,11 @@ public class ItemMap implements Cloneable {
             }
             for (ItemStack equipInventory : Objects.requireNonNull(player.getEquipment()).getArmorContents()) {
                 if (equipInventory != null && equipInventory.getType() == mat) {
-                    if (equipInventory.getAmount() >= this.cost) {
+                    if (equipInventory.getAmount() >= commandCost) {
                         return true;
                     } else {
                         foundAmount += equipInventory.getAmount();
-                        if (foundAmount >= this.cost) {
+                        if (foundAmount >= commandCost) {
                             return true;
                         }
                     }
@@ -5393,11 +5427,11 @@ public class ItemMap implements Cloneable {
             }
             if (ServerUtils.hasSpecificUpdate("1_9")) {
                 if (player.getInventory().getItemInOffHand().getType() == mat) {
-                    if (player.getInventory().getItemInOffHand().getAmount() >= this.cost) {
+                    if (player.getInventory().getItemInOffHand().getAmount() >= commandCost) {
                         return true;
                     } else {
                         foundAmount += player.getInventory().getItemInOffHand().getAmount();
-                        if (foundAmount >= this.cost) {
+                        if (foundAmount >= commandCost) {
                             return true;
                         }
                     }
@@ -5405,12 +5439,12 @@ public class ItemMap implements Cloneable {
             }
             if (PlayerHandler.isCraftingInv(player)) {
                 for (ItemStack craftInventory : CompatUtils.getTopInventory(player)) {
-                    if (craftInventory != null && craftInventory.getType() == mat && craftInventory.getAmount() >= this.cost) {
-                        if (craftInventory.getAmount() >= this.cost) {
+                    if (craftInventory != null && craftInventory.getType() == mat && craftInventory.getAmount() >= commandCost) {
+                        if (craftInventory.getAmount() >= commandCost) {
                             return true;
                         } else {
                             foundAmount += craftInventory.getAmount();
-                            if (foundAmount >= this.cost) {
+                            if (foundAmount >= commandCost) {
                                 return true;
                             }
                         }
@@ -5422,7 +5456,7 @@ public class ItemMap implements Cloneable {
                 formatCost.append(str.substring(0, 1).toUpperCase()).append(str.substring(1)).append(" ");
             }
             formatCost = new StringBuilder(formatCost.substring(0, formatCost.length() - 1));
-            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.ITEM_TYPE, formatCost.toString()).with(Holder.COST, String.valueOf(this.cost == 0 ? 1 : this.cost)).with(Holder.BALANCE, String.valueOf(foundAmount));
+            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.ITEM_TYPE, formatCost.toString()).with(Holder.COST, String.valueOf(commandCost == 0 ? 1 : commandCost)).with(Holder.BALANCE, String.valueOf(foundAmount));
             ItemJoin.getCore().getLang().sendLangMessage("general.itemFailed", player, placeHolders);
             return false;
         }
@@ -5436,7 +5470,8 @@ public class ItemMap implements Cloneable {
      */
     private void withdrawItemCost(final Player player) {
         final Material costMaterial = ItemHandler.getMaterial(this.itemCost, null);
-        int removeAmount = (this.cost == 0 ? 1 : this.cost);
+        final int commandCost = (int) Math.ceil(this.getCommandCost(player));
+        int removeAmount = (commandCost == 0 ? 1 : commandCost);
         for (int i = 0; i < player.getInventory().getSize(); i++) {
             final ItemStack item = player.getInventory().getItem(i);
             if (item != null && item.getType() == costMaterial) {
@@ -5481,7 +5516,7 @@ public class ItemMap implements Cloneable {
             formatCost.append(str.substring(0, 1).toUpperCase()).append(str.substring(1)).append(" ");
         }
         formatCost = new StringBuilder(formatCost.substring(0, formatCost.length() - 1));
-        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.ITEM_TYPE, formatCost.toString()).with(Holder.COST, String.valueOf(this.cost == 0 ? 1 : this.cost));
+        final PlaceHolder placeHolders = new PlaceHolder().with(Holder.ITEM_TYPE, formatCost.toString()).with(Holder.COST, String.valueOf(commandCost == 0 ? 1 : commandCost));
         ItemJoin.getCore().getLang().sendLangMessage("general.itemSuccess", player, placeHolders);
     }
 
@@ -5492,20 +5527,20 @@ public class ItemMap implements Cloneable {
      */
     private void withdrawBalance(final Player player) {
         if (ItemJoin.getCore().getDependencies().getVault().vaultEnabled()) {
+            final double commandCost = this.getCommandCost(player);
             double balance = 0.0;
             try {
                 balance = ItemJoin.getCore().getDependencies().getVault().getBalance(player);
             } catch (NullPointerException ignored) {
             }
-            int parseCost = this.cost;
-            if (balance >= parseCost) {
-                if (parseCost > 0) {
+            if (balance >= commandCost) {
+                if (commandCost > 0) {
                     try {
-                        ItemJoin.getCore().getDependencies().getVault().withdrawBalance(player, parseCost);
+                        ItemJoin.getCore().getDependencies().getVault().withdrawBalance(player, commandCost);
                     } catch (NullPointerException e) {
                         ServerUtils.sendDebugTrace(e);
                     }
-                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.COST, this.cost.toString()).with(Holder.BALANCE, String.valueOf(balance));
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.COST, String.valueOf(commandCost)).with(Holder.BALANCE, String.valueOf(balance));
                     ItemJoin.getCore().getLang().sendLangMessage("general.econSuccess", player, placeHolders);
                 }
             }
@@ -5855,7 +5890,7 @@ public class ItemMap implements Cloneable {
                 itemData.set("items." + this.configName + ".slot", this.CustomSlot);
             }
         }
-        if (this.getCount(null) > 1 && !this.count.contains("%")) {
+        if (this.getCount(null) > 1 || this.count.contains("%")) {
             itemData.set("items." + this.configName + ".count", this.count);
         }
         if (this.durability != null && this.durability > 0) {
@@ -6138,7 +6173,7 @@ public class ItemMap implements Cloneable {
         if (this.itemCost != null && !this.itemCost.isEmpty()) {
             itemData.set("items." + this.configName + ".commands-item", this.itemCost);
         }
-        if (this.cost != null && this.cost != 0) {
+        if (this.getCommandCost(null) > 0 || this.cost.contains("%")) {
             itemData.set("items." + this.configName + ".commands-cost", this.cost);
         }
         if (this.commandsReceive != null && this.commandsReceive != 0) {
