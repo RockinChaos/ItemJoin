@@ -460,7 +460,7 @@ public class ItemUtilities {
                     }
                 }
             }
-            for (int f = 0; f < inventory.getSize(); f++) {
+            for (int f = 0; f < 36; f++) {
                 if (this.canClear(inventory.getItem(f), Integer.toString(f), i, clearType)) {
                     inventory.setItem(f, new ItemStack(Material.AIR));
                 }
