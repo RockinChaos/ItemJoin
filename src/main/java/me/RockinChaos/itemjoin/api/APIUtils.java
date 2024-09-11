@@ -53,12 +53,12 @@ public class APIUtils {
         final int session = StringUtils.getRandom(1, 80000);
         for (final ItemMap item : ItemUtilities.getUtilities().getItems()) {
             if (item.inWorld(player.getWorld()) && ((probable != null && item.getConfigName().equals(probable.getConfigName())) || item.getProbability() == -1) && PluginData.getInfo().isEnabled(player, item.getConfigName())
-                    && item.isLimitMode(player.getGameMode()) && item.hasPermission(player, player.getWorld()) && ItemUtilities.getUtilities().isObtainable(player, item, session, TriggerType.DEFAULT)) {
+                    && item.isLimitMode(player.getGameMode()) && item.hasPermission(player, player.getWorld()) && ItemUtilities.getUtilities().isObtainable(player, item, session, TriggerType.DEFAULT, "IJ_WORLD")) {
                 item.giveTo(player);
             }
             item.setAnimations(player);
         }
-        ItemUtilities.getUtilities().sendFailCount(player, session);
+        ItemUtilities.getUtilities().sendFailCount(player, session, TriggerType.DEFAULT, "IJ_WORLD");
         PlayerHandler.updateInventory(player, 15L);
     }
 

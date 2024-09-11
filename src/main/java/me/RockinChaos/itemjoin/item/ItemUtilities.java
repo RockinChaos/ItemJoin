@@ -19,10 +19,8 @@ package me.RockinChaos.itemjoin.item;
 
 import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.PlayerHandler;
-import me.RockinChaos.core.utils.CompatUtils;
-import me.RockinChaos.core.utils.SchedulerUtils;
-import me.RockinChaos.core.utils.ServerUtils;
-import me.RockinChaos.core.utils.StringUtils;
+import me.RockinChaos.core.utils.*;
+import me.RockinChaos.core.utils.keys.CompositeKey;
 import me.RockinChaos.core.utils.types.PlaceHolder;
 import me.RockinChaos.core.utils.types.PlaceHolder.Holder;
 import me.RockinChaos.itemjoin.ItemJoin;
@@ -38,6 +36,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class ItemUtilities {
     private static ItemUtilities utilities;
@@ -276,6 +275,7 @@ public class ItemUtilities {
         }
         final int session = StringUtils.getRandom(1, 100000);
         boolean hasActioned = false;
+        boolean removed = false;
         if (type.equals(TriggerType.WORLD_SWITCH) || type.equals(TriggerType.JOIN)) {
             world = player.getWorld();
         }
@@ -292,21 +292,27 @@ public class ItemUtilities {
                     || (type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions))))
                     && item.inWorld(world) && item.isLimitMode(gameMode) && ((probable != null && item.getConfigName().equals(probable.getConfigName())) || item.getProbability() == -1)
                     && item.conditionMet(player, "trigger-conditions", true, false) && PluginData.getInfo().isEnabled(player, item.getConfigName()) && item.hasPermission(player, world)
-                    && this.isObtainable(player, item, session, type)) {
+                    && this.isObtainable(player, item, session, type, targetRegion)) {
                 item.giveTo(player);
                 hasActioned = true;
             } else if (((type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(gameMode)) || (type.equals(TriggerType.PERMISSION_SWITCH) && !item.hasPermission(player, world)) || (((type.name().startsWith("REGION") && (item.isGiveOnRegionAccess()
                     && ((item.inRegion(targetRegion) && !item.inRegion(regions)) || (!item.inRegion(targetRegion) && !item.inRegion(regions))))) || (type.name().startsWith("REGION") && (item.isGiveOnRegionEgress() && item.inRegion(targetRegion) && item.inRegion(regions)))))) && item.hasItem(player, false)) {
                 item.removeFrom(player);
                 hasActioned = true;
+                removed = true;
             } else if (item.isAutoRemove() && (!item.inWorld(world) || !item.isLimitMode(gameMode) || ((type.equals(TriggerType.REGION_ENTER) || type.equals(TriggerType.REGION_LEAVE)) && ((item.isGiveOnRegionLeave() && item.inRegion(targetRegion) && item.inRegion(regions)) || (item.isGiveOnRegionEnter() && item.inRegion(targetRegion) && !item.inRegion(regions))))) && item.hasItem(player, true)) {
                 item.removeFrom(player);
                 hasActioned = true;
+                removed = true;
             }
         }
-        this.sendFailCount(player, session);
+        this.sendFailCount(player, session, type, targetRegion);
         if (hasActioned) {
             PlayerHandler.updateInventory(player, 15L);
+        }
+        if (removed) {
+            TimerUtils.removeExpiry("wg_items", new CompositeKey(player, targetRegion), true);
+            TimerUtils.removeExpiry("wg_failed", new CompositeKey(player, targetRegion), true);
         }
     }
 
@@ -526,9 +532,11 @@ public class ItemUtilities {
      * @param itemMap - The ItemMap being checked.
      * @param session - The current set items session.
      * @param type    - The trigger type.
+     * @param region  - The region the player is in.
      * @return If the ItemMap is Obtainable.
      */
-    public boolean isObtainable(final Player player, final ItemMap itemMap, final int session, final TriggerType type) {
+    public boolean isObtainable(final Player player, final ItemMap itemMap, final int session, final TriggerType type, final String region) {
+        final boolean canSend = canSend(player, type, region);
         if (!itemMap.hasItem(player, false) || itemMap.isAlwaysGive()) {
             DataObject firstJoin = (itemMap.isOnlyFirstLife() && type.equals(TriggerType.JOIN) || itemMap.isOnlyFirstJoin() ? (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.FIRST_JOIN, PlayerHandler.getPlayerID(player), "", itemMap.getConfigName())) : null);
             DataObject firstWorld = itemMap.isOnlyFirstWorld() ? (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.FIRST_WORLD, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName())) : null;
@@ -541,23 +549,49 @@ public class ItemUtilities {
                 } else if (session != 0) {
                     this.failCount.put(session, 1);
                 }
-                ServerUtils.logDebug("{ItemMap} " + player.getName() + " has failed to receive item: " + itemMap.getConfigName() + ".");
+                if (canSend) {
+                    ServerUtils.logDebug("{ItemMap} " + player.getName() + " has failed to receive item: " + itemMap.getConfigName() + ".");
+                }
                 return false;
             } else {
                 if (firstJoin != null) {
-                    ServerUtils.logDebug("{ItemMap} " + player.getName() + " has already received first-join " + itemMap.getConfigName() + ", they can no longer receive this.");
+                    if (canSend) {
+                        ServerUtils.logDebug("{ItemMap} " + player.getName() + " has already received first-join " + itemMap.getConfigName() + ", they can no longer receive this.");
+                    }
                     return false;
                 } else if (firstWorld != null) {
-                    ServerUtils.logDebug("{ItemMap} " + player.getName() + " has already received first-world " + itemMap.getConfigName() + ", they can no longer receive this in " + player.getWorld().getName() + ".");
+                    if (canSend) {
+                        ServerUtils.logDebug("{ItemMap} " + player.getName() + " has already received first-world " + itemMap.getConfigName() + ", they can no longer receive this in " + player.getWorld().getName() + ".");
+                    }
                     return false;
                 } else if (!ipLimit.getPlayerId().equalsIgnoreCase(PlayerHandler.getPlayerID(player))) {
-                    ServerUtils.logDebug("{ItemMap} " + player.getName() + " has already received ip-limited " + itemMap.getConfigName() + ", they will only receive this on their dedicated ip.");
+                    if (canSend) {
+                        ServerUtils.logDebug("{ItemMap} " + player.getName() + " has already received ip-limited " + itemMap.getConfigName() + ", they will only receive this on their dedicated ip.");
+                    }
                     return false;
                 }
             }
         }
-        if (type != TriggerType.REGION_ENTER && type != TriggerType.REGION_LEAVE) {
+        if (canSend) {
             ServerUtils.logDebug("{ItemMap} " + player.getName() + " already has item: " + itemMap.getConfigName() + ".");
+        }
+        return false;
+    }
+
+    /**
+     * Checks if the debug message can be sent.
+     *
+     * @param player - The Player that is trying to obtain the ItemMap.
+     * @param type   - The trigger type.
+     * @param region - The region the player is in.
+     * @return If the debug message can be sent.
+     */
+    private boolean canSend(final Player player, final TriggerType type, final String region) {
+        if (TimerUtils.isExpired("wg_items", new CompositeKey(player, region))) {
+            if (type == TriggerType.REGION_ENTER || type == TriggerType.REGION_LEAVE) {
+                TimerUtils.setExpiry("wg_items", new CompositeKey(player, region), 20, TimeUnit.MINUTES);
+            }
+            return true;
         }
         return false;
     }
@@ -567,7 +601,7 @@ public class ItemUtilities {
      *
      * @param player  - The Player that is trying to overwrite the ItemMap.
      * @param itemMap - The ItemMap being checked.
-     * @return If the ItemMap is Overwritable.
+     * @return If the ItemMap is overwritable.
      */
     public boolean canOverwrite(final Player player, final ItemMap itemMap) {
         try {
@@ -620,16 +654,23 @@ public class ItemUtilities {
      *
      * @param player  - The Player that has failed to be given some items.
      * @param session - The current set items session.
+     * @param type    - The trigger executed.
+     * @param region  - The region the player is in.
      */
-    public void sendFailCount(final Player player, final int session) {
+    public void sendFailCount(final Player player, final int session, final TriggerType type, final String region) {
         SchedulerUtils.runAsync(() -> {
             if (this.failCount.get(session) != null && this.failCount.get(session) != 0) {
                 String overWrite = ItemJoin.getCore().getConfig("items.yml").getString("items-Overwrite");
                 final PlaceHolder placeHolders = new PlaceHolder().with(Holder.FAIL_COUNT, this.failCount.get(session).toString());
-                if ((overWrite != null && StringUtils.containsLocation(player.getWorld().getName(), overWrite.replace(" ", "")))) {
-                    ItemJoin.getCore().getLang().sendLangMessage("general.failedInventory", player, placeHolders);
-                } else {
-                    ItemJoin.getCore().getLang().sendLangMessage("general.failedOverwrite", player, placeHolders);
+                if (TimerUtils.isExpired("wg_failed", new CompositeKey(player, region))) {
+                    if (type == TriggerType.REGION_ENTER || type == TriggerType.REGION_LEAVE) {
+                        TimerUtils.setExpiry("wg_failed", new CompositeKey(player, region), 20, TimeUnit.MINUTES);
+                    }
+                    if ((overWrite != null && StringUtils.containsLocation(player.getWorld().getName(), overWrite.replace(" ", "")))) {
+                        ItemJoin.getCore().getLang().sendLangMessage("general.failedInventory", player, placeHolders);
+                    } else {
+                        ItemJoin.getCore().getLang().sendLangMessage("general.failedOverwrite", player, placeHolders);
+                    }
                 }
                 this.failCount.remove(session);
             }
