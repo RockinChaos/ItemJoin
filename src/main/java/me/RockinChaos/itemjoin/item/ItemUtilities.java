@@ -979,9 +979,10 @@ public class ItemUtilities {
                         final HashMap<Executor, String> commandMap = this.getCommandMap(commands);
                         for (Executor executor : commandMap.keySet()) {
                             final String formatCommand = StringUtils.translateLayout(commandMap.get(executor), player);
-                            final DataObject dataObject = ((trigger.equals(TriggerType.FIRST_JOIN) || executor.equals(Executor.FIRSTJOIN)) ? (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.FIRST_COMMANDS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), formatCommand)) : null);
+                            final boolean isFirstJoin = trigger.equals(TriggerType.FIRST_JOIN) || executor.equals(Executor.FIRSTJOIN);
+                            final DataObject dataObject = (isFirstJoin ? (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.FIRST_COMMANDS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), formatCommand)) : null);
                             if (dataObject == null) {
-                                if (trigger.equals(TriggerType.FIRST_JOIN)) {
+                                if (isFirstJoin) {
                                     ItemJoin.getCore().getSQL().saveData(new DataObject(Table.FIRST_COMMANDS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), formatCommand));
                                 }
                                 if (executor.equals(Executor.DEFAULT) || executor.equals(Executor.CONSOLE) || executor.equals(Executor.FIRSTJOIN)) {
