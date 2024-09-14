@@ -345,7 +345,7 @@ public class ItemMap implements Cloneable {
         if (commandItem != null && !commandItem.isEmpty()) {
             this.itemCost = commandItem;
         }
-        this.cost = this.nodeLocation.getString("commands-cost");
+        this.setCommandCost(this.nodeLocation.getString("commands-cost"));
     }
 
     /**
@@ -747,7 +747,7 @@ public class ItemMap implements Cloneable {
      * @param count - The stack size to be set.
      */
     public void setCount(final String count) {
-        this.count = count;
+        this.count = count == null || count.isEmpty() ? "1" : count;
     }
 
     /**
@@ -1935,7 +1935,7 @@ public class ItemMap implements Cloneable {
      * @param cost - The Commands Cost to be set.
      */
     public void setCommandCost(final String cost) {
-        this.cost = cost;
+        this.cost = cost == null || cost.isEmpty() ? "0" : cost;
     }
 
     /**
@@ -5891,7 +5891,7 @@ public class ItemMap implements Cloneable {
                 itemData.set("items." + this.configName + ".slot", this.CustomSlot);
             }
         }
-        if (this.getCount(null) > 1 || this.count.contains("%")) {
+        if (this.getCount(null) > 1 || (this.count != null && this.count.contains("%"))) {
             itemData.set("items." + this.configName + ".count", this.count);
         }
         if (this.durability != null && this.durability > 0) {
@@ -6174,7 +6174,7 @@ public class ItemMap implements Cloneable {
         if (this.itemCost != null && !this.itemCost.isEmpty()) {
             itemData.set("items." + this.configName + ".commands-item", this.itemCost);
         }
-        if (this.getCommandCost(null) > 0 || this.cost.contains("%")) {
+        if (this.getCommandCost(null) > 0 || (this.cost != null && this.cost.contains("%"))) {
             itemData.set("items." + this.configName + ".commands-cost", this.cost);
         }
         if (this.commandsReceive != null && this.commandsReceive != 0) {
