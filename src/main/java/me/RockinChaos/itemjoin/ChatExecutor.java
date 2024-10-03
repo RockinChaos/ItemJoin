@@ -276,7 +276,7 @@ public class ChatExecutor implements CommandExecutor {
     }
 
     /**
-     * Called when the CommandSender fails to execute a command.
+     * Attempts to match the command arguments with an applicable Executor.
      *
      * @param args - Passed command arguments.
      * @return The found Executor.
