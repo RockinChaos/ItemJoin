@@ -264,8 +264,8 @@
     </issueManagement>
 
     <ciManagement>
-        <system>GitLab</system>
-        <url>https://labs.craftationgaming.com/ChaosCore/</url>
+        <system>Jenkins</system>
+        <url>https://ci-dev.craftationgaming.com/job/ItemJoin</url>
     </ciManagement>
 
     <distributionManagement>
