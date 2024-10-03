@@ -528,11 +528,13 @@ public class PluginData {
                 });
                 {
                     runAsyncLater(100L, () -> {
-                        final MetricsAPI metrics = new MetricsAPI(ItemJoin.getCore().getPlugin(), 4115);
-                        metrics.addCustomChart(new SimplePie("items", () -> ItemUtilities.getUtilities().getItems().size() + " "));
-                        metrics.addCustomChart(new SimplePie("itemPermissions", () -> ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items") ? "True" : "False"));
-                        ItemJoin.getCore().getDependencies().addCustomCharts(metrics);
-                        ServerUtils.sendErrorStatements(null);
+                        if (ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Metrics-Logging")) {
+                            final MetricsAPI metrics = new MetricsAPI(ItemJoin.getCore().getPlugin(), 4115);
+                            metrics.addCustomChart(new SimplePie("items", () -> ItemUtilities.getUtilities().getItems().size() + " "));
+                            metrics.addCustomChart(new SimplePie("itemPermissions", () -> ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items") ? "True" : "False"));
+                            ItemJoin.getCore().getDependencies().addCustomCharts(metrics);
+                            ServerUtils.sendErrorStatements(null);
+                        }
                     });
                 }
             }
