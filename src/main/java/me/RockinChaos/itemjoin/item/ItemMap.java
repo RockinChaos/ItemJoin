@@ -3027,12 +3027,14 @@ public class ItemMap implements Cloneable {
         if ((this.enabledRegions == null || this.enabledRegions.isEmpty()) && (this.disabledRegions == null || this.disabledRegions.isEmpty())) {
             return true;
         }
-        if (this.enabledRegions != null) {
+        if (this.enabledRegions != null && !this.enabledRegions.isEmpty()) {
             for (String compareRegion : this.enabledRegions) {
                 if (compareRegion.equalsIgnoreCase(region) || compareRegion.equalsIgnoreCase("UNDEFINED")) {
                     return !this.isDisabledRegion(region);
                 }
             }
+        } else {
+           return !this.isDisabledRegion(region);
         }
         return false;
     }
@@ -3060,7 +3062,9 @@ public class ItemMap implements Cloneable {
             if (this.disabledRegions != null) {
                 for (String compareRegion : this.disabledRegions) {
                     if (compareRegion.equalsIgnoreCase(region) || compareRegion.equalsIgnoreCase("UNDEFINED")) {
-                        if (inRegion != 2) {
+                        if (this.enabledRegions == null || this.enabledRegions.isEmpty()) {
+                            inRegion = 1;
+                        } else if (inRegion != 2) {
                             inRegion = !this.isDisabledRegion(compareRegion) ? inRegion : 2;
                         }
                     }
@@ -3078,10 +3082,12 @@ public class ItemMap implements Cloneable {
      */
     public boolean isDisabledRegion(final String region) {
         boolean isDisabled = false;
-        for (String disabledRegion : this.disabledRegions) {
-            if (disabledRegion.equalsIgnoreCase(region)) {
-                isDisabled = true;
-                break;
+        if (this.disabledRegions != null) {
+            for (String disabledRegion : this.disabledRegions) {
+                if (disabledRegion.equalsIgnoreCase(region)) {
+                    isDisabled = true;
+                    break;
+                }
             }
         }
         return isDisabled;
