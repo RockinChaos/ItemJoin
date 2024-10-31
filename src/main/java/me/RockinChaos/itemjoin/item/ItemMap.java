@@ -4328,7 +4328,7 @@ public class ItemMap implements Cloneable {
         if (ServerUtils.hasSpecificUpdate("1_13") && this.attributes != null && !this.attributes.isEmpty()) {
             try {
                 for (String attrib : this.attributes.keySet()) {
-                    Attribute attribute = Attribute.valueOf(attrib.toUpperCase());
+                    Attribute attribute = (Attribute) CompatUtils.valueOf(Attribute.class, attrib.toUpperCase());
                     double value = this.attributes.get(attrib);
                     EquipmentSlot slot;
                     if (ItemHandler.getDesignatedSlot(this.material).equalsIgnoreCase("noslot")) {
@@ -6350,7 +6350,7 @@ public class ItemMap implements Cloneable {
         if (this.effect != null && !this.effect.isEmpty()) {
             StringBuilder effectList = new StringBuilder();
             for (PotionEffect effects : this.effect) {
-                effectList.append((ServerUtils.hasPreciseUpdate("1_20_3") ? effects.getType().getKey().getKey() : LegacyAPI.getEffectName(effects.getType()))).append(":").append(effects.getAmplifier()).append(":").append(effects.getDuration()).append(", ");
+                effectList.append(CompatUtils.getName(effects)).append(":").append(effects.getAmplifier()).append(":").append(effects.getDuration()).append(", ");
             }
             itemData.set("items." + this.configName + ".potion-effects", effectList.substring(0, effectList.length() - 2));
         }
