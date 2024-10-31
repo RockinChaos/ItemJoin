@@ -17,7 +17,6 @@
  */
 package me.RockinChaos.itemjoin.utils.menus;
 
-import com.google.common.collect.ImmutableList;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import me.RockinChaos.core.handlers.ItemHandler;
@@ -852,7 +851,7 @@ public class Menu {
             StringBuilder potionString = new StringBuilder();
             if (!StringUtils.nullCheck(itemMap.getPotionEffect().toString()).equals("NONE")) {
                 for (PotionEffect potions : itemMap.getPotionEffect()) {
-                    potionString.append((ServerUtils.hasPreciseUpdate("1_20_3") ? potions.getType().getKey().getKey().toUpperCase() : LegacyAPI.getEffectName(potions.getType()).toUpperCase())).append(":").append(potions.getAmplifier()).append(":").append(potions.getDuration()).append(", ");
+                    potionString.append(CompatUtils.getName(potions)).append(":").append(potions.getAmplifier()).append(":").append(potions.getDuration()).append(", ");
                 }
                 for (String split : StringUtils.softSplit(StringUtils.nullCheck(potionString.substring(0, potionString.length())))) {
                     potionList.append("&a").append(split).append(" /n ");
@@ -1050,7 +1049,7 @@ public class Menu {
                 Interface colorPane = new Interface(true, 6, exitButton, GUIName, player);
                 colorPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu"), event -> creatingPane(player, itemMap)));
                 for (DyeColor color : DyeColor.values()) {
-                    colorPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRAY_DYE" : "351:8"), 1, false, false, "&f" + color.name(), "&7", "&7*This will be the color", "&7of your firework charge."), event -> {
+                    colorPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? color.name() +  "_DYE" : "351:8"), 1, false, false, "&f" + color.name(), "&7", "&7*This will be the color", "&7of your firework charge."), event -> {
                         itemMap.setChargeColor(color);
                         creatingPane(player, itemMap);
                     }));
@@ -4606,7 +4605,7 @@ public class Menu {
         SchedulerUtils.runAsync(() -> {
             colorPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the particle menu."), event -> particlePane(player, itemMap, 3)));
             for (DyeColor color : DyeColor.values()) {
-                colorPane.addButton(new Button(ItemHandler.getItem("GRAY_DYE", 1, false, false, "&f" + color.name(), "&7", "&7*Click to set the " + (color1 != null ? "&c&lend color" : "&9&lstart color"), "&7of the firework explosion effect."), event -> {
+                colorPane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_13") ? color.name() +  "_DYE" : "351:8", 1, false, false, "&f" + color.name(), "&7", "&7*Click to set the " + (color1 != null ? "&c&lend color" : "&9&lstart color"), "&7of the firework explosion effect."), event -> {
                     if (color1 != null) {
                         itemMap.setCommandParticle(particle + ":" + color1.name() + ":" + color.name() + ":" + explosion.name() + ":" + lifetime);
                         commandPane(player, itemMap);
@@ -8505,7 +8504,7 @@ public class Menu {
         SchedulerUtils.runAsync(() -> {
             colorPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the banner patterns menu."), event -> bannerPane(player, itemMap)));
             for (DyeColor color : DyeColor.values()) {
-                colorPane.addButton(new Button(ItemHandler.getItem("GRAY_DYE", 1, false, false, "&f" + color.name(), "&7", "&7*This will be the color", "&7of your banner pattern."), event -> {
+                colorPane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_13") ? color.name() + "_DYE" : "351:8", 1, false, false, "&f" + color.name(), "&7", "&7*This will be the color", "&7of your banner pattern."), event -> {
                     List<Pattern> patterns = itemMap.getBannerPatterns();
                     patterns.add(new Pattern(color, pattern));
                     itemMap.setBannerPatterns(patterns);
@@ -8531,19 +8530,19 @@ public class Menu {
             } else {
                 potionPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the other settings menu."), event -> otherPane(player, itemMap)));
             }
-            for (PotionEffectType potion : (ServerUtils.hasPreciseUpdate("1_20_3") ? ImmutableList.copyOf(Registry.EFFECT.iterator()) : LegacyAPI.getEffects())) {
+            for (PotionEffectType potion : CompatUtils.values(PotionEffectType.class)) {
                 if (potion != null) {
                     String potionString = "NONE";
                     if (!StringUtils.nullCheck(itemMap.getPotionEffect().toString()).equals("NONE")) {
                         for (PotionEffect potions : itemMap.getPotionEffect()) {
                             if (potions.getType() == potion) {
-                                potionString = ((ServerUtils.hasPreciseUpdate("1_20_3") ? potions.getType().getKey().getKey().toUpperCase() : LegacyAPI.getEffectName(potions.getType()).toUpperCase())) + ":" + potions.getAmplifier() + ":" + (potions.getDuration());
+                                potionString = CompatUtils.getName(potions) + ":" + potions.getAmplifier() + ":" + (potions.getDuration());
                                 break;
                             }
                         }
                     }
                     final String checkPotion = potionString;
-                    potionPane.addButton(new Button(ItemHandler.getItem("GLASS_BOTTLE", 1, (!checkPotion.equals("NONE")), false, "&f" + ((ServerUtils.hasPreciseUpdate("1_20_3") ? potion.getKey().getKey() : LegacyAPI.getEffectName(potion))).toUpperCase(), "&7", "&7*Add this potion effect", "&7to the item.",
+                    potionPane.addButton(new Button(ItemHandler.getItem("GLASS_BOTTLE", 1, (!checkPotion.equals("NONE")), false, "&f" + CompatUtils.getName(potion), "&7", "&7*Add this potion effect", "&7to the item.",
                             (!checkPotion.equals("NONE") ? "&9&lInformation: &a" + checkPotion : "")), event -> {
                         if (!checkPotion.equals("NONE")) {
                             List<PotionEffect> potionEffects = itemMap.getPotionEffect();
@@ -8754,7 +8753,7 @@ public class Menu {
         SchedulerUtils.runAsync(() -> {
             colorPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> otherPane(player, itemMap)));
             for (DyeColor color : DyeColor.values()) {
-                colorPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRAY_DYE" : "351:8"), 1, StringUtils.containsValue(itemMap.getFireworkColor(), color.name()), false, "&f" + color.name(),
+                colorPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? color.name() + "_DYE" : "351:8"), 1, StringUtils.containsValue(itemMap.getFireworkColor(), color.name()), false, "&f" + color.name(),
                         "&7", "&7*This will be the color", "&7of your firework charge.", "&9&lENABLED: &a" + (StringUtils.containsValue(itemMap.getFireworkColor(), color.name()) + "").toUpperCase()), event -> {
                     List<DyeColor> colors = itemMap.getFireworkColor();
                     if (StringUtils.containsIgnoreCase(itemMap.getFireworkColor().toString(), color.name())) {
@@ -8927,16 +8926,16 @@ public class Menu {
                 attributePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
             }
             if (ServerUtils.hasSpecificUpdate("1_9")) {
-                for (Attribute attribute : Attribute.values()) {
-                    String checkAttribute = (itemMap.getAttributes().containsKey(attribute.name()) ? (attribute.name() + ":" + itemMap.getAttributes().get(attribute.name())) : "NONE");
-                    attributePane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, itemMap.getAttributes().containsKey(attribute.name()), false, "&f" + attribute.name(), "&7", "&7*Add this custom attribute to the item.",
+                for (Attribute attribute : CompatUtils.values(Attribute.class)) {
+                    String checkAttribute = (itemMap.getAttributes().containsKey(CompatUtils.getName(attribute)) ? (CompatUtils.getName(attribute) + ":" + itemMap.getAttributes().get(CompatUtils.getName(attribute))) : "NONE");
+                    attributePane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, itemMap.getAttributes().containsKey(CompatUtils.getName(attribute)), false, "&f" + CompatUtils.getName(attribute), "&7", "&7*Add this custom attribute to the item.",
                             (!checkAttribute.equals("NONE") ? "&9&lInformation: &a" + checkAttribute : "")), event -> {
-                        if (itemMap.getAttributes().containsKey(attribute.name())) {
+                        if (itemMap.getAttributes().containsKey(CompatUtils.getName(attribute))) {
                             Map<String, Double> attributeList = itemMap.getAttributes();
-                            attributeList.remove(attribute.name());
+                            attributeList.remove(CompatUtils.getName(attribute));
                             attributePane(player, itemMap, isLeather);
                         } else {
-                            strengthPane(player, itemMap, attribute.name(), isLeather);
+                            strengthPane(player, itemMap, CompatUtils.getName(attribute), isLeather);
                         }
                     }));
                 }
@@ -9044,7 +9043,7 @@ public class Menu {
                 StringBuilder potionString = new StringBuilder();
                 if (!StringUtils.nullCheck(itemMap.getPotionEffect().toString()).equals("NONE")) {
                     for (PotionEffect potions : itemMap.getPotionEffect()) {
-                        potionString.append((ServerUtils.hasPreciseUpdate("1_20_3") ? potions.getType().getKey().getKey().toUpperCase() : LegacyAPI.getEffectName(potions.getType()).toUpperCase())).append(":").append(potions.getAmplifier()).append(":").append(potions.getDuration()).append(", ");
+                        potionString.append(CompatUtils.getName(potions)).append(":").append(potions.getAmplifier()).append(":").append(potions.getDuration()).append(", ");
                     }
                     for (String split : StringUtils.softSplit(StringUtils.nullCheck(potionString.toString()))) {
                         potionList.append("&a").append(split).append(" /n ");
@@ -9106,7 +9105,7 @@ public class Menu {
                 StringBuilder potionString = new StringBuilder();
                 if (!StringUtils.nullCheck(itemMap.getPotionEffect().toString()).equals("NONE")) {
                     for (PotionEffect potions : itemMap.getPotionEffect()) {
-                        potionString.append((ServerUtils.hasPreciseUpdate("1_20_3") ? potions.getType().getKey().getKey().toUpperCase() : LegacyAPI.getEffectName(potions.getType()).toUpperCase())).append(":").append(potions.getAmplifier()).append(":").append(potions.getDuration()).append(", ");
+                        potionString.append(CompatUtils.getName(potions)).append(":").append(potions.getAmplifier()).append(":").append(potions.getDuration()).append(", ");
                     }
                     for (String split : StringUtils.softSplit(StringUtils.nullCheck(potionString.substring(0, potionString.length())))) {
                         potionList.append("&a").append(split).append(" /n ");
@@ -9159,7 +9158,7 @@ public class Menu {
                 Interface colorPane = new Interface(true, 6, exitButton, GUIName, player);
                 colorPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> otherPane(player, itemMap)));
                 for (DyeColor color : DyeColor.values()) {
-                    colorPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "GRAY_DYE" : "351:8"), 1, false, false, "&f" + color.name(), "&7", "&7*This will be the color", "&7of your leather armor."), event -> {
+                    colorPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? color.name() + "_DYE" : "351:8"), 1, false, false, "&f" + color.name(), "&7", "&7*This will be the color", "&7of your leather armor."), event -> {
                         itemMap.setLeatherColor(color.name());
                         itemMap.setLeatherHex(null);
                         otherPane(player, itemMap);
@@ -9288,7 +9287,7 @@ public class Menu {
         StringBuilder potionString = new StringBuilder();
         if (!StringUtils.nullCheck(itemMap.getPotionEffect().toString()).equals("NONE")) {
             for (PotionEffect potions : itemMap.getPotionEffect()) {
-                potionString.append((ServerUtils.hasPreciseUpdate("1_20_3") ? potions.getType().getKey().getKey().toUpperCase() : LegacyAPI.getEffectName(potions.getType()).toUpperCase())).append(":").append(potions.getAmplifier()).append(":").append(potions.getDuration()).append(", ");
+                potionString.append(CompatUtils.getName(potions)).append(":").append(potions.getAmplifier()).append(":").append(potions.getDuration()).append(", ");
             }
             if (potionString.length() >= 2) {
                 for (String split : StringUtils.softSplit(StringUtils.nullCheck(potionString.substring(0, potionString.length() - 2)))) {
