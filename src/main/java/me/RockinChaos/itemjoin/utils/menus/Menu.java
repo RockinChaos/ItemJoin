@@ -9534,7 +9534,9 @@ public class Menu {
         if (GUIName == null) {
             GUIName = StringUtils.colorFormat("&7           &0&n ItemJoin Menu");
         }
-        return player != null && CompatUtils.getInventoryTitle(player).equalsIgnoreCase(StringUtils.colorFormat(GUIName));
+        synchronized (CompatUtils.class) {
+            return player != null && CompatUtils.getInventoryTitle(player).equalsIgnoreCase(StringUtils.colorFormat(GUIName));
+        }
     }
 
 //  ==============================================================================================================================================================================================================================================================
