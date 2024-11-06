@@ -196,7 +196,7 @@ public class Drops implements Listener {
         final ItemStack offHandItem = PlayerHandler.getOffHandItem(player);
         ItemUtilities.getUtilities().closeAnimations(player);
         if (!LegacyAPI.hasGameRule(player.getWorld(), "keepInventory")) {
-            if (!bottomInventory.isEmpty()) {
+            if (!CompatUtils.isInventoryEmpty(bottomInventory)) {
                 for (int playerInventory = 0; playerInventory < bottomInventory.getSize(); playerInventory++) {
                     this.handleKeepItem(player, bottomInventory.getItem(playerInventory), playerInventory, "bottom_inventory");
                 }
@@ -213,7 +213,7 @@ public class Drops implements Listener {
                     event.getDrops().remove(stack);
                 }
             }
-            if (!topInventory.isEmpty()) {
+            if (!CompatUtils.isInventoryEmpty(topInventory)) {
                 for (int craftInventory = 0; craftInventory < topInventory.getSize(); craftInventory++) {
                     final ItemStack stack = topInventory.getItem(craftInventory);
                     if (stack != null && (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops") || !ItemUtilities.getUtilities().isAllowed(player, stack, "erase-drops") || !ItemUtilities.getUtilities().isAllowed(player, stack, "death-keep"))) {
