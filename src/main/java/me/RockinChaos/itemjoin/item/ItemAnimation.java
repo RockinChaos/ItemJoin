@@ -319,7 +319,10 @@ public class ItemAnimation {
                     LegacyAPI.updateInventory(player);
                 } else {
                     synchronized ("IJ_ANIMATE") {
-                        PlayerHandler.updateInventory(player, itemMap.getItemStack(player).clone(), 1L);
+                        final ItemStack updatedItem = itemMap.getItemStack(player);
+                        if (updatedItem != null) {
+                            PlayerHandler.updateInventory(player, updatedItem.clone(), 1L);
+                        }
                     }
                 }
                 // ============== This has Concluded all Animations.. ============== //

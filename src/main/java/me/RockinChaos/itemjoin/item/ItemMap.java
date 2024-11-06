@@ -4241,7 +4241,7 @@ public class ItemMap implements Cloneable {
             this.setMapImage();
             this.setJSONBookPages(player);
             this.setNBTData();
-            this.tempMeta = this.tempItem.getItemMeta();
+            this.tempMeta = this.tempItem != null ? this.tempItem.getItemMeta() : null;
         }
         if (tempMeta != null) {
             this.setCustomName(player);
@@ -4305,7 +4305,8 @@ public class ItemMap implements Cloneable {
                 }
                 tag.getClass().getMethod(MinecraftMethod.setInt.getMethod(), String.class, int.class).invoke(tag, "Unbreakable", 1);
                 nms.getClass().getMethod(MinecraftMethod.setTag.getMethod(), tag.getClass()).invoke(nms, tag);
-                this.tempItem = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
+                final ItemStack item = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
+                this.tempItem = item != null ? item : this.tempItem.clone();
             } catch (Exception e) {
                 ServerUtils.sendDebugTrace(e);
             }
@@ -4358,7 +4359,7 @@ public class ItemMap implements Cloneable {
     private void setMapImage() {
         if (this.customMapImage != null || this.mapId != -1) {
             if (ServerUtils.hasSpecificUpdate("1_13")) {
-                MapMeta mapmeta = (MapMeta) this.tempItem.getItemMeta();
+                final MapMeta mapmeta = (MapMeta) this.tempItem.getItemMeta();
                 try {
                     if (mapmeta != null && this.mapView != null) {
                         try {
@@ -4385,7 +4386,8 @@ public class ItemMap implements Cloneable {
      */
     public void setJSONBookPages(final Player player) {
         if (this.tempItem.getType().toString().equalsIgnoreCase("WRITTEN_BOOK") && this.bookPages != null && !this.bookPages.isEmpty()) {
-            this.tempItem = this.setJSONBookPages(player, this.tempItem, this.bookPages);
+            final ItemStack item = this.setJSONBookPages(player, this.tempItem, this.bookPages);
+            this.tempItem = item != null ? item : this.tempItem.clone();
         }
     }
 
@@ -4585,7 +4587,8 @@ public class ItemMap implements Cloneable {
                         }
                     }
                 }
-                this.tempItem = ItemHandler.setNBTData(this.tempItem, tagInstance);
+                final ItemStack item = ItemHandler.setNBTData(this.tempItem, tagInstance);
+                this.tempItem = item != null ? item : this.tempItem.clone();
             } catch (Exception e) {
                 ServerUtils.logSevere("{ItemMap} An error has occurred when setting NBTData to an item.");
                 ServerUtils.sendDebugTrace(e);
