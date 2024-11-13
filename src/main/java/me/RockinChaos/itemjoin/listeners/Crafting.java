@@ -109,7 +109,11 @@ public class Crafting implements Listener {
             ServerUtils.logDebug("{CRAFTING} Bukkit inventory was opened for the player " + event.getPlayer().getName() + ".");
             PlayerHandler.addOpenCraftItems(player, PlayerHandler.getTopContents(player));
             ItemHandler.removeCraftItems(player);
-            PlayerHandler.updateInventory(player, 1L);
+            SchedulerUtils.runLater(1L, () -> {
+                if (PlayerHandler.isCraftingInv(player)) {
+                    PlayerHandler.updateInventory(player);
+                }
+            });
         }
     }
 
@@ -269,7 +273,11 @@ public class Crafting implements Listener {
             PlayerHandler.addCraftItems(player, PlayerHandler.getCreativeCraftItems().get(PlayerHandler.getPlayerID(player)));
             PlayerHandler.removeCreativeCraftItems(player);
         }
-        PlayerHandler.updateInventory(player, 1L);
+        SchedulerUtils.runLater(1L, () -> {
+            if (PlayerHandler.isCraftingInv(player)) {
+                PlayerHandler.updateInventory(player);
+            }
+        });
     }
 
     /**
@@ -328,7 +336,11 @@ public class Crafting implements Listener {
                     } else {
                         SchedulerUtils.runLater(1L, () -> {
                             topInventory.setItem(0, new ItemStack(Material.AIR));
-                            PlayerHandler.updateInventory(player, new ItemStack(Material.AIR), 1L);
+                            SchedulerUtils.runLater(1L, () -> {
+                                if (PlayerHandler.isCraftingInv(player)) {
+                                    PlayerHandler.updateInventory(player, new ItemStack(Material.AIR), 0L);
+                                }
+                            });
                         });
                     }
                 }
@@ -394,14 +406,22 @@ public class Crafting implements Listener {
                     final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(contents[i]);
                     if (contents[i] != null && itemMap != null) {
                         topInventory.setItem(i, contents[i]);
-                        PlayerHandler.updateInventory(player, itemMap.getItemStack(player), 1L);
+                        SchedulerUtils.runLater(1L, () -> {
+                            if (PlayerHandler.isCraftingInv(player)) {
+                                PlayerHandler.updateInventory(player, itemMap.getItemStack(player), 0L);
+                            }
+                        });
                     }
                 }
             } else if (contents != null) {
                 final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(contents[0]);
                 if (contents[0] != null && itemMap != null) {
                     topInventory.setItem(0, contents[0]);
-                    PlayerHandler.updateInventory(player, itemMap.getItemStack(player), 1L);
+                    SchedulerUtils.runLater(1L, () -> {
+                        if (PlayerHandler.isCraftingInv(player)) {
+                            PlayerHandler.updateInventory(player, itemMap.getItemStack(player), 0L);
+                        }
+                    });
                 }
             }
         });
