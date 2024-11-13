@@ -375,7 +375,7 @@ public class ItemMap implements Cloneable {
             if (sound != null) {
                 if (sound.contains(":")) {
                     final String[] soundParts = sound.split(":");
-                    this.commandSound = Sound.valueOf(soundParts[0]);
+                    this.commandSound = (Sound) CompatUtils.valueOf(Sound.class, soundParts[0]);
                     try {
                         this.commandSoundVolume = Double.valueOf(soundParts[1]);
                         this.commandSoundPitch = Double.valueOf(soundParts[2]);
@@ -384,7 +384,7 @@ public class ItemMap implements Cloneable {
                         ServerUtils.sendDebugTrace(e);
                     }
                 } else {
-                    this.commandSound = Sound.valueOf(this.nodeLocation.getString(".commands-sound"));
+                    this.commandSound = (Sound) CompatUtils.valueOf(Sound.class, sound);
                 }
             }
         } catch (Exception e) {
@@ -6172,7 +6172,7 @@ public class ItemMap implements Cloneable {
             itemData.set("items." + this.configName + ".toggle", this.toggleCommands);
         }
         if (this.commandSound != null) {
-            itemData.set("items." + this.configName + ".commands-sound", this.commandSound.name() + ((this.commandSoundVolume != 1.0 && this.commandSoundPitch != 1.0) ? ":" + this.commandSoundVolume + ":" + this.commandSoundPitch : ""));
+            itemData.set("items." + this.configName + ".commands-sound", CompatUtils.getName(this.commandSound) + ((this.commandSoundVolume != 1.0 && this.commandSoundPitch != 1.0) ? ":" + this.commandSoundVolume + ":" + this.commandSoundPitch : ""));
         }
         if (this.commandParticle != null && !this.commandParticle.isEmpty()) {
             itemData.set("items." + this.configName + ".commands-particle", this.commandParticle);

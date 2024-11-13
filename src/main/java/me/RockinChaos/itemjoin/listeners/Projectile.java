@@ -18,6 +18,7 @@
 package me.RockinChaos.itemjoin.listeners;
 
 import me.RockinChaos.core.handlers.PlayerHandler;
+import me.RockinChaos.core.utils.CompatUtils;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.itemjoin.item.ItemMap;
@@ -125,7 +126,7 @@ public class Projectile implements Listener {
                 }
                 if (itemMap.getTeleportSound() != null && !itemMap.getTeleportSound().isEmpty()) {
                     try {
-                        projectile.getWorld().playSound(projectile.getLocation(), Sound.valueOf(itemMap.getTeleportSound()), (float) ((double) itemMap.getTeleportVolume()), (float) ((double) itemMap.getTeleportPitch()));
+                        projectile.getWorld().playSound(projectile.getLocation(), (Sound) CompatUtils.valueOf(Sound.class, itemMap.getTeleportSound()), (float) ((double) itemMap.getTeleportVolume()), (float) ((double) itemMap.getTeleportPitch()));
                     } catch (Exception e) {
                         ServerUtils.logSevere("{Projectile} The defined teleport-sound " + itemMap.getTeleportSound() + " for the item " + itemMap.getConfigName() + " is not valid!");
                     }

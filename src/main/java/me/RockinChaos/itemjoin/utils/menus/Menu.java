@@ -4362,14 +4362,14 @@ public class Menu {
                 soundPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item commands menu."), event -> commandPane(player, itemMap)));
             }
 
-            for (Sound sound : Sound.values()) {
+            for (Sound sound : CompatUtils.values(Sound.class)) {
                 if (stage != 3) {
-                    soundPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "MUSIC_DISC_MELLOHI" : "2262"), 1, false, false, "&f" + sound.name(), "&7", "&7*Click to set the", "&7teleport-sound of the item."), event -> {
-                        itemMap.setTeleportSound(sound.name());
+                    soundPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "MUSIC_DISC_MELLOHI" : "2262"), 1, false, false, "&f" + CompatUtils.getName(sound), "&7", "&7*Click to set the", "&7teleport-sound of the item."), event -> {
+                        itemMap.setTeleportSound(CompatUtils.getName(sound));
                         soundVolumePane(player, itemMap, stage);
                     }));
                 } else {
-                    soundPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "MUSIC_DISC_MELLOHI" : "2262"), 1, false, false, "&f" + sound.name(), "&7", "&7*Click to set the", "&7commands-sound of the item."), event -> {
+                    soundPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "MUSIC_DISC_MELLOHI" : "2262"), 1, false, false, "&f" + CompatUtils.getName(sound), "&7", "&7*Click to set the", "&7commands-sound of the item."), event -> {
                         itemMap.setCommandSound(sound);
                         soundVolumePane(player, itemMap, stage);
                     }));
