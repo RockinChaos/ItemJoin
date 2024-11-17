@@ -283,7 +283,6 @@ public class ItemUtilities {
             item.setAnimations(player);
             if (((type.equals(TriggerType.JOIN) && item.isGiveOnJoin() && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions)))
                     || (type.equals(TriggerType.TELEPORT) && item.isGiveOnTeleport() && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions)))
-                    || (type.equals(TriggerType.RESPAWN) && item.isGiveOnRespawn() && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions)))
                     || (type.equals(TriggerType.RESPAWN_POINT) && (item.isGiveOnRespawnPoint() || item.isGiveOnRespawn()) && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions)))
                     || (type.equals(TriggerType.RESPAWN_WILD) && (item.isGiveOnRespawnWild() || item.isGiveOnRespawn()) && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions)))
                     || (type.equals(TriggerType.WORLD_SWITCH) && item.isGiveOnWorldSwitch() && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions)))
