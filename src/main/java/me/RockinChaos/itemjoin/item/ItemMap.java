@@ -217,6 +217,7 @@ public class ItemMap implements Cloneable {
     private boolean AllowOpBypass = false;
     private boolean onlyFirstJoin = false;
     private boolean onlyFirstLife = false;
+    private boolean onlyFirstWild = false;
     private boolean onlyFirstWorld = false;
     /*  ============================================== */
     private boolean ipLimited = false;
@@ -227,6 +228,7 @@ public class ItemMap implements Cloneable {
     private boolean giveOnJoin = false;
     private boolean giveOnTeleport = false;
     private boolean giveOnRespawn = false;
+    private boolean giveOnRespawnWild = false;
     private boolean giveOnRespawnPoint = false;
     private boolean giveOnWorldSwitch = false;
     private boolean giveOnPermissionSwitch = false;
@@ -526,7 +528,8 @@ public class ItemMap implements Cloneable {
             /* Shared with Triggers */
             this.setOnlyFirstJoin((StringUtils.splitIgnoreCase(this.itemflags, "first-join", ",") || this.onlyFirstJoin));
             this.setOnlyFirstLife((StringUtils.splitIgnoreCase(this.itemflags, "first-life", ",") || this.onlyFirstLife));
-            this.onlyFirstWorld = (StringUtils.splitIgnoreCase(this.itemflags, "first-world", ",") || this.onlyFirstWorld);
+            this.setOnlyFirstWild((StringUtils.splitIgnoreCase(this.itemflags, "first-wild", ",") || this.onlyFirstWild));
+            this.setOnlyFirstWorld((StringUtils.splitIgnoreCase(this.itemflags, "first-world", ",") || this.onlyFirstWorld));
             this.AllowOpBypass = (StringUtils.splitIgnoreCase(this.itemflags, "AllowOpBypass", ",") || this.AllowOpBypass);
             this.CreativeBypass = (StringUtils.splitIgnoreCase(this.itemflags, "CreativeBypass", ",") || this.CreativeBypass);
         }
@@ -549,6 +552,7 @@ public class ItemMap implements Cloneable {
         this.giveOnJoin = StringUtils.splitIgnoreCase(this.triggers, "JOIN", ",");
         this.giveOnTeleport = StringUtils.splitIgnoreCase(this.triggers, "TELEPORT", ",");
         this.giveOnRespawn = StringUtils.splitIgnoreCase(this.triggers, "RESPAWN", ",");
+        this.giveOnRespawnWild = StringUtils.splitIgnoreCase(this.triggers, "RESPAWN-WILD", ",");
         this.giveOnRespawnPoint = StringUtils.splitIgnoreCase(this.triggers, "RESPAWN-POINT", ",");
         this.giveOnWorldSwitch = StringUtils.splitIgnoreCase(this.triggers, "WORLD-CHANGE", ",") || StringUtils.splitIgnoreCase(this.triggers, "WORLD-SWITCH", ",");
         this.giveOnPermissionSwitch = StringUtils.splitIgnoreCase(this.triggers, "PERMISSION-CHANGE", ",") || StringUtils.splitIgnoreCase(this.triggers, "PERMISSION-SWITCH", ",") || StringUtils.splitIgnoreCase(this.triggers, "PERMISSIONS-CHANGE", ",") || StringUtils.splitIgnoreCase(this.triggers, "PERMISSIONS-SWITCH", ",");
@@ -567,6 +571,7 @@ public class ItemMap implements Cloneable {
         this.useOnLimitSwitch = StringUtils.splitIgnoreCase(this.triggers, "GAMEMODE-SWITCH", ",");
         this.setOnlyFirstJoin(StringUtils.splitIgnoreCase(this.triggers, "FIRST-JOIN", ","));
         this.setOnlyFirstLife(StringUtils.splitIgnoreCase(this.triggers, "FIRST-LIFE", ","));
+        this.setOnlyFirstWild(StringUtils.splitIgnoreCase(this.triggers, "FIRST-WILD", ","));
         this.setOnlyFirstWorld(StringUtils.splitIgnoreCase(this.triggers, "FIRST-WORLD", ","));
     }
 
@@ -2789,8 +2794,28 @@ public class ItemMap implements Cloneable {
     }
 
     /**
-     * Checks if you give on respawn point is enabled.
+     * Checks if you give on respawn wild is enabled.
      * Only gives the item if the player is NOT spawning in a bed, anchor, or spawn-point.
+     *
+     * @return If it is enabled.
+     */
+    public boolean isGiveOnRespawnWild() {
+        return this.giveOnRespawnWild;
+    }
+
+    /**
+     * Sets the ItemStack to be given only on Respawn Wild.
+     * Only gives the item if the player is NOT spawning in a bed, anchor, or spawn-point.
+     *
+     * @param bool - The value to be set.
+     */
+    public void setGiveOnRespawnWild(final boolean bool) {
+        this.giveOnRespawnWild = bool;
+    }
+
+    /**
+     * Checks if you give on respawn point is enabled.
+     * Only gives the item if the player IS spawning in a bed, anchor, or spawn-point.
      *
      * @return If it is enabled.
      */
@@ -2800,7 +2825,7 @@ public class ItemMap implements Cloneable {
 
     /**
      * Sets the ItemStack to be given only on Respawn Point.
-     * Only gives the item if the player is NOT spawning in a bed, anchor, or spawn-point.
+     * Only gives the item if the player IS spawning in a bed, anchor, or spawn-point.
      *
      * @param bool - The value to be set.
      */
@@ -2911,14 +2936,18 @@ public class ItemMap implements Cloneable {
      * Sets the ItemStack to be given only on First Join.
      *
      * @param bool - The value to be set.
+     * @param unset - If the trigger is being unset.
      */
-    public void setOnlyFirstJoin(final boolean bool) {
+    public void setOnlyFirstJoin(final boolean bool, boolean... unset) {
         this.onlyFirstJoin = bool;
         if (bool && !this.giveOnRegionEnter && !this.giveOnRegionLeave && !this.giveOnRegionAccess && !this.giveOnRegionEgress) {
             this.giveOnJoin = true;
             this.giveOnRespawn = false;
+            this.giveOnRespawnWild = false;
             this.giveOnRespawnPoint = false;
             this.giveOnTeleport = false;
+        } else if (!bool && unset.length > 0 && unset[0]) {
+            this.giveOnJoin = false;
         }
     }
 
@@ -2935,13 +2964,44 @@ public class ItemMap implements Cloneable {
      * Sets the ItemStack to be given only on First Join but will always be given upon respawn.
      *
      * @param bool - The value to be set.
+     * @param unset - If the trigger is being unset.
      */
-    public void setOnlyFirstLife(final boolean bool) {
+    public void setOnlyFirstLife(final boolean bool, boolean... unset) {
         this.onlyFirstLife = bool;
         if (bool && !this.giveOnRegionEnter && !this.giveOnRegionLeave && !this.giveOnRegionAccess && !this.giveOnRegionEgress) {
             this.giveOnJoin = true;
             this.giveOnRespawn = true;
             this.giveOnTeleport = false;
+        } else if (!bool && unset.length > 0 && unset[0]) {
+            this.giveOnJoin = false;
+            this.giveOnRespawn = false;
+        }
+    }
+
+    /**
+     * Checks if you give on first wild is enabled.
+     *
+     * @return If it is enabled.
+     */
+    public boolean isOnlyFirstWild() {
+        return this.onlyFirstWild;
+    }
+
+    /**
+     * Sets the ItemStack to be given only on First Join but will always be given when they do not respawn at a bed or anchor.
+     *
+     * @param bool - The value to be set.
+     * @param unset - If the trigger is being unset.
+     */
+    public void setOnlyFirstWild(final boolean bool, boolean... unset) {
+        this.onlyFirstWild = bool;
+        if (bool && !this.giveOnRegionEnter && !this.giveOnRegionLeave && !this.giveOnRegionAccess && !this.giveOnRegionEgress) {
+            this.giveOnJoin = true;
+            this.giveOnRespawnWild = true;
+            this.giveOnTeleport = false;
+        } else if (!bool && unset.length > 0 && unset[0]) {
+            this.giveOnJoin = false;
+            this.giveOnRespawnWild = false;
         }
     }
 
@@ -2958,15 +3018,20 @@ public class ItemMap implements Cloneable {
      * Sets the ItemStack to be given only on First World.
      *
      * @param bool - The value to be set.
+     * @param unset - If the trigger is being unset.
      */
-    public void setOnlyFirstWorld(final boolean bool) {
+    public void setOnlyFirstWorld(final boolean bool, boolean... unset) {
         this.onlyFirstWorld = bool;
         if (bool && !this.giveOnRegionEnter && !this.giveOnRegionLeave && !this.giveOnRegionAccess && !this.giveOnRegionEgress) {
             this.giveOnJoin = true;
             this.giveOnWorldSwitch = true;
             this.giveOnRespawn = false;
+            this.giveOnRespawnWild = false;
             this.giveOnRespawnPoint = false;
             this.giveOnTeleport = false;
+        } else if (!bool && unset.length > 0 && unset[0]) {
+            this.giveOnJoin = false;
+            this.giveOnWorldSwitch = false;
         }
     }
 
