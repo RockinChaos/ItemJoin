@@ -5259,14 +5259,14 @@ public class Menu {
                 itemMap.setGiveOnPermissionSwitch(!itemMap.isGiveOnPermissionSwitch());
                 triggerPane(player, itemMap);
             }));
-            triggerPane.addButton(new Button(ItemHandler.getItem("COAL", 1, itemMap.isGiveOnRespawnWild() && !itemMap.isOnlyFirstWild() && !itemMap.isOnlyFirstLife(), false, "&e&l&nRespawn Wild", "&7", "&7*Gives the item when the", "&7player respawns from a death event.", "&7", "&c&nException:&7 The item will not be given if", "&7spawning in a &lBED&7, &lANCHOR&7, or &lSPAWN-POINT&7.", "&9&lENABLED: &a" +
+            triggerPane.addButton(new Button(ItemHandler.getItem("COAL", 1, itemMap.isGiveOnRespawnWild() && !itemMap.isOnlyFirstWild() && !itemMap.isOnlyFirstLife(), false, "&e&l&nRespawn Wild", "&7", "&7*Gives the item when the", "&7player respawns from a death event.", "&7", "&c&nException:&7 The item will &lNOT&7 be given if", "&7spawning in a &lBED&7, &lANCHOR&7, or &lSPAWN-POINT&7.", "&9&lENABLED: &a" +
                     ((itemMap.isGiveOnRespawnWild() && !itemMap.isOnlyFirstWild() && !itemMap.isOnlyFirstLife()) + "").toUpperCase()), event -> {
                 itemMap.setGiveOnRespawnWild(!itemMap.isGiveOnRespawnWild());
                 itemMap.setGiveOnRespawn(false);
                 itemMap.setGiveOnRespawnPoint(false);
                 triggerPane(player, itemMap);
             }));
-            triggerPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "RED_BED" : "355"), 1, itemMap.isGiveOnRespawnPoint() && !itemMap.isOnlyFirstWild() && !itemMap.isOnlyFirstLife(), false, "&e&l&nRespawn Wild", "&7", "&7*Gives the item when the", "&7player respawns from a death event.", "&7", "&c&nException:&7 The item will &lONLY&7 be given if", "&7spawning in a &lBED&7, &lANCHOR&7, or &lSPAWN-POINT&7.", "&9&lENABLED: &a" +
+            triggerPane.addButton(new Button(ItemHandler.getItem("TORCH", 1, itemMap.isGiveOnRespawnPoint() && !itemMap.isOnlyFirstWild() && !itemMap.isOnlyFirstLife(), false, "&e&l&nRespawn Point", "&7", "&7*Gives the item when the", "&7player respawns from a death event.", "&7", "&c&nException:&7 The item will &lONLY&7 be given if", "&7spawning in a &lBED&7, &lANCHOR&7, or &lSPAWN-POINT&7.", "&9&lENABLED: &a" +
                     ((itemMap.isGiveOnRespawnPoint() && !itemMap.isOnlyFirstWild() && !itemMap.isOnlyFirstLife()) + "").toUpperCase()), event -> {
                 itemMap.setGiveOnRespawnPoint(!itemMap.isGiveOnRespawnPoint());
                 itemMap.setGiveOnRespawn(false);
