@@ -43,9 +43,9 @@ public class Respawn implements Listener {
         final boolean isProtected = event.isBedSpawn() || (ServerUtils.hasPreciseUpdate("1_16_2") && event.isAnchorSpawn());
         if (PlayerHandler.isPlayer(player)) {
             if (ItemJoin.getCore().getDependencies().getGuard().guardEnabled()) {
-                ItemUtilities.getUtilities().handleRegions(player, player.getWorld(), (isProtected ? TriggerType.RESPAWN : TriggerType.RESPAWN_POINT), player.getGameMode());
+                ItemUtilities.getUtilities().handleRegions(player, player.getWorld(), (isProtected ? TriggerType.RESPAWN_POINT : TriggerType.RESPAWN_WILD), player.getGameMode());
             } else {
-                ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), (isProtected ? TriggerType.RESPAWN : TriggerType.RESPAWN_POINT), player.getGameMode(), "IJ_WORLD", Collections.singletonList("IJ_WORLD"));
+                ItemUtilities.getUtilities().setAuthenticating(player, player.getWorld(), (isProtected ? TriggerType.RESPAWN_POINT : TriggerType.RESPAWN_WILD), player.getGameMode(), "IJ_WORLD", Collections.singletonList("IJ_WORLD"));
             }
         }
         ServerUtils.logDebug("{ItemMap} " + player.getName() + " has performed the RESPAWN trigger.");
