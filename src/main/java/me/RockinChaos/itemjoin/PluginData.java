@@ -612,7 +612,7 @@ public class PluginData {
         if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnJoin()) || itemMap.isAutoRemove() || (enabledWorlds != null && (!enabledWorlds.equalsIgnoreCase("DISABLED") && !enabledWorlds.equalsIgnoreCase("FALSE")))) && StringUtils.isRegistered(PlayerJoin.class.getSimpleName())) {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new PlayerJoin(), ItemJoin.getCore().getPlugin());
         }
-        if ((((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnRespawn()) || itemMap.isDeathKeepable()) || itemMap.isAutoRemove()) && StringUtils.isRegistered(Respawn.class.getSimpleName())) {
+        if ((((!itemMap.isGiveOnDisabled() && (itemMap.isGiveOnRespawn() || itemMap.isGiveOnRespawnPoint() || itemMap.isGiveOnRespawnWild())) || itemMap.isDeathKeepable()) || itemMap.isAutoRemove()) && StringUtils.isRegistered(Respawn.class.getSimpleName())) {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Respawn(), ItemJoin.getCore().getPlugin());
         }
         if (((!itemMap.isGiveOnDisabled() && itemMap.isGiveOnTeleport()) || itemMap.isAutoRemove()) && StringUtils.isRegistered(PlayerTeleport.class.getSimpleName())) {
