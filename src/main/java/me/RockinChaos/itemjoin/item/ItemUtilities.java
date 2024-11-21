@@ -311,8 +311,8 @@ public class ItemUtilities {
             PlayerHandler.updateInventory(player, 15L);
         }
         if (removed) {
-            TimerUtils.removeExpiry("wg_items", new CompositeKey(player, targetRegion), true);
-            TimerUtils.removeExpiry("wg_failed", new CompositeKey(player, targetRegion), true);
+            TimerUtils.removeExpiry("wg_items", new CompositeKey(player.getUniqueId(), targetRegion), true);
+            TimerUtils.removeExpiry("wg_failed", new CompositeKey(player.getUniqueId(), targetRegion), true);
         }
     }
 
@@ -587,9 +587,9 @@ public class ItemUtilities {
      * @return If the debug message can be sent.
      */
     private boolean canSend(final Player player, final TriggerType type, final String region) {
-        if (TimerUtils.isExpired("wg_items", new CompositeKey(player, region))) {
+        if (TimerUtils.isExpired("wg_items", new CompositeKey(player.getUniqueId(), region))) {
             if (type == TriggerType.REGION_ENTER || type == TriggerType.REGION_LEAVE) {
-                TimerUtils.setExpiry("wg_items", new CompositeKey(player, region), 20, TimeUnit.MINUTES);
+                TimerUtils.setExpiry("wg_items", new CompositeKey(player.getUniqueId(), region), 20, TimeUnit.MINUTES);
             }
             return true;
         }
@@ -662,9 +662,9 @@ public class ItemUtilities {
             if (this.failCount.get(session) != null && this.failCount.get(session) != 0) {
                 String overWrite = ItemJoin.getCore().getConfig("items.yml").getString("items-Overwrite");
                 final PlaceHolder placeHolders = new PlaceHolder().with(Holder.FAIL_COUNT, this.failCount.get(session).toString());
-                if (TimerUtils.isExpired("wg_failed", new CompositeKey(player, region))) {
+                if (TimerUtils.isExpired("wg_failed", new CompositeKey(player.getUniqueId(), region))) {
                     if (type == TriggerType.REGION_ENTER || type == TriggerType.REGION_LEAVE) {
-                        TimerUtils.setExpiry("wg_failed", new CompositeKey(player, region), 20, TimeUnit.MINUTES);
+                        TimerUtils.setExpiry("wg_failed", new CompositeKey(player.getUniqueId(), region), 20, TimeUnit.MINUTES);
                     }
                     if ((overWrite != null && StringUtils.containsLocation(player.getWorld().getName(), overWrite.replace(" ", "")))) {
                         ItemJoin.getCore().getLang().sendLangMessage("general.failedInventory", player, placeHolders);

@@ -59,7 +59,7 @@ public class Commands implements Listener {
     private void onCreativeCraft(PrepareItemCraftEvent event) {
         final Player player = CompatUtils.getPlayer(event.getView());
         if (PlayerHandler.isCreativeMode(player) && PlayerHandler.isCraftingInv(player)) {
-            TimerUtils.setExpiry("cc_destroy", player, 20);
+            TimerUtils.setExpiry("cc_destroy", player.getUniqueId(), 20);
         }
     }
 
@@ -78,7 +78,7 @@ public class Commands implements Listener {
             this.runCommands(player, null, item, action, event.getClick().name(), slot);
         } else {
             SchedulerUtils.run(() -> {
-                if (TimerUtils.isExpired("cc_destroy", player)) {
+                if (TimerUtils.isExpired("cc_destroy", player.getUniqueId())) {
                     this.runCommands(player, null, item, action, "CREATIVE", slot);
                 }
             });
@@ -428,11 +428,11 @@ public class Commands implements Listener {
         final Player player = event.getPlayer();
         final ItemStack item = (event.getItem() != null ? event.getItem().clone() : (event.getAction() == Action.PHYSICAL ? PlayerHandler.getMainHandItem(player) : event.getItem()));
         final String action = event.getAction().name();
-        if (((PlayerHandler.isAdventureMode(player) && !action.contains("LEFT") || !PlayerHandler.isAdventureMode(player))) && TimerUtils.isExpired("dd_drop", player)) {
+        if (((PlayerHandler.isAdventureMode(player) && !action.contains("LEFT") || !PlayerHandler.isAdventureMode(player))) && TimerUtils.isExpired("dd_drop", player.getUniqueId())) {
             final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player));
             if (!PlayerHandler.isMenuClick(player, event.getAction()) && itemMap != null && itemMap.isSimilar(player, item)) {
-                if (TimerUtils.isExpired("dd_interact", new CompositeKey(player, item))) {
-                    TimerUtils.setExpiry("dd_interact", new CompositeKey(player, item), 30, TimeUnit.MILLISECONDS);
+                if (TimerUtils.isExpired("dd_interact", new CompositeKey(player.getUniqueId(), item))) {
+                    TimerUtils.setExpiry("dd_interact", new CompositeKey(player.getUniqueId(), item), 30, TimeUnit.MILLISECONDS);
                     this.runCommands(player, null, item, action, (event.getAction() == Action.PHYSICAL ? "INTERACTED" : action.split("_")[0]), String.valueOf(player.getInventory().getHeldItemSlot()));
                 }
             }
@@ -448,7 +448,7 @@ public class Commands implements Listener {
     private void onSwingArm(PlayerAnimationEvent event) {
         final Player player = event.getPlayer();
         final ItemStack item = PlayerHandler.getHandItem(player);
-        if (PlayerHandler.isAdventureMode(player) && TimerUtils.isExpired("dd_drop", player) && (!PlayerHandler.isMenuClick(player, Action.LEFT_CLICK_AIR) || PlayerHandler.isMenuClick(player, Action.LEFT_CLICK_BLOCK))) {
+        if (PlayerHandler.isAdventureMode(player) && TimerUtils.isExpired("dd_drop", player.getUniqueId()) && (!PlayerHandler.isMenuClick(player, Action.LEFT_CLICK_AIR) || PlayerHandler.isMenuClick(player, Action.LEFT_CLICK_BLOCK))) {
             this.runCommands(player, null, item, "LEFT_CLICK_AIR", "LEFT", String.valueOf(player.getInventory().getHeldItemSlot()));
         }
     }
@@ -460,8 +460,8 @@ public class Commands implements Listener {
      */
     @EventHandler()
     private void onHandDrop(PlayerDropItemEvent event) {
-        if (TimerUtils.isExpired("dd_drop", event.getPlayer())) {
-            TimerUtils.setExpiry("dd_drop", event.getPlayer(), 900, TimeUnit.MILLISECONDS);
+        if (TimerUtils.isExpired("dd_drop", event.getPlayer().getUniqueId())) {
+            TimerUtils.setExpiry("dd_drop", event.getPlayer().getUniqueId(), 900, TimeUnit.MILLISECONDS);
         }
     }
 
@@ -497,7 +497,7 @@ public class Commands implements Listener {
                 this.runCommands(player, null, item, action, (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") ? "EQUIPPED" : clickType), slot);
             } else {
                 SchedulerUtils.run(() -> {
-                    if (TimerUtils.isExpired("cc_destroy", player)) {
+                    if (TimerUtils.isExpired("cc_destroy", player.getUniqueId())) {
                         this.runCommands(player, null, item, action, (clickType.equalsIgnoreCase("SHIFT_EQUIPPED") ? "EQUIPPED" : clickType), slot);
                     }
                 });
