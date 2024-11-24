@@ -11,10 +11,10 @@
     <description>Get custom items on join.</description>
     <url>https://www.spigotmc.org/resources/itemjoin.12661/</url>
 
-    <version>6.1.1-SNAPSHOT</version>
+    <version>6.1.1-RELEASE</version>
 
     <properties>
-        <chaoscore.version>1.0.9-SNAPSHOT</chaoscore.version>
+        <chaoscore.version>1.0.9-RELEASE</chaoscore.version>
         <spigot.version>1.21.3-R0.1-SNAPSHOT</spigot.version>
 
         <authlib.version>1.5.21</authlib.version>
