@@ -36,7 +36,7 @@ public class ItemJoin extends JavaPlugin {
      * Notice: This class is not the actual API class, this is the secondary main class for the JavaPlugin plugin.
      * For API methods, use the static methods available from the class: {@link ItemJoinAPI}.
      *
-     * @return ChaosCore instance.
+     * @return ChaosCore instance. 
      */
     public static Core getCore() {
         return core;
