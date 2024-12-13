@@ -1520,7 +1520,7 @@ public class Menu {
                 final String triggerSet = ItemJoin.getCore().getConfig("config.yml").getString(triggerString);
                 if (triggerSet != null && !triggerSet.isEmpty()) {
                     for (String trigger : triggerSet.replace(" ", "").split(",")) {
-                        if (trigger != null && !trigger.isEmpty()) {
+                        if (!trigger.isEmpty()) {
                             triggers.add(trigger);
                         }
                     }
@@ -1810,7 +1810,7 @@ public class Menu {
             final String bypassSet = ItemJoin.getCore().getConfig("config.yml").getString("Prevent.Bypass");
             if (bypassSet != null) {
                 for (String bypass : bypassSet.replace(" ", "").split(",")) {
-                    if (bypass != null && !bypass.isEmpty()) {
+                    if (!bypass.isEmpty()) {
                         bypassList.add(bypass);
                     }
                 }
@@ -2477,7 +2477,7 @@ public class Menu {
         final String options = ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Options");
         if (options != null) {
             for (String option : options.replace(" ", "").split(",")) {
-                if (option != null && !option.isEmpty()) {
+                if (!option.isEmpty()) {
                     optionList.add(option);
                 }
             }
