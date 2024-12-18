@@ -4810,6 +4810,7 @@ public class ItemMap implements Cloneable {
      */
     private void setAttributeFlags() {
         if (this.hideAttributes) {
+            CompatUtils.setDummyAttributes(this.tempMeta);
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ATTRIBUTES);
         }
     }
@@ -4819,6 +4820,7 @@ public class ItemMap implements Cloneable {
      */
     private void setEnchantmentsFlags() {
         if (this.hideEnchantments) {
+            CompatUtils.setDummyAttributes(this.tempMeta);
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
         }
     }
@@ -4831,6 +4833,7 @@ public class ItemMap implements Cloneable {
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
         }
         if (this.hideFlags) {
+            CompatUtils.setDummyAttributes(this.tempMeta);
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ATTRIBUTES);
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_DESTROYS);
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_PLACED_ON);
