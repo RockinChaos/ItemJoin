@@ -24,6 +24,7 @@ import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.core.utils.protocol.events.PlayerPickItemEvent;
+import me.RockinChaos.core.utils.types.ActionBlocks;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.item.ItemMap;
@@ -32,8 +33,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -225,10 +228,12 @@ public class Clicking implements Listener {
         if (item != null && item.getType() != Material.AIR && !PlayerHandler.isMenuClick(player, event.getAction())) {
             final String[] itemType = (item.getType().name().equalsIgnoreCase("ELYTRA") ? "ELYTRA_CHESTPLATE".split("_") : item.getType().name().split("_"));
             if (itemType.length >= 2 && itemType[1] != null && !itemType[1].isEmpty() && StringUtils.isInt(StringUtils.getArmorSlot(itemType[1], true))
-                    && player.getInventory().getItem(Integer.parseInt(StringUtils.getArmorSlot(itemType[1], true))) == null
                     && this.isEquipment(item, "EQUIPPED", StringUtils.getArmorSlot(itemType[1], true))
+                    && (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK) || event.useInteractedBlock().equals(Result.DENY) || player.isSneaking() || !ActionBlocks.isActionBlocks(Objects.requireNonNull(event.getClickedBlock()).getType()))
                     && (!ItemUtilities.getUtilities().isAllowed(player, item, "inventory-modify")
-                    || !ItemUtilities.getUtilities().isAllowed(player, item, "cancel-equip"))) {
+                    || !ItemUtilities.getUtilities().isAllowed(player, item, "cancel-equip")
+                    || !ItemUtilities.getUtilities().isAllowed(player, player.getInventory().getItem(Integer.parseInt(StringUtils.getArmorSlot(itemType[1], true))), "inventory-modify")
+                    || !ItemUtilities.getUtilities().isAllowed(player, player.getInventory().getItem(Integer.parseInt(StringUtils.getArmorSlot(itemType[1], true))), "cancel-equip"))) {
                 event.setCancelled(true);
                 PlayerHandler.updateInventory(player, 1L);
             }
