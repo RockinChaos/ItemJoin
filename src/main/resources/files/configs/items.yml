@@ -28,14 +28,14 @@ items:
       - 'player: say This is item slot 1.'
       - 'op: say This command executes as if the player is op.'
       - 'say Hello world!'
-    commands-sound: BLOCK_NOTE_BLOCK_PLING
+    commands-sound: BLOCK.NOTE_BLOCK.PLING
     commands-particle: FIREWORK:BLACK:RED:BURST:10
     commands-sequence: SEQUENTIAL
     commands-item: EMERALD
     commands-cost: 3
     commands-cooldown: 5
     cooldown-message: '&7[&eItemJoin&7] &a[%item%&a] &cis on cooldown for &a%timeleft% &cseconds..'
-    attributes: '{GENERIC_ATTACK_DAMAGE:15.2}, {GENERIC_ATTACK_SPEED:19.0}'
+    attributes: '{ATTACK_DAMAGE:15.2}, {ATTACK_SPEED:19.0}'
     enchantment: FIRE_ASPECT:3, DAMAGE_ALL:5, DAMAGE_UNDEAD:5, KNOCKBACK:8
     itemflags: unbreakable, hide-flags, self-drops, death-drops, CreativeBypass
     triggers: join, respawn, world-switch, region-enter
@@ -68,7 +68,7 @@ items:
     interact-left:
       - 'player: minecraft:gamemode spectator %player%'
       - 'message: &eYou have been set to spectator mode.'
-    commands-sound: BLOCK_NOTE_BLOCK_PLING
+    commands-sound: BLOCK.NOTE_BLOCK.PLING
     commands-cooldown: 2
     itemflags: item-store, death-drops, self-drops, hide-flags, disposable
     triggers: join, respawn, world-switch
@@ -201,7 +201,7 @@ items:
     inventory:
       - 'server: survival'
       - 'message: &eSending you to the survival server!'
-    commands-sound: BLOCK_NOTE_BLOCK_PLING
+    commands-sound: BLOCK.NOTE_BLOCK.PLING
     commands-cost: 10
     commands-cooldown: 2
     enchantment: FIRE_ASPECT:3

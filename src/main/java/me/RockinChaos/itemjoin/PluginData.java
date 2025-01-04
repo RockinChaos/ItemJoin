@@ -740,8 +740,36 @@ public class PluginData {
         return () -> {
             final File itemsFile = new File(ItemJoin.getCore().getPlugin().getDataFolder(), "items.yml");
             final FileConfiguration itemsData = YamlConfiguration.loadConfiguration(itemsFile);
-            if (ServerUtils.hasSpecificUpdate("1_14")) {
+            if (ServerUtils.hasPreciseUpdate("1_21_3")) {
+                itemsData.set("items.devine-item.commands-sound", "BLOCK.NOTE_BLOCK.PLING");
+                itemsData.set("items.devine-item.attributes", "{ATTACK_DAMAGE:15.2}, {ATTACK_SPEED:19.0}");
+                itemsData.set("items.map-item.id", "FILLED_MAP");
+                itemsData.set("items.gamemode-token.id", "FIREWORK_STAR");
+                itemsData.set("items.gamemode-token.commands-sound", "BLOCK.NOTE_BLOCK.PLING");
+                itemsData.set("items.bungeecord-item.id", "PURPLE_STAINED_GLASS");
+                itemsData.set("items.bungeecord-item.commands-sound", "BLOCK.NOTE_BLOCK.PLING");
+                itemsData.set("items.animated-panes.id.1", "<delay:40>BLACK_STAINED_GLASS_PANE");
+                itemsData.set("items.animated-panes.id.2", "<delay:20>BLUE_STAINED_GLASS_PANE");
+                itemsData.set("items.animated-panes.id.3", "<delay:20>GREEN_STAINED_GLASS_PANE");
+                itemsData.set("items.animated-panes.id.4", "<delay:20>MAGENTA_STAINED_GLASS_PANE");
+                itemsData.set("items.animated-panes.id.5", "<delay:20>ORANGE_STAINED_GLASS_PANE");
+                itemsData.set("items.animated-panes.id.6", "<delay:20>RED_STAINED_GLASS_PANE");
+                itemsData.set("items.banner-item.id", "WHITE_BANNER");
+                itemsData.set("items.animated-sign.id", "OAK_SIGN");
+                itemsData.set("items.skull-item.id", "PLAYER_HEAD");
+                itemsData.set("items.potion-arrow.id", "TIPPED_ARROW");
+                itemsData.set("items.potion-arrow.name", "&fDeath Arrow");
+                itemsData.set("items.potion-arrow.potion-effect", "WITHER:1:20");
+                itemsData.set("items.firework-item.id", "FIREWORK_ROCKET");
+                itemsData.set("items.firework-item.firework.colors", "GRAY, WHITE, PURPLE, LIGHT_GRAY, GREEN");
+                itemsData.set("items.potion-apple.potion-effect", "JUMP:2:120, NIGHT_VISION:2:400, GLOWING:1:410, REGENERATION:1:160");
+                itemsData.set("items.profile-item.id", "PLAYER_HEAD");
+                itemsData.set("items.random-pane-1.id", "YELLOW_STAINED_GLASS_PANE");
+                itemsData.set("items.random-pane-2.id", "BLUE_STAINED_GLASS_PANE");
+                itemsData.set("items.random-pane-3.id", "PINK_STAINED_GLASS_PANE");
+            } else if (ServerUtils.hasSpecificUpdate("1_14")) {
                 itemsData.set("items.devine-item.commands-sound", "BLOCK_NOTE_BLOCK_PLING");
+                itemsData.set("items.devine-item.attributes", "{GENERIC_ATTACK_DAMAGE:15.2}, {GENERIC_ATTACK_SPEED:19.0}");
                 itemsData.set("items.map-item.id", "FILLED_MAP");
                 itemsData.set("items.gamemode-token.id", "FIREWORK_STAR");
                 itemsData.set("items.gamemode-token.commands-sound", "BLOCK_NOTE_BLOCK_PLING");
@@ -768,6 +796,7 @@ public class PluginData {
                 itemsData.set("items.random-pane-3.id", "PINK_STAINED_GLASS_PANE");
             } else if (ServerUtils.hasSpecificUpdate("1_13")) {
                 itemsData.set("items.devine-item.commands-sound", "BLOCK_NOTE_BLOCK_PLING");
+                itemsData.set("items.devine-item.attributes", "{GENERIC_ATTACK_DAMAGE:15.2}, {GENERIC_ATTACK_SPEED:19.0}");
                 itemsData.set("items.map-item.id", "FILLED_MAP");
                 itemsData.set("items.gamemode-token.id", "FIREWORK_STAR");
                 itemsData.set("items.gamemode-token.commands-sound", "BLOCK_NOTE_BLOCK_PLING");
@@ -794,6 +823,7 @@ public class PluginData {
                 itemsData.set("items.random-pane-3.id", "PINK_STAINED_GLASS_PANE");
             } else if (ServerUtils.hasSpecificUpdate("1_9")) {
                 itemsData.set("items.devine-item.commands-sound", "BLOCK_NOTE_PLING");
+                itemsData.set("items.devine-item.attributes", "{GENERIC_ATTACK_DAMAGE:15.2}, {GENERIC_ATTACK_SPEED:19.0}");
                 itemsData.set("items.map-item.id", "MAP");
                 itemsData.set("items.gamemode-token.id", "FIREWORK_CHARGE");
                 itemsData.set("items.gamemode-token.commands-sound", "BLOCK_NOTE_PLING");

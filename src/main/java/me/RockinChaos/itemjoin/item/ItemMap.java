@@ -378,6 +378,12 @@ public class ItemMap implements Cloneable {
                 if (sound.contains(":")) {
                     final String[] soundParts = sound.split(":");
                     this.commandSound = (Sound) CompatUtils.valueOf(Sound.class, soundParts[0]);
+                    if (this.commandSound == null) {
+                        ServerUtils.logSevere("{ItemMap} Your server is running MC " + ReflectionUtils.getServerVersion() + " and this version of Minecraft does not have the defined command-sound " + this.nodeLocation.getString(".commands-sound") + ".");
+                        if (ServerUtils.hasPreciseUpdate("1_21_3")) {
+                            ServerUtils.logSevere("{ItemMap} See the Minecraft Wiki for a list of command sounds https://minecraft.fandom.com/wiki/Sounds.json/Java_Edition_values");
+                        }
+                    }
                     try {
                         this.commandSoundVolume = Double.valueOf(soundParts[1]);
                         this.commandSoundPitch = Double.valueOf(soundParts[2]);
@@ -387,6 +393,12 @@ public class ItemMap implements Cloneable {
                     }
                 } else {
                     this.commandSound = (Sound) CompatUtils.valueOf(Sound.class, sound);
+                    if (this.commandSound == null) {
+                        ServerUtils.logSevere("{ItemMap} Your server is running MC " + ReflectionUtils.getServerVersion() + " and this version of Minecraft does not have the defined command-sound " + this.nodeLocation.getString(".commands-sound") + ".");
+                        if (ServerUtils.hasPreciseUpdate("1_21_3")) {
+                            ServerUtils.logSevere("{ItemMap} See the Minecraft Wiki for a list of command sounds https://minecraft.fandom.com/wiki/Sounds.json/Java_Edition_values");
+                        }
+                    }
                 }
             }
         } catch (Exception e) {
@@ -4395,6 +4407,13 @@ public class ItemMap implements Cloneable {
             try {
                 for (String attrib : this.attributes.keySet()) {
                     Attribute attribute = (Attribute) CompatUtils.valueOf(Attribute.class, attrib.toUpperCase());
+                    if (attribute == null) {
+                        ServerUtils.logSevere("{ItemMap} Your server is running MC " + ReflectionUtils.getServerVersion() + " and this version of Minecraft does not have the defined attribute " + attrib + ".");
+                        if (ServerUtils.hasPreciseUpdate("1_21_3")) {
+                            ServerUtils.logSevere("{ItemMap} See the Minecraft Wiki for a list of attributes https://minecraft.fandom.com/wiki/Attribute");
+                        }
+                        return;
+                    }
                     double value = this.attributes.get(attrib);
                     EquipmentSlot slot;
                     if (ItemHandler.getDesignatedSlot(this.material).equalsIgnoreCase("noslot")) {
@@ -4403,7 +4422,7 @@ public class ItemMap implements Cloneable {
                         slot = EquipmentSlot.valueOf(ItemHandler.getDesignatedSlot(this.material).toUpperCase());
                     }
                     final AttributeModifier modifier = (AttributeModifier) CompatUtils.resolveByVersion("1_21", // still experimental... not even supported across all server platforms...
-                            () -> new AttributeModifier(Objects.requireNonNull(NamespacedKey.fromString(attrib.toLowerCase().replace("_", "."))), value, AttributeModifier.Operation.ADD_NUMBER, slot.getGroup()),
+                            () -> new AttributeModifier(attribute.getKey(), value, AttributeModifier.Operation.ADD_NUMBER, slot.getGroup()),
                             () -> LegacyAPI.getAttribute(this.configName + attrib, attrib, value, slot));
                     if (this.tempMeta.getAttributeModifiers() == null || !this.tempMeta.getAttributeModifiers().containsValue(modifier)) {
                         this.tempMeta.addAttributeModifier(attribute, modifier);
