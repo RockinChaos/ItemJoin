@@ -696,12 +696,12 @@ public class ItemUtilities {
                 for (int k = 0; k < (!protectItems.isEmpty() ? protectItems.size() : 1); k++) {
                     if (i <= 41 && inventory.getSize() >= i && canClear(inventory.getItem(i), String.valueOf(i), k, clearType)) {
                         final ItemStack item = inventory.getItem(i);
-                        if (item != null) {
+                        if (item != null && item.getType() != Material.AIR) {
                             saveInventory.setItem(i, item.clone());
                         }
                     } else if (i >= 42 && canClear(craftView.getItem(i - 42), "CRAFTING[" + (i - 42) + "]", k, clearType) && PlayerHandler.isCraftingInv(player)) {
                         final ItemStack item = craftView.getItem(i - 42);
-                        if (item != null) {
+                        if (item != null && item.getType() != Material.AIR) {
                             saveInventory.setItem(i, item.clone());
                         }
                     }
@@ -722,7 +722,7 @@ public class ItemUtilities {
         final String clearOptions = ItemJoin.getCore().getConfig("config.yml").getString("Clear-Items.Options");
         if (type == TriggerType.WORLD_SWITCH && clearOptions != null && !clearOptions.isEmpty() && StringUtils.splitIgnoreCase(clearOptions.replace(" ", ""), "RETURN_SWITCH", ",")) {
             final DataObject dataObject = (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.RETURN_SWITCH_ITEMS, PlayerHandler.getPlayerID(player), world, ""));
-            final Inventory inventory = (dataObject != null ? ItemHandler.deserializeInventory(dataObject.getInventory64().replace(world + ".", "")) : null);
+            final Inventory inventory = (dataObject != null ? ItemHandler.deserializeInventory(dataObject.getInventory64()) : null);
             for (int i = 47; i >= 0; i--) {
                 if (inventory != null) {
                     final ItemStack item = inventory.getItem(i);
