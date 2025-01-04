@@ -363,15 +363,6 @@ public class ItemUtilities {
         if (StringUtils.splitIgnoreCase(PluginData.getInfo().getHotbarTriggers(), type.name, ",")) {
             PlayerHandler.setHotbarSlot(player, PluginData.getInfo().getHotbarSlot());
         }
-        if (type.equals(TriggerType.REGION_LEAVE) && !regions.contains(targetRegion)) {
-            final List<String> regionList = clearRegions.get(player) != null ? clearRegions.get(player) : new ArrayList<>();
-            regionList.remove(targetRegion);
-            GuardAPI.pasteReturnItems(player, targetRegion);
-            clearRegions.put(player, regionList);
-        }
-        if (type.equals(TriggerType.WORLD_SWITCH)) {
-            this.pasteReturnItems(type, player, world.getName());
-        }
         if (type.equals(TriggerType.REGION_ENTER) && (clearRegions.get(player) == null || !clearRegions.get(player).contains(targetRegion))) {
             final List<String> regionList = clearRegions.get(player) != null ? clearRegions.get(player) : new ArrayList<>();
             regionList.add(targetRegion);
@@ -395,6 +386,18 @@ public class ItemUtilities {
             }
             this.triggerCommands(player, type);
         }
+        // handle returning cleared items.
+        SchedulerUtils.runLater(getItemDelay(), () -> {
+            if (type.equals(TriggerType.REGION_LEAVE) && !regions.contains(targetRegion)) {
+                final List<String> regionList = clearRegions.get(player) != null ? clearRegions.get(player) : new ArrayList<>();
+                regionList.remove(targetRegion);
+                GuardAPI.pasteReturnItems(player, targetRegion);
+                clearRegions.put(player, regionList);
+            }
+            if (type.equals(TriggerType.WORLD_SWITCH)) {
+                this.pasteReturnItems(type, player, world.getName());
+            }
+        });
     }
     private final HashMap<Player, List<String>> clearRegions = new HashMap<>();
 
