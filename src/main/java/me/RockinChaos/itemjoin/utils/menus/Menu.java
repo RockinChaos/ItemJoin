@@ -3664,8 +3664,12 @@ public class Menu {
                     listCommands(itemMap, Action.INTERACT_RIGHT_ALL)), event -> commandListPane(player, itemMap, Action.INTERACT_RIGHT_ALL)));
             clickPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, false, "&e&lInventory-Swap-Cursor", "&7", "&7*Commands that will execute only", "&7when cursor swapping with another item.", "&7", "&9&lCommands: &a" +
                     listCommands(itemMap, Action.INVENTORY_SWAP_CURSOR)), event -> commandListPane(player, itemMap, Action.INVENTORY_SWAP_CURSOR)));
-            clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SNOWBALL" : "SNOW_BALL"), 8, false, false, "&e&lInventory-Middle", "&7", "&7*Commands that will execute only", "&7when cursor middle clicking the item.", "&7", "&9&lCommands: &a" +
-                    listCommands(itemMap, Action.INVENTORY_MIDDLE)), event -> commandListPane(player, itemMap, Action.INVENTORY_MIDDLE)));
+            if (!ServerUtils.hasSpecificUpdate("1_21")) {
+                clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SNOWBALL" : "SNOW_BALL"), 8, false, false, "&e&lInventory-Middle", "&7", "&7*Commands that will execute only", "&7when cursor middle clicking the item.", "&7", "&9&lCommands: &a" +
+                        listCommands(itemMap, Action.INVENTORY_MIDDLE)), event -> commandListPane(player, itemMap, Action.INVENTORY_MIDDLE)));
+            } else {
+                clickPane.addButton(new Button(fillerPaneBItem));
+            }
             clickPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTED_GOLDEN_APPLE" : "322:1"), 1, false, false, "&e&lInventory-Creative", "&7", "&7*Commands that will execute only", "&7when cursor clicking the item in creative mode.", "&7", "&9&lCommands: &a" +
                     listCommands(itemMap, Action.INVENTORY_CREATIVE)), event -> commandListPane(player, itemMap, Action.INVENTORY_CREATIVE)));
             clickPane.addButton(new Button(ItemHandler.getItem("ENDER_CHEST", 1, false, false, "&e&lInventory-Left", "&7", "&7*Commands that will execute only", "&7when cursor left clicking the item.", "&7", "&9&lCommands: &a" +
@@ -6879,8 +6883,12 @@ public class Menu {
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INTERACT_RIGHT_ALL.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.INTERACT_RIGHT_ALL)));
             commandPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, false, "&e&lInventory-Swap-Cursor", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_SWAP_CURSOR.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.INVENTORY_SWAP_CURSOR)));
-            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SNOWBALL" : "SNOW_BALL"), 8, false, false, "&e&lInventory-Middle", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_MIDDLE.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.INVENTORY_MIDDLE)));
+            if (!ServerUtils.hasSpecificUpdate("1_21")) {
+                commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SNOWBALL" : "SNOW_BALL"), 8, false, false, "&e&lInventory-Middle", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
+                        "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_MIDDLE.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.INVENTORY_MIDDLE)));
+            } else {
+                commandPane.addButton(new Button(fillerPaneBItem));
+            }
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTED_GOLDEN_APPLE" : "322:1"), 1, false, false, "&e&lInventory-Creative", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandConditions().get(Action.INVENTORY_CREATIVE.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandCPane(player, itemMap, Action.INVENTORY_CREATIVE)));
             commandPane.addButton(new Button(ItemHandler.getItem("ENDER_CHEST", 1, false, false, "&e&lInventory-Left", "&7", "&7*Condition(s) that must be met", "&7in order to execute item commands.",
@@ -6960,8 +6968,12 @@ public class Menu {
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INTERACT_RIGHT_ALL.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INTERACT_RIGHT_ALL)));
             commandPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, false, "&e&lInventory-Swap-Cursor", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INVENTORY_SWAP_CURSOR.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INVENTORY_SWAP_CURSOR)));
-            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SNOWBALL" : "SNOW_BALL"), 8, false, false, "&e&lInventory-Middle", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INVENTORY_MIDDLE.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INVENTORY_MIDDLE)));
+            if (!ServerUtils.hasSpecificUpdate("1_21")) {
+                commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SNOWBALL" : "SNOW_BALL"), 8, false, false, "&e&lInventory-Middle", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
+                        "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INVENTORY_MIDDLE.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INVENTORY_MIDDLE)));
+            } else {
+                commandPane.addButton(new Button(fillerPaneBItem));
+            }
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTED_GOLDEN_APPLE" : "322:1"), 1, false, false, "&e&lInventory-Creative", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandPermissions().get(Action.INVENTORY_CREATIVE.config()) + "").equals("NONE") ? "YES" : "NO")), event -> commandPPane(player, itemMap, Action.INVENTORY_CREATIVE)));
             commandPane.addButton(new Button(ItemHandler.getItem("ENDER_CHEST", 1, false, false, "&e&lInventory-Left", "&7", "&7*Permissions(s) that must be met", "&7in order to execute item commands.",
@@ -7461,28 +7473,32 @@ public class Menu {
                 itemMap.setCommandMessages(messagessMap);
                 commandFailPane(player, itemMap);
             }));
-            commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SNOWBALL" : "SNOW_BALL"), 8, false, false, "&e&lInventory-Middle", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
-                    "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_MIDDLE.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_MIDDLE.config()) : "NONE")),
-                    event -> {
-                        if (itemMap.getCommandMessages().get(Action.INVENTORY_MIDDLE.config()) == null) {
-                            player.closeInventory();
-                            final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
-                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
-                            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
-                        } else {
-                            final Map<String, String> messagesMap = itemMap.getCommandMessages();
-                            messagesMap.remove(Action.INVENTORY_MIDDLE.config());
-                            itemMap.setCommandMessages(messagesMap);
-                            commandFailPane(player, itemMap);
-                        }
-                    }, event -> {
-                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
-                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
-                final Map<String, String> messagessMap = itemMap.getCommandMessages();
-                messagessMap.put(Action.INVENTORY_MIDDLE.config(), ChatColor.stripColor(event.getMessage()));
-                itemMap.setCommandMessages(messagessMap);
-                commandFailPane(player, itemMap);
-            }));
+            if (!ServerUtils.hasSpecificUpdate("1_21")) {
+                commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "SNOWBALL" : "SNOW_BALL"), 8, false, false, "&e&lInventory-Middle", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
+                        "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_MIDDLE.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_MIDDLE.config()) : "NONE")),
+                        event -> {
+                            if (itemMap.getCommandMessages().get(Action.INVENTORY_MIDDLE.config()) == null) {
+                                player.closeInventory();
+                                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE").with(Holder.INPUT_EXAMPLE, "You do not meet the requirements to execute this command.");
+                                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+                            } else {
+                                final Map<String, String> messagesMap = itemMap.getCommandMessages();
+                                messagesMap.remove(Action.INVENTORY_MIDDLE.config());
+                                itemMap.setCommandMessages(messagesMap);
+                                commandFailPane(player, itemMap);
+                            }
+                        }, event -> {
+                    final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "FAIL MESSAGE");
+                    ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                    final Map<String, String> messagessMap = itemMap.getCommandMessages();
+                    messagessMap.put(Action.INVENTORY_MIDDLE.config(), ChatColor.stripColor(event.getMessage()));
+                    itemMap.setCommandMessages(messagessMap);
+                    commandFailPane(player, itemMap);
+                }));
+            } else {
+                commandPane.addButton(new Button(fillerPaneBItem));
+            }
             commandPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "ENCHANTED_GOLDEN_APPLE" : "322:1"), 1, false, false, "&e&lInventory-Creative", "&7", "&7*Message that will be sent when", "&7either the permission or conditions", "&7requirements are not met.",
                     "&7", "&9&lENABLED: &a" + (!StringUtils.nullCheck(itemMap.getCommandMessages().get(Action.INVENTORY_CREATIVE.config())).equals("NONE") ? itemMap.getCommandMessages().get(Action.INVENTORY_CREATIVE.config()) : "NONE")),
                     event -> {
