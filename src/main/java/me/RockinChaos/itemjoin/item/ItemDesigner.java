@@ -76,12 +76,6 @@ public class ItemDesigner {
                     String slotList = ((itemSlot != null && !itemSlot.isEmpty()) ? itemSlot : "ARBITRARY");
                     String[] slots = slotList.replace(" ", "").split(",");
                     for (String slot : slots) {
-                        if (slot.startsWith("C[") || slot.startsWith("C(")) {
-                            slot = slot.replace("C", "CRAFTING");
-                        }
-                        if (slot.startsWith("CRAFTING")) {
-                            slot = slot.replace("(", "[").replace(")", "]");
-                        }
                         if (this.isDefinable(internalName, slot)) {
                             ItemMap itemMap = new ItemMap(internalName, slot);
 

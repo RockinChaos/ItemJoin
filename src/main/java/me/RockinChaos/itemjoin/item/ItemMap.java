@@ -328,12 +328,6 @@ public class ItemMap implements Cloneable {
         if (itemSlot != null && itemSlot.contains(",")) {
             String[] slots = itemSlot.replace(" ", "").split(",");
             for (String slot : slots) {
-                if (slot.startsWith("C[") || slot.startsWith("C(")) {
-                    slot = slot.replace("C", "CRAFTING");
-                }
-                if (slot.startsWith("CRAFTING")) {
-                    slot = slot.replace("(", "[").replace(")", "]");
-                }
                 this.AllSlots.add(slot);
             }
         }

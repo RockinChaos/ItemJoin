@@ -2159,10 +2159,16 @@ public class Menu {
                 }
             } catch (Exception ignored) {
             }
+            final boolean[] isCrafting = new boolean[5];
+            for (String slot : slots) {
+                if (ItemHandler.isCraftingSlot(slot)) {
+                    isCrafting[StringUtils.getSlotConversion(slot)] = true;
+                }
+            }
             craftingPane.addButton(new Button(fillerPaneGItem), 3);
-            craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, StringUtils.containsValue(slots, "CRAFTING[1]"), false, "&9&lSlot: &7&lCRAFTING&a&l[1]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
-                    (StringUtils.containsValue(slots, "CRAFTING[1]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
-                if (!StringUtils.containsValue(slots, "CRAFTING[1]")) {
+            craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, isCrafting[1], false, "&9&lSlot: &7&lCRAFTING&a&l[1]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
+                    (isCrafting[1] ? "&9&lENABLED: &aTRUE" : "")), event -> {
+                if (!isCrafting[1]) {
                     slots.add("CRAFTING[1]");
                 } else {
                     slots.remove("CRAFTING[1]");
@@ -2178,9 +2184,9 @@ public class Menu {
                 SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
             }));
             craftingPane.addButton(new Button(fillerPaneGItem));
-            craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 2, StringUtils.containsValue(slots, "CRAFTING[2]"), false, "&9&lSlot: &7&lCRAFTING&a&l[2]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
-                    (StringUtils.containsValue(slots, "CRAFTING[2]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
-                if (!StringUtils.containsValue(slots, "CRAFTING[2]")) {
+            craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 2, isCrafting[2], false, "&9&lSlot: &7&lCRAFTING&a&l[2]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
+                    (isCrafting[2] ? "&9&lENABLED: &aTRUE" : "")), event -> {
+                if (!isCrafting[2]) {
                     slots.add("CRAFTING[2]");
                 } else {
                     slots.remove("CRAFTING[2]");
@@ -2196,9 +2202,9 @@ public class Menu {
                 SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
             }));
             craftingPane.addButton(new Button(fillerPaneGItem), 10);
-            craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, StringUtils.containsValue(slots, "CRAFTING[0]"), false, "&9&lSlot: &7&lCRAFTING&a&l[0]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
-                    (StringUtils.containsValue(slots, "CRAFTING[0]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
-                if (!StringUtils.containsValue(slots, "CRAFTING[0]")) {
+            craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, isCrafting[0], false, "&9&lSlot: &7&lCRAFTING&a&l[0]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
+                    (isCrafting[0] ? "&9&lENABLED: &aTRUE" : "")), event -> {
+                if (!isCrafting[0]) {
                     slots.add("CRAFTING[0]");
                 } else {
                     slots.remove("CRAFTING[0]");
@@ -2214,9 +2220,9 @@ public class Menu {
                 SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
             }));
             craftingPane.addButton(new Button(fillerPaneGItem), 4);
-            craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 3, StringUtils.containsValue(slots, "CRAFTING[3]"), false, "&9&lSlot: &7&lCRAFTING&a&l[3]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
-                    (StringUtils.containsValue(slots, "CRAFTING[3]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
-                if (!StringUtils.containsValue(slots, "CRAFTING[3]")) {
+            craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 3, isCrafting[3], false, "&9&lSlot: &7&lCRAFTING&a&l[3]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
+                    (isCrafting[3] ? "&9&lENABLED: &aTRUE" : "")), event -> {
+                if (!isCrafting[3]) {
                     slots.add("CRAFTING[3]");
                 } else {
                     slots.remove("CRAFTING[3]");
@@ -2232,9 +2238,9 @@ public class Menu {
                 SchedulerUtils.runLater(2L, () -> blacklistSlotPane(player));
             }));
             craftingPane.addButton(new Button(fillerPaneGItem));
-            craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 4, StringUtils.containsValue(slots, "CRAFTING[4]"), false, "&9&lSlot: &7&lCRAFTING&a&l[4]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
-                    (StringUtils.containsValue(slots, "CRAFTING[4]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
-                if (!StringUtils.containsValue(slots, "CRAFTING[4]")) {
+            craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 4, isCrafting[4], false, "&9&lSlot: &7&lCRAFTING&a&l[4]", "&7", "&7*Click to prevent this slot", "&7from having its items cleared.",
+                    (isCrafting[4] ? "&9&lENABLED: &aTRUE" : "")), event -> {
+                if (!isCrafting[4]) {
                     slots.add("CRAFTING[4]");
                 } else {
                     slots.remove("CRAFTING[4]");
@@ -2941,109 +2947,105 @@ public class Menu {
         Interface slotPane = new Interface(false, 6, exitButton, GUIName, player);
         Interface craftingPane = new Interface(false, 4, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
+            final boolean[] isCrafting = new boolean[5];
+            for (String slot : itemMap.getMultipleSlots()) {
+                if (ItemHandler.isCraftingSlot(slot)) {
+                    isCrafting[StringUtils.getSlotConversion(slot)] = true;
+                }
+            }
             craftingPane.addButton(new Button(fillerPaneGItem), 3);
-            craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[1]")), false, "&9&lSlot: &7&lCRAFTING&a&l[1]", "&7", "&7*Click to set the custom item",
-                    "&7to appear in the &lCRAFTING &7slot &a&l[1]&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[1]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+            craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, (type > 0 && isCrafting[1]), false, "&9&lSlot: &7&lCRAFTING&a&l[1]", "&7", "&7*Click to set the custom item",
+                    "&7to appear in the &lCRAFTING &7slot &a&l[1]&7", (type > 0 && isCrafting[1] ? "&9&lENABLED: &aTRUE" : "")), event -> {
                 if (type == 0) {
                     itemMap.setSlot("CRAFTING[1]");
                     itemMap.setMultipleSlots(new ArrayList<>());
                     creatingPane(player, itemMap);
+                } else if (isCrafting[1]) {
+                    List<String> slots = itemMap.getMultipleSlots();
+                    slots.removeIf(slot -> ItemHandler.isCraftingSlot(slot) && StringUtils.getSlotConversion(slot) == 1);
+                    itemMap.setMultipleSlots(slots);
+                    slotPane(player, itemMap, stage, 2);
                 } else {
-                    if (StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[1]")) {
-                        List<String> slots = itemMap.getMultipleSlots();
-                        slots.remove("CRAFTING[1]");
-                        itemMap.setMultipleSlots(slots);
-                        slotPane(player, itemMap, stage, 2);
-                    } else {
-                        List<String> slots = itemMap.getMultipleSlots();
-                        slots.add("CRAFTING[1]");
-                        itemMap.setMultipleSlots(slots);
-                        slotPane(player, itemMap, stage, 2);
-                    }
+                    List<String> slots = itemMap.getMultipleSlots();
+                    slots.add("CRAFTING[1]");
+                    itemMap.setMultipleSlots(slots);
+                    slotPane(player, itemMap, stage, 2);
                 }
             }));
             craftingPane.addButton(new Button(fillerPaneGItem));
-            craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 2, (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[2]")), false, "&9&lSlot: &7&lCRAFTING&a&l[2]", "&7", "&7*Click to set the custom item",
-                    "&7to appear in the &lCRAFTING &7slot &a&l[2]&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[2]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+            craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 2, (type > 0 && isCrafting[2]), false, "&9&lSlot: &7&lCRAFTING&a&l[2]", "&7", "&7*Click to set the custom item",
+                    "&7to appear in the &lCRAFTING &7slot &a&l[2]&7", (type > 0 && isCrafting[2] ? "&9&lENABLED: &aTRUE" : "")), event -> {
                 if (type == 0) {
                     itemMap.setSlot("CRAFTING[2]");
                     itemMap.setMultipleSlots(new ArrayList<>());
                     creatingPane(player, itemMap);
+                } else if (isCrafting[2]) {
+                    List<String> slots = itemMap.getMultipleSlots();
+                    slots.removeIf(slot -> ItemHandler.isCraftingSlot(slot) && StringUtils.getSlotConversion(slot) == 2);
+                    itemMap.setMultipleSlots(slots);
+                    slotPane(player, itemMap, stage, 2);
                 } else {
-                    if (StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[2]")) {
-                        List<String> slots = itemMap.getMultipleSlots();
-                        slots.remove("CRAFTING[2]");
-                        itemMap.setMultipleSlots(slots);
-                        slotPane(player, itemMap, stage, 2);
-                    } else {
-                        List<String> slots = itemMap.getMultipleSlots();
-                        slots.add("CRAFTING[2]");
-                        itemMap.setMultipleSlots(slots);
-                        slotPane(player, itemMap, stage, 2);
-                    }
+                    List<String> slots = itemMap.getMultipleSlots();
+                    slots.add("CRAFTING[2]");
+                    itemMap.setMultipleSlots(slots);
+                    slotPane(player, itemMap, stage, 2);
                 }
             }));
             craftingPane.addButton(new Button(fillerPaneGItem), 10);
-            craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[0]")), false, "&9&lSlot: &7&lCRAFTING&a&l[0]", "&7", "&7*Click to set the custom item",
-                    "&7to appear in the &lCRAFTING &7slot &a&l[0]&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[0]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+            craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 1, (type > 0 && isCrafting[0]), false, "&9&lSlot: &7&lCRAFTING&a&l[0]", "&7", "&7*Click to set the custom item",
+                    "&7to appear in the &lCRAFTING &7slot &a&l[0]&7", (type > 0 && isCrafting[0] ? "&9&lENABLED: &aTRUE" : "")), event -> {
                 if (type == 0) {
                     itemMap.setSlot("CRAFTING[0]");
                     itemMap.setMultipleSlots(new ArrayList<>());
                     creatingPane(player, itemMap);
+                } else if (isCrafting[0]) {
+                    List<String> slots = itemMap.getMultipleSlots();
+                    slots.removeIf(slot -> ItemHandler.isCraftingSlot(slot) && StringUtils.getSlotConversion(slot) == 0);
+                    itemMap.setMultipleSlots(slots);
+                    slotPane(player, itemMap, stage, 2);
                 } else {
-                    if (StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[0]")) {
-                        List<String> slots = itemMap.getMultipleSlots();
-                        slots.remove("CRAFTING[0]");
-                        itemMap.setMultipleSlots(slots);
-                        slotPane(player, itemMap, stage, 2);
-                    } else {
-                        List<String> slots = itemMap.getMultipleSlots();
-                        slots.add("CRAFTING[0]");
-                        itemMap.setMultipleSlots(slots);
-                        slotPane(player, itemMap, stage, 2);
-                    }
+                    List<String> slots = itemMap.getMultipleSlots();
+                    slots.add("CRAFTING[0]");
+                    itemMap.setMultipleSlots(slots);
+                    slotPane(player, itemMap, stage, 2);
                 }
             }));
             craftingPane.addButton(new Button(fillerPaneGItem), 4);
-            craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 3, (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[3]")), false, "&9&lSlot: &7&lCRAFTING&a&l[3]", "&7", "&7*Click to set the custom item",
-                    "&7to appear in the &lCRAFTING &7slot &a&l[3]&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[3]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+            craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 3, (type > 0 && isCrafting[3]), false, "&9&lSlot: &7&lCRAFTING&a&l[3]", "&7", "&7*Click to set the custom item",
+                    "&7to appear in the &lCRAFTING &7slot &a&l[3]&7", (type > 0 && isCrafting[3] ? "&9&lENABLED: &aTRUE" : "")), event -> {
                 if (type == 0) {
                     itemMap.setSlot("CRAFTING[3]");
                     itemMap.setMultipleSlots(new ArrayList<>());
                     creatingPane(player, itemMap);
+                } else if (isCrafting[3]) {
+                    List<String> slots = itemMap.getMultipleSlots();
+                    slots.removeIf(slot -> ItemHandler.isCraftingSlot(slot) && StringUtils.getSlotConversion(slot) == 3);
+                    itemMap.setMultipleSlots(slots);
+                    slotPane(player, itemMap, stage, 2);
                 } else {
-                    if (StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[3]")) {
-                        List<String> slots = itemMap.getMultipleSlots();
-                        slots.remove("CRAFTING[3]");
-                        itemMap.setMultipleSlots(slots);
-                        slotPane(player, itemMap, stage, 2);
-                    } else {
-                        List<String> slots = itemMap.getMultipleSlots();
-                        slots.add("CRAFTING[3]");
-                        itemMap.setMultipleSlots(slots);
-                        slotPane(player, itemMap, stage, 2);
-                    }
+                    List<String> slots = itemMap.getMultipleSlots();
+                    slots.add("CRAFTING[3]");
+                    itemMap.setMultipleSlots(slots);
+                    slotPane(player, itemMap, stage, 2);
                 }
             }));
             craftingPane.addButton(new Button(fillerPaneGItem));
-            craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 4, (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[4]")), false, "&9&lSlot: &7&lCRAFTING&a&l[4]", "&7", "&7*Click to set the custom item",
-                    "&7to appear in the &lCRAFTING &7slot &a&l[4]&7", (type > 0 && StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[4]") ? "&9&lENABLED: &aTRUE" : "")), event -> {
+            craftingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "CRAFTING_TABLE" : "58"), 4, (type > 0 && isCrafting[4]), false, "&9&lSlot: &7&lCRAFTING&a&l[4]", "&7", "&7*Click to set the custom item",
+                    "&7to appear in the &lCRAFTING &7slot &a&l[4]&7", (type > 0 && isCrafting[4] ? "&9&lENABLED: &aTRUE" : "")), event -> {
                 if (type == 0) {
                     itemMap.setSlot("CRAFTING[4]");
                     itemMap.setMultipleSlots(new ArrayList<>());
                     creatingPane(player, itemMap);
+                } else if (isCrafting[4]) {
+                    List<String> slots = itemMap.getMultipleSlots();
+                    slots.removeIf(slot -> ItemHandler.isCraftingSlot(slot) && StringUtils.getSlotConversion(slot) == 4);
+                    itemMap.setMultipleSlots(slots);
+                    slotPane(player, itemMap, stage, 2);
                 } else {
-                    if (StringUtils.containsValue(itemMap.getMultipleSlots(), "CRAFTING[4]")) {
-                        List<String> slots = itemMap.getMultipleSlots();
-                        slots.remove("CRAFTING[4]");
-                        itemMap.setMultipleSlots(slots);
-                        slotPane(player, itemMap, stage, 2);
-                    } else {
-                        List<String> slots = itemMap.getMultipleSlots();
-                        slots.add("CRAFTING[4]");
-                        itemMap.setMultipleSlots(slots);
-                        slotPane(player, itemMap, stage, 2);
-                    }
+                    List<String> slots = itemMap.getMultipleSlots();
+                    slots.add("CRAFTING[4]");
+                    itemMap.setMultipleSlots(slots);
+                    slotPane(player, itemMap, stage, 2);
                 }
             }));
             craftingPane.addButton(new Button(fillerPaneGItem), 3);
