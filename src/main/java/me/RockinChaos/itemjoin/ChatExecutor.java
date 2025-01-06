@@ -529,7 +529,7 @@ public class ChatExecutor implements CommandExecutor {
                         hasFailed[0] = true;
                         return;
                     }
-                    final String playerId = PlayerHandler.getPlayerID(argsPlayer);
+                    final String playerId = argsPlayer != null ? PlayerHandler.getPlayerID(argsPlayer) : null;
                     placeHolders.with(Holder.TARGET_PLAYER, argsPlayer != null ? argsPlayer.getName() : "NULL");
                     DataObject dataObject = (table.replace("-", "_").equalsIgnoreCase("map_ids")
                             ? new DataObject(Table.MAP_IDS, null, "", args, "") : (table.replace("-", "_").equalsIgnoreCase("first_join")
@@ -539,7 +539,7 @@ public class ChatExecutor implements CommandExecutor {
                             ? new DataObject(Table.ENABLED_PLAYERS, playerId, "", "", "", "") : (table.replace("-", "_").equalsIgnoreCase("first_commands")
                             ? new DataObject(Table.FIRST_COMMANDS, playerId, "", "", "") : null))))));
                     if (dataObject != null) {
-                        ItemJoin.getCore().getSQL().removeData(dataObject);
+                        ItemJoin.getCore().getSQL().removeData(dataObject, playerId == null);
                     }
                     if ((argsPlayer != null && !handledPlayers.contains(argsPlayer.getName())) || !handledPlayers.contains("All Players")) {
                         handledPlayers.add(argsPlayer != null ? argsPlayer.getName() : "All Players");
