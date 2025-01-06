@@ -22,9 +22,9 @@ import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
+import me.RockinChaos.core.utils.types.ActionBlocks;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
-import me.RockinChaos.itemjoin.utils.api.ItemAPI;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
@@ -50,8 +50,8 @@ public class Interact implements Listener {
      */
     @EventHandler(priority = EventPriority.LOW)
     private void onInteractCancel(PlayerInteractEvent event) {
-        ItemStack item = event.getItem();
-        Player player = event.getPlayer();
+        final ItemStack item = event.getItem();
+        final Player player = event.getPlayer();
         if ((!PlayerHandler.isMenuClick(player, event.getAction()) && (event.hasItem() && event.getAction() != Action.PHYSICAL && !ItemUtilities.getUtilities().isAllowed(player, item, "cancel-events")
                 || (event.getAction() != Action.PHYSICAL && event.getAction() != Action.LEFT_CLICK_AIR && ServerUtils.hasSpecificUpdate("1_9") && event.getHand() != null
                 && event.getHand().toString().equalsIgnoreCase("OFF_HAND") && !ItemUtilities.getUtilities().isAllowed(player, PlayerHandler.getMainHandItem(event.getPlayer()), "cancel-events"))))) {
@@ -70,10 +70,10 @@ public class Interact implements Listener {
      */
     @EventHandler()
     private void onInteractCooldown(PlayerInteractEvent event) {
-        Player player = event.getPlayer();
-        ItemStack item = event.getItem();
-        if ((event.hasItem() && event.getAction() != Action.PHYSICAL) && (((ItemAPI.isPlaceable(event.getMaterial()) || (player.getInventory().getChestplate() != null && player.getInventory().getChestplate().getType().name().equalsIgnoreCase("ELYTRA"))) && event.getAction() == Action.RIGHT_CLICK_AIR) || event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
-            ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
+        final Player player = event.getPlayer();
+        final ItemStack item = event.getItem();
+        if ((event.hasItem() && event.getAction() != Action.PHYSICAL) && (event.getAction() == Action.RIGHT_CLICK_AIR || (event.getAction() == Action.RIGHT_CLICK_BLOCK && (player.isSneaking() || !ActionBlocks.isActionBlocks(Objects.requireNonNull(event.getClickedBlock()).getType()))))) {
+            final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
             if (itemMap != null && itemMap.getInteractCooldown() != 0) {
                 long lockDuration = !this.interactLock.isEmpty() && this.interactLock.get(item) != null ? System.currentTimeMillis() - this.interactLock.get(item) : -1;
                 this.interactLock.put(item, System.currentTimeMillis());
