@@ -967,11 +967,13 @@ public class ItemUtilities {
     public void triggerCommands(final Player player, TriggerType triggerRef) {
         final String enableWorlds = ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.enabled-worlds");
         final String triggers = ItemJoin.getCore().getConfig("config.yml").getString("Active-Commands.triggers");
-        if (enableWorlds != null && !enableWorlds.equalsIgnoreCase("DISABLED") && !enableWorlds.equalsIgnoreCase("FALSE") && (StringUtils.containsIgnoreCase(triggers, TriggerType.JOIN.name) && triggerRef.equals(TriggerType.JOIN) || StringUtils.containsIgnoreCase(triggers, TriggerType.FIRST_JOIN.name) && triggerRef.equals(TriggerType.JOIN) || StringUtils.containsIgnoreCase(triggers, TriggerType.WORLD_SWITCH.name) && triggerRef.equals(TriggerType.WORLD_SWITCH) || StringUtils.containsIgnoreCase(triggers, TriggerType.RESPAWN.name) && (triggerRef.equals(TriggerType.RESPAWN) || triggerRef.equals(TriggerType.RESPAWN_WILD) || triggerRef.equals(TriggerType.RESPAWN_POINT)) || StringUtils.containsIgnoreCase(triggers, TriggerType.TELEPORT.name) && triggerRef.equals(TriggerType.TELEPORT))) {
+        if (enableWorlds != null && !enableWorlds.equalsIgnoreCase("DISABLED") && !enableWorlds.equalsIgnoreCase("FALSE") && (StringUtils.containsIgnoreCase(triggers, TriggerType.JOIN.name) && triggerRef.equals(TriggerType.JOIN) || (StringUtils.containsIgnoreCase(triggers, TriggerType.FIRST_JOIN.name) || StringUtils.containsIgnoreCase(triggers, TriggerType.FIRST_WORLD.name)) && triggerRef.equals(TriggerType.JOIN) || (StringUtils.containsIgnoreCase(triggers, TriggerType.WORLD_SWITCH.name) || StringUtils.containsIgnoreCase(triggers, TriggerType.FIRST_WORLD.name)) && triggerRef.equals(TriggerType.WORLD_SWITCH) || StringUtils.containsIgnoreCase(triggers, TriggerType.RESPAWN.name) && (triggerRef.equals(TriggerType.RESPAWN) || triggerRef.equals(TriggerType.RESPAWN_WILD) || triggerRef.equals(TriggerType.RESPAWN_POINT)) || StringUtils.containsIgnoreCase(triggers, TriggerType.TELEPORT.name) && triggerRef.equals(TriggerType.TELEPORT))) {
             String commandsWorlds = enableWorlds.replace(", ", ",");
             TriggerType trigger = triggerRef;
             if (StringUtils.containsIgnoreCase(triggers, TriggerType.FIRST_JOIN.name) && trigger.equals(TriggerType.JOIN)) {
                 trigger = TriggerType.FIRST_JOIN;
+            } else if (StringUtils.containsIgnoreCase(triggers, TriggerType.FIRST_WORLD.name) && (trigger.equals(TriggerType.JOIN) || trigger.equals(TriggerType.WORLD_SWITCH))) {
+                trigger = TriggerType.FIRST_WORLD;
             }
             String[] compareWorlds = commandsWorlds.split(",");
             for (String compareWorld : compareWorlds) {
@@ -982,7 +984,7 @@ public class ItemUtilities {
                         final HashMap<Executor, String> commandMap = this.getCommandMap(commands);
                         for (Executor executor : commandMap.keySet()) {
                             final String formatCommand = StringUtils.translateLayout(commandMap.get(executor), player);
-                            final boolean isFirstJoin = trigger.equals(TriggerType.FIRST_JOIN) || executor.equals(Executor.FIRSTJOIN);
+                            final boolean isFirstJoin = trigger.equals(TriggerType.FIRST_JOIN) || trigger.equals(TriggerType.FIRST_WORLD) || executor.equals(Executor.FIRSTJOIN);
                             final DataObject dataObject = (isFirstJoin ? (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.FIRST_COMMANDS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), formatCommand)) : null);
                             if (dataObject == null) {
                                 if (isFirstJoin) {
@@ -1370,6 +1372,7 @@ public class ItemUtilities {
      */
     public enum TriggerType {
         FIRST_JOIN("First-Join"),
+        FIRST_WORLD("First-World"),
         JOIN("Join"),
         QUIT("Quit"),
         RESPAWN("Respawn"),
