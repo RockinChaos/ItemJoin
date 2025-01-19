@@ -390,7 +390,7 @@ public class Commands implements Listener {
             final String action = Action.RIGHT_CLICK_BLOCK.name();
             final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player));
             if (itemMap != null && itemMap.isSimilar(player, item)) {
-                this.runCommands(player, (event.getRightClicked() instanceof Player ? (Player) event.getRightClicked() : null), item, action, action.split("_")[0], String.valueOf(player.getInventory().getHeldItemSlot()));
+                this.runCommands(player, null, item, action, action.split("_")[0], String.valueOf(player.getInventory().getHeldItemSlot()));
             }
         }
     }
@@ -413,7 +413,7 @@ public class Commands implements Listener {
             final String action = Action.RIGHT_CLICK_BLOCK.name();
             final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player));
             if (itemMap != null && itemMap.isSimilar(player, item)) {
-                this.runCommands(player, (event.getRightClicked() instanceof Player ? (Player) event.getRightClicked() : null), item, action, action.split("_")[0], String.valueOf(player.getInventory().getHeldItemSlot()));
+                this.runCommands(player, null, item, action, action.split("_")[0], String.valueOf(player.getInventory().getHeldItemSlot()));
             }
         }
     }
