@@ -753,10 +753,10 @@ public class ItemUtilities {
     public void setInvSlots(final Player player, final ItemMap itemMap, final int size) {
         SchedulerUtils.run(() -> {
             boolean isGiven = false;
-            ItemStack item = itemMap.getItem(player).clone();
+            final ItemStack item = itemMap.getItem(player).clone();
             this.shiftItem(player, itemMap);
-            int nextSlot = this.nextItem(player, itemMap);
-            boolean overWrite = itemMap.isOverwritable() || ItemJoin.getCore().getConfig("items.yml").getBoolean("items-Overwrite");
+            final int nextSlot = this.nextItem(player, itemMap);
+            final boolean overWrite = itemMap.isOverwritable() || ItemJoin.getCore().getConfig("items.yml").getBoolean("items-Overwrite");
             if (size > 1) {
                 item.setAmount(size);
             }
@@ -807,9 +807,9 @@ public class ItemUtilities {
     public void setCustomSlots(final Player player, final ItemMap itemMap, final int size) {
         SchedulerUtils.run(() -> {
             boolean isGiven = false;
-            int craftSlot = StringUtils.getSlotConversion(itemMap.getSlot());
-            ItemStack existingItem = ItemHandler.getItem(player, itemMap.getSlot());
-            ItemStack item = itemMap.getItem(player).clone();
+            final int craftSlot = StringUtils.getSlotConversion(itemMap.getSlot());
+            final ItemStack existingItem = ItemHandler.getItem(player, itemMap.getSlot()).clone();
+            final ItemStack item = itemMap.getItem(player).clone();
             this.shiftItem(player, itemMap);
             int nextSlot = this.nextItem(player, itemMap);
             boolean overWrite = itemMap.isOverwritable() || ItemJoin.getCore().getConfig("items.yml").getBoolean("items-Overwrite");
@@ -906,24 +906,22 @@ public class ItemUtilities {
      * @param itemMap - The ItemMap to be given to the Player.
      */
     public void shiftItem(final Player player, final ItemMap itemMap) {
-        ItemStack existingItem = ItemHandler.getItem(player, itemMap.getSlot());
+        final ItemStack existingItem = ItemHandler.getItem(player, itemMap.getSlot());
         if (itemMap.isMoveNext() && !itemMap.isSimilar(player, existingItem) && player.getInventory().firstEmpty() != -1) {
             for (int i = 0; i <= 35; i++) {
                 final ItemStack itemMain = player.getInventory().getItem(i);
                 if (itemMain == null || itemMain.getType() == Material.AIR) {
-                    player.getInventory().setItem(i, existingItem);
+                    player.getInventory().setItem(i, existingItem.clone());
                     existingItem.setAmount(0);
                     existingItem.setType(Material.AIR);
-                    existingItem.setData(new ItemStack(Material.AIR).getData());
                     return;
                 } else if (i == 35) {
                     for (int k = 0; k == 0; k--) {
                         final ItemStack item = player.getInventory().getItem(k);
                         if (item == null || item.getType() == Material.AIR) {
-                            player.getInventory().setItem(k, existingItem);
+                            player.getInventory().setItem(k, existingItem.clone());
                             existingItem.setAmount(0);
                             existingItem.setType(Material.AIR);
-                            existingItem.setData(new ItemStack(Material.AIR).getData());
                             return;
                         }
                     }
