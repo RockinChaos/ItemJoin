@@ -549,7 +549,7 @@ public class ChatExecutor implements CommandExecutor {
                 ItemJoin.getCore().getData().setStarted(false);
                 ItemJoin.getCore().getSQL().purgeDatabase();
                 {
-                    SchedulerUtils.runAsync(() -> {
+                    SchedulerUtils.runAsyncLater(20L, () -> {
                         ItemJoin.getCore().getSQL().refresh();
                         {
                             SchedulerUtils.runAsyncLater(2L, () -> SchedulerUtils.runSingleAsync(() -> ItemJoin.getCore().getData().setStarted(true)));

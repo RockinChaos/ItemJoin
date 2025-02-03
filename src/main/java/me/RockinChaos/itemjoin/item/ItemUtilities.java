@@ -783,11 +783,13 @@ public class ItemUtilities {
             }
             if (isGiven) {
                 ServerUtils.logDebug("{ItemMap} " + player.getName() + " has been given the item " + itemMap.getConfigName() + " in the world [" + player.getWorld().getName() + "].");
-                DataObject ipLimit = (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.IP_LIMITS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), Objects.requireNonNull(player.getAddress()).getHostString()));
-                if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife() || itemMap.isOnlyFirstWild())) {
+                final DataObject firstJoin = (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.FIRST_JOIN, PlayerHandler.getPlayerID(player), "", itemMap.getConfigName()));
+                final DataObject firstWorld = (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.FIRST_WORLD, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName()));
+                final DataObject ipLimit = (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.IP_LIMITS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), Objects.requireNonNull(player.getAddress()).getHostString()));
+                if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife() || itemMap.isOnlyFirstWild()) && firstJoin == null) {
                     ItemJoin.getCore().getSQL().saveData(new DataObject(Table.FIRST_JOIN, PlayerHandler.getPlayerID(player), "", itemMap.getConfigName()));
                 }
-                if (itemMap.isOnlyFirstWorld()) {
+                if (itemMap.isOnlyFirstWorld() && firstWorld == null) {
                     ItemJoin.getCore().getSQL().saveData(new DataObject(Table.FIRST_WORLD, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName()));
                 }
                 if (itemMap.isIpLimited() && ipLimit == null) {
@@ -853,11 +855,13 @@ public class ItemUtilities {
             }
             if (isGiven) {
                 ServerUtils.logDebug("{ItemMap} " + player.getName() + " has been given the item " + itemMap.getConfigName() + " in the world [" + player.getWorld().getName() + "].");
-                DataObject ipLimit = (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.IP_LIMITS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), Objects.requireNonNull(player.getAddress()).getHostString()));
-                if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife() || itemMap.isOnlyFirstWild())) {
+                final DataObject firstJoin = (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.FIRST_JOIN, PlayerHandler.getPlayerID(player), "", itemMap.getConfigName()));
+                final DataObject firstWorld = (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.FIRST_WORLD, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName()));
+                final DataObject ipLimit = (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.IP_LIMITS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), Objects.requireNonNull(player.getAddress()).getHostString()));
+                if ((itemMap.isOnlyFirstJoin() || itemMap.isOnlyFirstLife() || itemMap.isOnlyFirstWild()) && firstJoin == null) {
                     ItemJoin.getCore().getSQL().saveData(new DataObject(Table.FIRST_JOIN, PlayerHandler.getPlayerID(player), "", itemMap.getConfigName()));
                 }
-                if (itemMap.isOnlyFirstWorld()) {
+                if (itemMap.isOnlyFirstWorld() && firstWorld == null) {
                     ItemJoin.getCore().getSQL().saveData(new DataObject(Table.FIRST_WORLD, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName()));
                 }
                 if (itemMap.isIpLimited() && ipLimit == null) {
