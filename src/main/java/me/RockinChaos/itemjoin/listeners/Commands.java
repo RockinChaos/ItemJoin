@@ -419,24 +419,38 @@ public class Commands implements Listener {
     }
 
     /**
+     * Sets a timer for the player dropping an item to prevent any duplicate command execution, typically because of the hand swing animation.
+     *
+     * @param event - PlayerDropItemEvent
+     */
+    @EventHandler(priority = EventPriority.LOWEST)
+    private void onHandDrop(PlayerDropItemEvent event) {
+        if (TimerUtils.isExpired("dd_drop", event.getPlayer().getUniqueId())) {
+            TimerUtils.setExpiry("dd_drop", event.getPlayer().getUniqueId(), 900, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    /**
      * Runs the commands upon physically interacting with the custom item.
      *
      * @param event - PlayerInteractEvent
      */
-    @EventHandler()
+    @EventHandler(priority = EventPriority.HIGHEST)
     private void onInteract(PlayerInteractEvent event) {
         final Player player = event.getPlayer();
         final ItemStack item = (event.getItem() != null ? event.getItem().clone() : (event.getAction() == Action.PHYSICAL ? PlayerHandler.getMainHandItem(player) : event.getItem()));
         final String action = event.getAction().name();
-        if (((PlayerHandler.isAdventureMode(player) && !action.contains("LEFT") || !PlayerHandler.isAdventureMode(player))) && TimerUtils.isExpired("dd_drop", player.getUniqueId())) {
-            final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player));
-            if (!PlayerHandler.isMenuClick(player, event.getAction()) && itemMap != null && itemMap.isSimilar(player, item)) {
-                if (TimerUtils.isExpired("dd_interact", new CompositeKey(player.getUniqueId(), item))) {
-                    TimerUtils.setExpiry("dd_interact", new CompositeKey(player.getUniqueId(), item), 30, TimeUnit.MILLISECONDS);
-                    this.runCommands(player, null, item, action, (event.getAction() == Action.PHYSICAL ? "INTERACTED" : action.split("_")[0]), String.valueOf(player.getInventory().getHeldItemSlot()));
+        SchedulerUtils.run(() -> { /* need to schedule for the next available tick to prevent commands from being run when dropping items, occasionally PlayerInteractEvent triggers before PlayerDropEvent. */
+            if (((PlayerHandler.isAdventureMode(player) && !action.contains("LEFT") || !PlayerHandler.isAdventureMode(player))) && TimerUtils.isExpired("dd_drop", player.getUniqueId())) {
+                final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player));
+                if (!PlayerHandler.isMenuClick(player, event.getAction()) && itemMap != null && itemMap.isSimilar(player, item)) {
+                    if (TimerUtils.isExpired("dd_interact", new CompositeKey(player.getUniqueId(), item))) {
+                        TimerUtils.setExpiry("dd_interact", new CompositeKey(player.getUniqueId(), item), 30, TimeUnit.MILLISECONDS);
+                        this.runCommands(player, null, item, action, (action.equals(Action.PHYSICAL.name()) ? "INTERACTED" : action.split("_")[0]), String.valueOf(player.getInventory().getHeldItemSlot()));
+                    }
                 }
             }
-        }
+        });
     }
 
     /**
@@ -444,25 +458,15 @@ public class Commands implements Listener {
      *
      * @param event - PlayerAnimationEvent
      */
-    @EventHandler()
+    @EventHandler(priority = EventPriority.HIGHEST)
     private void onSwingArm(PlayerAnimationEvent event) {
         final Player player = event.getPlayer();
         final ItemStack item = PlayerHandler.getHandItem(player);
-        if (PlayerHandler.isAdventureMode(player) && TimerUtils.isExpired("dd_drop", player.getUniqueId()) && (!PlayerHandler.isMenuClick(player, Action.LEFT_CLICK_AIR) || PlayerHandler.isMenuClick(player, Action.LEFT_CLICK_BLOCK))) {
-            this.runCommands(player, null, item, "LEFT_CLICK_AIR", "LEFT", String.valueOf(player.getInventory().getHeldItemSlot()));
-        }
-    }
-
-    /**
-     * Sets a timer for the player dropping an item to prevent any duplicate command execution, typically because of the hand swing animation.
-     *
-     * @param event - PlayerDropItemEvent
-     */
-    @EventHandler()
-    private void onHandDrop(PlayerDropItemEvent event) {
-        if (TimerUtils.isExpired("dd_drop", event.getPlayer().getUniqueId())) {
-            TimerUtils.setExpiry("dd_drop", event.getPlayer().getUniqueId(), 900, TimeUnit.MILLISECONDS);
-        }
+        SchedulerUtils.run(() -> { /* need to schedule for the next available tick to prevent commands from being run when dropping items, occasionally PlayerAnimationEvent triggers before PlayerDropEvent. */
+            if (PlayerHandler.isAdventureMode(player) && TimerUtils.isExpired("dd_drop", player.getUniqueId()) && (!PlayerHandler.isMenuClick(player, Action.LEFT_CLICK_AIR) || PlayerHandler.isMenuClick(player, Action.LEFT_CLICK_BLOCK))) {
+                this.runCommands(player, null, item, "LEFT_CLICK_AIR", "LEFT", String.valueOf(player.getInventory().getHeldItemSlot()));
+            }
+        });
     }
 
     /**
