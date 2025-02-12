@@ -9192,7 +9192,7 @@ public class Menu {
                 otherPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIME_DYE" : "351:10"), 1, false, false, "&a&lColor(s)", "&7", "&7*Define the individual colors of the", "&7firework effect type.",
                         "&9&lColor(s): &a" + (!StringUtils.nullCheck(colorList.toString()).equals("NONE") ? colorList.toString() : "NONE")), event -> colorPane(player, itemMap)));
                 otherPane.addButton(new Button(fillerPaneGItem), 2);
-            } else if (itemMap.getMaterial().toString().contains("LEATHER_")) {
+            } else if (itemMap.getMaterial().toString().contains("LEATHER_") && (ServerUtils.hasSpecificUpdate("1_14") || !itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_HORSE_ARMOR"))) {
                 Interface colorPane = new Interface(true, 6, exitButton, GUIName, player);
                 colorPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> otherPane(player, itemMap)));
                 for (DyeColor color : DyeColor.values()) {

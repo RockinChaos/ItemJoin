@@ -1258,8 +1258,7 @@ public class ItemDesigner {
     private void setDye(final ItemMap itemMap) {
         String leatherColor = itemMap.getNodeLocation().getString(".leather-color");
         if (leatherColor != null) {
-            if (itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_HELMET") || itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_CHESTPLATE")
-                    || itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_LEGGINGS") || itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_BOOTS")) {
+            if (itemMap.getMaterial().toString().contains("LEATHER_") && (ServerUtils.hasSpecificUpdate("1_14") || !itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_HORSE_ARMOR"))) {
                 boolean isPlaceholder = leatherColor.startsWith("%");
                 leatherColor = leatherColor.replace(" ", "");
                 try {
