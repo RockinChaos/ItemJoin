@@ -21,10 +21,7 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.PlayerHandler;
-import me.RockinChaos.core.utils.CompatUtils;
-import me.RockinChaos.core.utils.SchedulerUtils;
-import me.RockinChaos.core.utils.ServerUtils;
-import me.RockinChaos.core.utils.StringUtils;
+import me.RockinChaos.core.utils.*;
 import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.core.utils.interfaces.Interface;
 import me.RockinChaos.core.utils.interfaces.Query;
@@ -62,6 +59,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -1023,7 +1021,7 @@ public class Menu {
                 creatingPane.addButton(new Button(fillerPaneGItem));
             }
             creatingPane.addButton(new Button(ItemHandler.getItem("GOLD_INGOT", 1, false, false, "&e&lDrop Chances", "&7", "&7*Define the drop chance for receiving", "&7this item from mobs or breaking blocks."), event -> dropsPane(player, itemMap)));
-            creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, false, false, "&c&lNBT Properties", "&7", "&7*Define specific NBT Properties", "&7to be set to the item.", "&9Enabled: &a" + (itemMap.getNBTValues() != null && !itemMap.getNBTValues().isEmpty() ? "YES" : "NONE")), event -> nbtPane(player, itemMap)));
+            creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, false, false, "&c&lNBT Properties", "&7", "&7*Define specific NBT Properties", "&7to be set to the item.", "&9Enabled: &a" + (itemMap.getNBTProperties() != null && !itemMap.getNBTProperties().isEmpty() ? "YES" : "NONE")), event -> nbtPane(player, itemMap)));
             if (itemMap.getMaterial().toString().contains("MAP")) {
                 creatingPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, false, "&e&lMap Image", "&7", "&7*Adds a custom map image that", "&7will be displayed when held.", "&7", "&7Place the custom map image",
                         "&7in the MAIN ItemJoin folder.", "&7", "&7The map CAN be a GIF but", "&7must be a 128x128 pixel image.", "&9&lImage: &a" + StringUtils.nullCheck(itemMap.getMapImage())), event -> {
@@ -8345,7 +8343,7 @@ public class Menu {
     private static void nbtPane(final Player player, final ItemMap itemMap) {
         Interface nbtPane = new Interface(true, 2, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
-            Map<Object, Object> properties = itemMap.getNBTValues();
+            Map<Object, Object> properties = itemMap.getNBTProperties();
             nbtPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
             nbtPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, true, false, "&e&l&nNew Property", "&7", "&7*Add a new NBT Property to the custom item."), event -> {
                 player.closeInventory();
@@ -8357,7 +8355,7 @@ public class Menu {
                     String[] propertyParts = ChatColor.stripColor(event.getMessage()).split(":");
                     properties.put(propertyParts[0], propertyParts[1]);
                 }
-                itemMap.setNBTValues(properties);
+                itemMap.setNBTProperties(properties);
                 final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "NBT PROPERTY");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 nbtPane(event.getPlayer(), itemMap);
@@ -8379,7 +8377,7 @@ public class Menu {
     private static void modifyProperty(final Player player, final ItemMap itemMap, final Object key) {
         Interface modifyProperty = new Interface(false, 2, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
-            Map<Object, Object> properties = itemMap.getNBTValues();
+            Map<Object, Object> properties = itemMap.getNBTProperties();
             modifyProperty.addButton(new Button(fillerPaneGItem), 3);
             modifyProperty.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, false, "&c&l&nModify", "&7", "&7*Modify this NBT Property.", "&7", "&9&lProperty: &a" + "&f" + key + ":" + properties.get(key)), event -> {
                 player.closeInventory();
@@ -8392,7 +8390,7 @@ public class Menu {
                     String[] propertyParts = ChatColor.stripColor(event.getMessage()).split(":");
                     properties.put(propertyParts[0], propertyParts[1]);
                 }
-                itemMap.setNBTValues(properties);
+                itemMap.setNBTProperties(properties);
                 final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "NBT PROPERTY");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
                 nbtPane(event.getPlayer(), itemMap);
@@ -8400,7 +8398,7 @@ public class Menu {
             modifyProperty.addButton(new Button(fillerPaneGItem));
             modifyProperty.addButton(new Button(ItemHandler.getItem("REDSTONE", 1, false, false, "&c&l&nDelete", "&7", "&7*Delete this custom NBT Property.", "&7", "&9&lProperty: &a" + "&f" + key + ":" + properties.get(key)), event -> {
                 properties.remove(key);
-                itemMap.setNBTValues(properties);
+                itemMap.setNBTProperties(properties);
                 nbtPane(player, itemMap);
             }));
             modifyProperty.addButton(new Button(fillerPaneGItem), 3);
@@ -9412,7 +9410,7 @@ public class Menu {
                     ((!StringUtils.isEmpty(mobs)) ? "&9&lMobs Drop: &a" + mobs.substring(0, mobs.length() - 2) : ""), ((!StringUtils.isEmpty(blocks)) ? "&9&lBlocks Drop: &a" + blocks.substring(0, blocks.length() - 2) : ""),
                     (!StringUtils.nullCheck(itemMap.getCommandConditions() + "").equals("NONE") ? "&9&lCommand Conditions: &aYES" : ""), (!StringUtils.nullCheck(itemMap.getCommandPermissions() + "").equals("NONE") ? "&9&lCommand Permissions: &aYES" : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getDisposableConditions() + ""), "NONE") ? "&9&lDisposable Conditions: &aYES" : ""),
                     (!StringUtils.nullCheck(itemMap.getTriggerConditions() + "").equals("NONE") ? "&9&lTrigger Conditions: &aYES" : ""),
-                    (!StringUtils.nullCheck(itemMap.getNBTValues() + "").equals("NONE") ? "&9&lNBT Properties: &aYES" : ""), (!StringUtils.nullCheck(itemMap.getContents() + "").equals("NONE") ? "&9&lContents: &aYES" : ""),
+                    (!StringUtils.nullCheck(itemMap.getNBTProperties() + "").equals("NONE") ? "&9&lNBT Properties: &aYES" : ""), (!StringUtils.nullCheck(itemMap.getContents() + "").equals("NONE") ? "&9&lContents: &aYES" : ""),
                     (!StringUtils.nullCheck(attributeList.toString()).equals("NONE") ? "&9&lAttributes: &a" + attributeList : ""), (!StringUtils.nullCheck(itemMap.getPages() + "").equals("NONE") ? "&9&lBook Pages: &aYES" : ""),
                     (!StringUtils.nullCheck(itemMap.getAuthor()).equals("NONE") ? "&9&lBook Author: &a" + itemMap.getAuthor() : ""), (!StringUtils.nullCheck(itemMap.getSkull()).equals("NONE") ? "&9&lSkull-Owner: &a" + itemMap.getSkull() : ""),
                     (!StringUtils.nullCheck(itemMap.getSkullTexture()).equals("NONE") ? "&9&lSkull-Texture: &a" + (itemMap.getSkullTexture().length() > 40 ? itemMap.getSkullTexture().substring(0, 40) : itemMap.getSkullTexture()) : ""),

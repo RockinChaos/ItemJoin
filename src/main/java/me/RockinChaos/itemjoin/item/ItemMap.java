@@ -836,6 +836,15 @@ public class ItemMap implements Cloneable {
     }
 
     /**
+     * Gets the NBT Properties.
+     *
+     * @return The NBT Properties.
+     */
+    public Map<Object, Object> getNBTProperties() {
+        return this.nbtProperty;
+    }
+
+    /**
      * Sets the NBT Properties.
      *
      * @param tagValues - The Object Tags with their Values to be set.
@@ -2358,24 +2367,6 @@ public class ItemMap implements Cloneable {
      */
     public void setLeatherHex(final String hex) {
         this.leatherHex = hex;
-    }
-
-    /**
-     * Gets the NBT Values.
-     *
-     * @return The NBT Values.
-     */
-    public Map<Object, Object> getNBTValues() {
-        return this.nbtProperty;
-    }
-
-    /**
-     * Sets the NBT Values.
-     *
-     * @param tagValues - The Object Tags to be set.
-     */
-    public void setNBTValues(final Map<Object, Object> tagValues) {
-        this.nbtProperty = tagValues;
     }
 
     /**
@@ -4651,14 +4642,36 @@ public class ItemMap implements Cloneable {
                     }
                 }
                 tagInstance.getClass().getMethod(MinecraftMethod.setString.getMethod(), String.class, String.class).invoke(tagInstance, "ItemJoin Name", this.getConfigName());
+                final Map<String, Object> packages = new HashMap<>();
                 if (this.nbtProperty != null && !this.nbtProperty.isEmpty()) {
                     for (Object tag : this.nbtProperty.keySet()) {
                         String castTag = (String) tag;
                         String castProperty = (String) this.nbtProperty.get(tag);
+                        String packageName = null;
+                        String tagName = castTag;
+                        if (castTag.contains(".")) {
+                            String [] packageParts = castTag.split("\\.");
+                            packageName = packageParts[0];
+                            tagName = packageParts[1];
+                        }
                         try {
-                            tagInstance.getClass().getMethod(MinecraftMethod.setString.getMethod(), String.class, String.class).invoke(tagInstance, castTag, castProperty);
+                            if (packageName != null) {
+                                Object customPackage = packages.get(packageName) != null ? packages.get(packageName) : ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
+                                customPackage.getClass().getMethod(MinecraftMethod.setString.getMethod(), String.class, String.class).invoke(customPackage, tagName, castProperty);
+                                packages.put(packageName, customPackage);
+                                tagInstance.getClass().getMethod(MinecraftMethod.setCompound.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagInstance, packageName, customPackage);
+                            } else {
+                                tagInstance.getClass().getMethod(MinecraftMethod.setString.getMethod(), String.class, String.class).invoke(tagInstance, tagName, castProperty);
+                            }
                         } catch (Exception e) {
-                            tagInstance.getClass().getMethod(MinecraftMethod.set.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagInstance, castTag, castProperty);
+                            if (packageName != null) {
+                                Object customPackage = packages.get(packageName) != null ? packages.get(packageName) : ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
+                                customPackage.getClass().getMethod(MinecraftMethod.set.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(customPackage, tagName, castProperty);
+                                packages.put(packageName, customPackage);
+                                tagInstance.getClass().getMethod(MinecraftMethod.setCompound.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagInstance, packageName, customPackage);
+                            } else {
+                                tagInstance.getClass().getMethod(MinecraftMethod.set.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagInstance, tagName, castProperty);
+                            }
                         }
                     }
                 }

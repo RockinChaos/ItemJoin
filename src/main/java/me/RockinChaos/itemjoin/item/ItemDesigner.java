@@ -451,6 +451,10 @@ public class ItemDesigner {
                     for (String property : properties) {
                         String[] propertyParts = property.split(":");
                         String identifier = (propertyParts[0].startsWith(" ") ? propertyParts[0].substring(1) : propertyParts[0]);
+                        String tagName = identifier;
+                        if (identifier.contains(".")) {
+                            tagName = identifier.split("\\.")[1];
+                        }
                         Object tagList = null;
                         StringBuilder value = new StringBuilder(propertyParts[1]);
                         for (int i = 2; i < propertyParts.length; i++) {
@@ -467,7 +471,7 @@ public class ItemDesigner {
                             }
                         }
                         Object propertyTag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
-                        propertyTag.getClass().getMethod(MinecraftMethod.setString.getMethod(), String.class, String.class).invoke(propertyTag, identifier, value.toString());
+                        propertyTag.getClass().getMethod(MinecraftMethod.setString.getMethod(), String.class, String.class).invoke(propertyTag, tagName, value.toString());
                         if (tagList == null) {
                             tagValues.put(identifier, value.toString());
                         } else {
