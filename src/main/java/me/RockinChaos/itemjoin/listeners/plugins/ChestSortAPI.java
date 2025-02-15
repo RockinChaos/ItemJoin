@@ -24,10 +24,13 @@ import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.utils.menus.Menu;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.List;
 
 public class ChestSortAPI implements Listener {
 
@@ -40,7 +43,10 @@ public class ChestSortAPI implements Listener {
     private void onChestSortEvent(de.jeff_media.chestsort.api.ChestSortEvent event) {
         Player player = (Player) event.getPlayer();
         if (player == null) {
-            player = (Player) event.getInventory().getViewers().get(0);
+            List<HumanEntity> viewers = event.getInventory().getViewers();
+            if (!viewers.isEmpty() && viewers.get(0) instanceof Player) {
+                player = (Player) viewers.get(0);
+            }
         }
         if (player != null) {
             if (PluginData.getInfo().isPreventString(player, "itemMovement")) {
