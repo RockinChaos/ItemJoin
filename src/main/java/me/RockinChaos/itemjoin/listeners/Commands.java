@@ -440,7 +440,7 @@ public class Commands implements Listener {
         final Player player = event.getPlayer();
         final ItemStack item = (event.getItem() != null ? event.getItem().clone() : (event.getAction() == Action.PHYSICAL ? PlayerHandler.getMainHandItem(player) : event.getItem()));
         final String action = event.getAction().name();
-        SchedulerUtils.runLater(ServerUtils.isFolia() ? 2L : 0L, () -> { /* need to schedule for the next available tick to prevent commands from being run when dropping items, occasionally PlayerInteractEvent triggers before PlayerDropEvent. */
+        SchedulerUtils.runLater(ServerUtils.isFolia() ? 4L : 0L, () -> { /* need to schedule for the next available tick to prevent commands from being run when dropping items, occasionally PlayerInteractEvent triggers before PlayerDropEvent. */
             if (((PlayerHandler.isAdventureMode(player) && !action.contains("LEFT") || !PlayerHandler.isAdventureMode(player))) && TimerUtils.isExpired("dd_drop", player.getUniqueId())) {
                 final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player));
                 if (!PlayerHandler.isMenuClick(player, event.getAction()) && itemMap != null && itemMap.isSimilar(player, item)) {
@@ -462,7 +462,7 @@ public class Commands implements Listener {
     private void onSwingArm(PlayerAnimationEvent event) {
         final Player player = event.getPlayer();
         final ItemStack item = PlayerHandler.getHandItem(player);
-        SchedulerUtils.runLater(ServerUtils.isFolia() ? 2L : 0L, () -> { /* need to schedule for the next available tick to prevent commands from being run when dropping items, occasionally PlayerAnimationEvent triggers before PlayerDropEvent. */
+        SchedulerUtils.runLater(ServerUtils.isFolia() ? 4L : 0L, () -> { /* need to schedule for the next available tick to prevent commands from being run when dropping items, occasionally PlayerAnimationEvent triggers before PlayerDropEvent. */
             if (PlayerHandler.isAdventureMode(player) && TimerUtils.isExpired("dd_drop", player.getUniqueId()) && (!PlayerHandler.isMenuClick(player, Action.LEFT_CLICK_AIR) || PlayerHandler.isMenuClick(player, Action.LEFT_CLICK_BLOCK))) {
                 this.runCommands(player, null, item, "LEFT_CLICK_AIR", "LEFT", String.valueOf(player.getInventory().getHeldItemSlot()));
             }
