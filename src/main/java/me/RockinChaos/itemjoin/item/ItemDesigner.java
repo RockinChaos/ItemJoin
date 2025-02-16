@@ -466,8 +466,8 @@ public class ItemDesigner {
                             final List<String> listNBT = new ArrayList<>(Arrays.asList(valueParts));
                             tagList = ReflectionUtils.getMinecraftClass("NBTTagList").getConstructor().newInstance();
                             for (String nbt : listNBT) {
-                                Object tagString = ReflectionUtils.getMinecraftClass("NBTTagString").getConstructor(String.class).newInstance(nbt);
-                                tagList.getClass().getMethod(MinecraftMethod.add.getMethod(), ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagList, tagString);
+                                Object tagString = ReflectionUtils.getMinecraftClass("NBTTagString").getMethod(MinecraftMethod.valueOf.getMethod(), String.class).invoke(null, nbt);
+                                tagList.getClass().getMethod(MinecraftMethod.add.getMethod(), int.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagList, 0, tagString);
                             }
                         }
                         Object propertyTag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
