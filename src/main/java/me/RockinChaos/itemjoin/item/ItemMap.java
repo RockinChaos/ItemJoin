@@ -6471,7 +6471,15 @@ public class ItemMap implements Cloneable {
         if (this.nbtProperty != null && !this.nbtProperty.isEmpty()) {
             StringBuilder propertyList = new StringBuilder();
             for (Object property : this.nbtProperty.keySet()) {
-                propertyList.append(property).append(":").append(this.nbtProperty.get(property)).append(", ");
+                if (propertyList.length() > 0) {
+                    propertyList.append(", ");
+                }
+                String value = this.nbtProperty.get(property).toString().replace("\"", "");
+                if (value.matches("\\[.*?,.*?\\]")) {
+                    value = value.replace(",", "#").replace("[", "").replace("]", "");
+                    value = "[" + value + "]";
+                }
+                propertyList.append(property).append(":").append(value);
             }
             itemData.set("items." + this.configName + ".properties", propertyList.substring(0, propertyList.length() - 2));
         }

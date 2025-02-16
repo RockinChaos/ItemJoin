@@ -22,6 +22,7 @@ import com.mojang.authlib.properties.Property;
 import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.*;
+import me.RockinChaos.core.utils.ReflectionUtils.MinecraftMethod;
 import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.core.utils.interfaces.Interface;
 import me.RockinChaos.core.utils.interfaces.Query;
@@ -59,7 +60,6 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -740,7 +740,82 @@ public class Menu {
             final PlaceHolder placeHolders = new PlaceHolder().with(Holder.ITEM, (item.hasItemMeta() && Objects.requireNonNull(item.getItemMeta()).hasDisplayName() ? item.getItemMeta().getDisplayName() : itemMap.getConfigName()));
             ItemJoin.getCore().getLang().sendLangMessage("commands.menu.itemSaved", player, placeHolders);
         }
+        final Map<Object, Object> properties = getNBTProperties(item);
+        if (properties != null && !properties.isEmpty()) {
+            itemMap.setNBTProperties(properties);
+        }
         itemMap.renderItemStack();
+    }
+
+    /**
+     * Retrieves the NBT Properties from a given {@link ItemStack}.
+     *
+     * @param item the {@link ItemStack} object from which to retrieve NBT data
+     * @return a {@link Map} containing the NBT data where keys are the NBT tags and values are the corresponding data or null if an error occurs or if no NBT data is found
+     */
+    public static Map<Object, Object> getNBTProperties(final ItemStack item) {
+        try {
+            Object tag = null;
+            final ItemStack itemCopy = item.clone();
+            final Class<?> itemClass = ReflectionUtils.getMinecraftClass("ItemStack");
+            final Object nms = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, itemCopy);
+            if (ServerUtils.hasPreciseUpdate("1_20_5")) {
+                final Object componentMap = ReflectionUtils.getMethod(itemClass, MinecraftMethod.getComponents.getMethod()).invoke(nms);
+                final Object customDataType = ReflectionUtils.getField(ReflectionUtils.getMinecraftClass("DataComponents"), ReflectionUtils.MinecraftField.CustomData.getField()).get(null);
+                final Object customDataOptional = ReflectionUtils.getMethod(ReflectionUtils.getMinecraftClass("DataComponentMap"), MinecraftMethod.get.getMethod(), ReflectionUtils.getMinecraftClass("DataComponentType")).invoke(componentMap, customDataType);
+                if (customDataOptional != null) {
+                    tag = ReflectionUtils.getMethod(customDataOptional.getClass(), MinecraftMethod.copyTag.getMethod()).invoke(customDataOptional);
+                }
+            } else {
+                tag = itemClass.getMethod(MinecraftMethod.getTag.getMethod()).invoke(nms);
+            }
+            if (tag == null) {
+                return null;
+            }
+            final Map<Object, Object> nbtData = new HashMap<>();
+            extractNBTData(tag, "", nbtData);
+            return nbtData;
+        } catch (Exception e) {
+            ServerUtils.logSevere("{Menu} Failed to extract NBT Properties from the ItemStack!");
+            ServerUtils.sendSevereTrace(e);
+            return null;
+        }
+    }
+
+    /**
+     * Recursively extracts NBT data from a given NBT tag compound and stores it in a map.
+     *
+     * @param tag the NBT tag compound object to extract data from
+     * @param parentKey the key prefix used to construct the full key for the map
+     * @param nbtData the map to store the extracted NBT data, where keys are the full NBT keys and values are the corresponding NBT tag values
+     * @throws Exception if an error occurs while invoking reflection methods or processing NBT data
+     */
+    @SuppressWarnings("unchecked")
+    private static void extractNBTData(final Object tag, final String parentKey, final Map<Object, Object> nbtData) throws Exception {
+        for (final String key : (Set<String>) tag.getClass().getMethod(MinecraftMethod.getKeys.getMethod()).invoke(tag)) {
+            if (isVanillaTag(key)) {
+                continue;
+            }
+            final Object nbtBase = tag.getClass().getMethod(MinecraftMethod.getBase.getMethod(), String.class).invoke(tag, key);
+            final byte typeId = (byte) nbtBase.getClass().getMethod(MinecraftMethod.getTypeId.getMethod()).invoke(nbtBase);
+            final String fullKey = parentKey.isEmpty() ? key : parentKey + "." + key;
+            if (typeId == 10) {
+                extractNBTData(nbtBase, fullKey, nbtData);
+            } else {
+                nbtData.put(fullKey, nbtBase);
+            }
+        }
+    }
+
+    /**
+     * Checks if the NBT tag is a default Minecraft tag that should be ignored.
+     */
+    private static boolean isVanillaTag(final String key) {
+        ServerUtils.logDebug("{Menu} Checking if NBT key is Vanilla: " + key);
+        return new HashSet<>(Arrays.asList(
+                "display", "damage", "enchantments", "ench", "unbreakable", "custommodeldata", "hideflags", "attributemodifiers", "blockentitytag", "blockstatetag", "trim", "chargedprojectiles",
+                "bookpages", "pages", "title", "author", "generation", "resolved", "map", "explosion", "potion", "custompotioneffects", "fireworks", "skullowner", "itemjoin name"
+        )).contains(key.toLowerCase());
     }
 
     /**
