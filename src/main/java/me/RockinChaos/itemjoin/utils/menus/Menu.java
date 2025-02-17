@@ -215,7 +215,7 @@ public class Menu {
             itemPane.addButton(new Button(ItemHandler.getItem("LAVA_BUCKET", 1, false, false,
                     "&bClear Items", "&7", "&7*Modify settings for clearing", "&7specific items when a player", "&7performed a specified action."),
                     event -> clearPane(player)));
-            itemPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, false, false,
+            itemPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "STRUCTURE_BLOCK" : "137"), 1, false, false,
                     "&bPrevent Actions", "&7", "&7*Disable certain actions", "&7with items for players."),
                     event -> preventPane(player)));
             itemPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the main menu."), event -> startMenu(player)));
@@ -239,7 +239,7 @@ public class Menu {
                     "&9&lLANG: &a" + String.valueOf(ItemJoin.getCore().getConfig("config.yml").getString("Language")).toUpperCase()),
                     event -> languagePane(player)));
             configPane.addButton(new Button(fillerPaneBItem));
-            configPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("Database.MySQL"), false,
+            configPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "STRUCTURE_BLOCK" : "137"), 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("Database.MySQL"), false,
                     "&bMySQL Database", "&7", "&7*If the plugin should use", "&7a MySQL Database instead", "&7of the locale SQLite Database.",
                     "&9&lENABLED: &a" + String.valueOf(ItemJoin.getCore().getConfig("config.yml").getBoolean("Database.MySQL")).toUpperCase()),
                     event -> databasePane(player)));
@@ -1096,7 +1096,7 @@ public class Menu {
                 creatingPane.addButton(new Button(fillerPaneGItem));
             }
             creatingPane.addButton(new Button(ItemHandler.getItem("GOLD_INGOT", 1, false, false, "&e&lDrop Chances", "&7", "&7*Define the drop chance for receiving", "&7this item from mobs or breaking blocks."), event -> dropsPane(player, itemMap)));
-            creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, false, false, "&c&lNBT Properties", "&7", "&7*Define specific NBT Properties", "&7to be set to the item.", "&9Enabled: &a" + (itemMap.getNBTProperties() != null && !itemMap.getNBTProperties().isEmpty() ? "YES" : "NONE")), event -> nbtPane(player, itemMap)));
+            creatingPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "STRUCTURE_BLOCK" : "137"), 1, false, false, "&c&lNBT Properties", "&7", "&7*Define specific NBT Properties", "&7to be set to the item.", "&9Enabled: &a" + (itemMap.getNBTProperties() != null && !itemMap.getNBTProperties().isEmpty() ? "YES" : "NONE")), event -> nbtPane(player, itemMap)));
             if (itemMap.getMaterial().toString().contains("MAP")) {
                 creatingPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, false, "&e&lMap Image", "&7", "&7*Adds a custom map image that", "&7will be displayed when held.", "&7", "&7Place the custom map image",
                         "&7in the MAIN ItemJoin folder.", "&7", "&7The map CAN be a GIF but", "&7must be a 128x128 pixel image.", "&9&lImage: &a" + StringUtils.nullCheck(itemMap.getMapImage())), event -> {
@@ -1440,7 +1440,7 @@ public class Menu {
         Interface databasePane = new Interface(false, 3, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
             databasePane.addButton(new Button(fillerPaneBItem), 4);
-            databasePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("Database.MySQL"), false, "&b&l&nMySQL", "&7",
+            databasePane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "STRUCTURE_BLOCK" : "137"), 1, ItemJoin.getCore().getConfig("config.yml").getBoolean("Database.MySQL"), false, "&b&l&nMySQL", "&7",
                     "&7*If the plugin should use a", "&7MySQL connection instead of the", "&7local SQLite database inside", "&7the plugin folder.", "&7", "&c&lNote: &7Keep this set to false", "&7if you do not know what", "&7you are doing.",
                     "&7", "&c&l&nWARNING: &7Changing this value requires", "&7a server restart for the", "&7changes to take affect.",
                     "&9&lENABLED: &a" + String.valueOf(ItemJoin.getCore().getConfig("config.yml").getBoolean("Database.MySQL")).toUpperCase()),
@@ -2059,7 +2059,7 @@ public class Menu {
                         }
                     }));
             clearPane.addButton(new Button(fillerPaneBItem));
-            clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, false, false,
+            clearPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "STRUCTURE_BLOCK" : "137"), 1, false, false,
                     "&b&lOptions", "&7", "&7*Actions to apply to", "&7the clear items triggers", "&7such as OP bypass.",
                     "&9&lENABLED: &a" + (((options != null && !StringUtils.containsIgnoreCase(options, "DISABLE")) ? options : "FALSE")).toUpperCase()),
                     event -> optionPane(player)));
@@ -3401,7 +3401,7 @@ public class Menu {
                 }
             }));
             dataPane.addButton(new Button(fillerPaneBItem), 2);
-            dataPane.addButton(new Button(ItemHandler.getItem("STICK", 1, false, false, "&a&lDamage Data", "&7", "&7*Set the custom data of the item.", "&7This is the damage value assigned", "&7to the custom resource texture.", (ServerUtils.hasSpecificUpdate("1_14") ? "&7" : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&c&l&nWARNING: &eThis setting is only for" : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&eMinecraft versions below 1.14." : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&eYou are using a newer version of Minecraft" : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&eso things may not function as expected." : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&7" : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&eIt is highly recommended to use &l&nModel Data." : ""), "&9&lDAMAGE DATA: &a" + StringUtils.nullCheck(itemMap.getData() + "&7")), event -> {
+            dataPane.addButton(new Button(ItemHandler.getItem("STICK", 1, false, false, "&a&lDamage Data", "&7", "&7*Set the custom data of the item.", "&7This is the damage value assigned", "&7to the custom resource texture.", (ServerUtils.hasSpecificUpdate("1_14") ? "&7" : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&c&l&nWARNING:&e This setting is only for" : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&eMinecraft versions below 1.14." : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&eYou are using a newer version of Minecraft" : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&eso things may not function as expected." : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&7" : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&eIt is highly recommended to use &l&nModel Data." : ""), "&9&lDAMAGE DATA: &a" + StringUtils.nullCheck(itemMap.getData() + "&7")), event -> {
                 if (!StringUtils.nullCheck(itemMap.getData() + "&7").equals("NONE")) {
                     itemMap.setData(null);
                     dataPane(player, itemMap);
@@ -3491,13 +3491,13 @@ public class Menu {
         Interface texturePane = new Interface(true, 6, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
             texturePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> dataPane(player, itemMap)));
-            texturePane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, false, "&e&lCustom Model Data", "&7", "&7*Click to set the custom mode data", "&7value for the item."), event -> {
+            texturePane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, false, "&e&lCustom Model Data", "&7", "&7*Click to set the custom model data", "&7value for the item."), event -> {
                 player.closeInventory();
-                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "MODEL DATA").with(Holder.INPUT_EXAMPLE, "1193");
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "MODEL DATA").with(Holder.INPUT_EXAMPLE, ServerUtils.hasPreciseUpdate("1_21_4") ? "example:custom_sword" : "1193");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
-                if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player))) {
+                if (StringUtils.isInt(StringUtils.translateLayout(ChatColor.stripColor(event.getMessage()), player)) || ServerUtils.hasPreciseUpdate("1_21_4")) {
                     itemMap.setModelData(ChatColor.stripColor(event.getMessage()));
                     final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "MODEL DATA");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
@@ -8436,7 +8436,7 @@ public class Menu {
                 nbtPane(event.getPlayer(), itemMap);
             }));
             for (Object key : properties.keySet()) {
-                nbtPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "COMMAND_BLOCK" : "137"), 1, false, false, "&f" + key + ":" + properties.get(key), "&7", "&7*Click to modify or delete", "&7this custom NBT Property."), event -> modifyProperty(player, itemMap, key)));
+                nbtPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "STRUCTURE_BLOCK" : "137"), 1, false, false, "&f" + key + ":" + properties.get(key), "&7", "&7*Click to modify or delete", "&7this custom NBT Property."), event -> modifyProperty(player, itemMap, key)));
             }
         });
         nbtPane.open(player);
@@ -9496,11 +9496,19 @@ public class Menu {
             ServerUtils.sendDebugTrace(e);
         }
         if (ServerUtils.hasSpecificUpdate("1_14") && itemMap.getModelData() != null) {
-            final int modelData = Integer.parseInt(StringUtils.translateLayout(itemMap.getModelData(), player));
-            ItemMeta itemMeta = item.getItemMeta();
-            if (modelData != 0 && itemMeta != null) {
-                itemMeta.setCustomModelData(modelData);
-                item.setItemMeta(itemMeta);
+            if (StringUtils.isInt(itemMap.getModelData())) {
+                final int modelData = Integer.parseInt(StringUtils.translateLayout(itemMap.getModelData(), player));
+                ItemMeta itemMeta = item.getItemMeta();
+                if (modelData != 0 && itemMeta != null) {
+                    itemMeta.setCustomModelData(modelData);
+                    item.setItemMeta(itemMeta);
+                }
+            } else if (ServerUtils.hasPreciseUpdate("1_21_4")) {
+                ItemMeta itemMeta = item.getItemMeta();
+                if (itemMeta != null) {
+                    itemMeta.setItemModel(NamespacedKey.fromString(StringUtils.translateLayout(itemMap.getModelData(), player)));
+                    item.setItemMeta(itemMeta);
+                }
             }
         }
         if (itemMap.getDurability() != null && (itemMap.getData() == null || itemMap.getData() == 0)) {

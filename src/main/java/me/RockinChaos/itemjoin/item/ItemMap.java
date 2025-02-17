@@ -1500,13 +1500,19 @@ public class ItemMap implements Cloneable {
      */
     private void setModelData(final Player player) {
         if (modelData != null) {
-            final int modelData = Integer.parseInt(StringUtils.translateLayout(this.modelData, player));
-            if (modelData != 0) {
-                if (ServerUtils.hasSpecificUpdate("1_14")) {
-                    this.tempMeta.setCustomModelData(modelData);
-                } else {
-                    ServerUtils.logWarn("{ItemMap} The item " + this.getConfigName() + " is using Custom Model Data which is not supported until Minecraft 1.14+.");
+            if (StringUtils.isInt(this.modelData)) {
+                final int modelData = Integer.parseInt(StringUtils.translateLayout(this.modelData, player));
+                if (modelData != 0) {
+                    if (ServerUtils.hasSpecificUpdate("1_14")) {
+                        this.tempMeta.setCustomModelData(modelData);
+                    } else {
+                        ServerUtils.logWarn("{ItemMap} The item " + this.getConfigName() + " is using Custom Model Data which is not supported until Minecraft 1.14+.");
+                    }
                 }
+            } else if (ServerUtils.hasPreciseUpdate("1_21_4")) {
+                this.tempMeta.setItemModel(NamespacedKey.fromString(StringUtils.translateLayout(this.modelData, player)));
+            } else {
+                ServerUtils.logWarn("{ItemMap} The item " + this.getConfigName() + " is using Custom Model Data that is not an integer, item model names are not supported until Minecraft 1.21.4+.");
             }
         }
     }
