@@ -9,8 +9,8 @@ Prefix: '&7[&eItemJoin&7]'
 
 # Il s’agit simplement de messages généraux envoyés à partir des utilisations de certains éléments du plugin.
 general:
-  failedOverwrite: '%prefix% &cJe n’est pas réussi à vous donner &4%fail_count% &citems, car vous n’êtes pas autorisé à remplacer des éléments !'
-  failedInventory: '%prefix% &cJe n’est pas réussi à vous donner &4%fail_count% &citems, car votre inventaire est plein !'
+  failedOverwrite: '%prefix% &cJe n’ai pas réussi à vous donner &4%fail_count% &citems, car vous n’êtes pas autorisé à remplacer des éléments !'
+  failedInventory: '%prefix% &cJe n’ai pas réussi à vous donner &4%fail_count% &citems, car votre inventaire est plein !'
   econSuccess: '%prefix% &aA exécuté avec succés la commande pour &e$%cost%&a.'
   econFailed: '%prefix% &cVous n’en avez pas assez pour exécuter cette commande ! \n%prefix% &cVous avez &4$%balance% &csauf que vous avez besoins de &4$%cost%.'
   itemSuccess: '%prefix% &aExécution réussie de la commande pour &e%cost% %item_type%(s)&a.'
@@ -26,7 +26,7 @@ commands:
     noPermission: '%prefix% &cVous n’avez pas la permission d’utiliser cette commande !'
     configReload: '%prefix% &aConfiguration(s) actualisée(s) !'
     noPlayer: '%prefix% &cVous devez être un joueur pour exécuter cette commande !'
-    noTarget: '%prefix% &cLe joueur &c%target_player% &cn’a pas pu être trouver !'
+    noTarget: '%prefix% &cLe joueur &c%target_player% &cn’a pas pu être trouvé !'
   menu:
     openMenu: '%prefix% &aLe créateur d’objet a été ouvert.'
     itemSaved: '%prefix% &e%item% &aà été sauvegardé avec succés.'
@@ -55,7 +55,7 @@ commands:
     noItems: '&c&l   &cAucun item n’est défini pour ce monde.'
   world:
     worldFound: '&aJ’ai trouvé les mondes :'
-    worldHeader: '&aVous étes dans le monde :'
+    worldHeader: '&aVous êtes dans le monde :'
     worldRow: '&e- %world%'
   updates:
     checkRequest: '%prefix% &4%player% a demandé de vérifier les mises à jour !'
@@ -93,12 +93,12 @@ commands:
     targetFailedInventory: '%prefix% &cL’Item &7[&e%item%&7] &cn’existe pas dans &4%target_player% &cson inventaire !'
     targetFailedInventory_All: '%prefix% &bAucun item défini &cexistent dans &cl’inventaire de &4%target_player% !'
     onlineFailedInventory: '%prefix% &cL’Item &b%item% &cn’existe dans aucun des &cinventaire des &4joueurs en ligne.'
-    usageSyntax: '%prefix% &cVous devrez plutét utiliser /ItemJoin remove <itemname> <player> depuis la console.'
+    usageSyntax: '%prefix% &cVous devrez plutôt utiliser /ItemJoin remove <itemname> <player> depuis la console.'
     badSyntax: '%prefix% &cMauvaise utilisation ! Syntaxe : /itemjoin remove <itemname> !'
     badOnlineSyntax: '%prefix% &cMauvaise utilisation ! Syntaxe : /itemjoin removeOnline <itemname> !'
   database:
     purgeWarn: '%prefix% &aLa suppresion de la base de données supprimera &cTOUTES &a%purge_data% les données de &b%target_player%&a.'
-    purgeSuccess: '%prefix% &aVous avez supprimer la base de donnée %purge_data% de &b%target_player%&a !'
+    purgeSuccess: '%prefix% &aVous avez supprimé la base de donnée %purge_data% de &b%target_player%&a !'
     purgeConfirm: '%prefix% &aVous avez 5 secondes pour taper &e%command% &apour confirmer é nouveau que vous souhaitez supprimer la base de données.'
     purgeTimeOut: '%prefix% &cVous n’avez pas confirmé la purge de la base de données dans les &b5 secondes&c, donc la suppresion a été annulé !'
   enabled:
