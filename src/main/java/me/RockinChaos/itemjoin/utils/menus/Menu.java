@@ -8306,7 +8306,7 @@ public class Menu {
         SchedulerUtils.runAsync(() -> {
             trimPatternPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the trim material menu."), event -> trimPane(player, itemMap)));
             for (org.bukkit.inventory.meta.trim.TrimPattern pattern : Objects.requireNonNull(ItemHandler.getTrimPatterns())) {
-                trimPatternPane.addButton(new Button(ItemHandler.getItem(ItemHandler.TrimPattern.valueOf(CompatUtils.getKey(pattern).toString().replace("minecraft:", "").toUpperCase()).getMaterial().name(), 1, false, false, "&f" + org.apache.commons.lang.StringUtils.capitalize(CompatUtils.getKey(pattern).toString().replace("minecraft:", "")), "&7", "&7*Click to set this as", "&7the armor trim pattern."), event -> {
+                trimPatternPane.addButton(new Button(ItemHandler.getItem(ItemHandler.getMaterial(CompatUtils.getKey(pattern).toString().replace("minecraft:", "").toUpperCase() + "_ARMOR_TRIM_SMITHING_TEMPLATE", null).name(), 1, false, false, "&f" + org.apache.commons.lang.StringUtils.capitalize(CompatUtils.getKey(pattern).toString().replace("minecraft:", "")), "&7", "&7*Click to set this as", "&7the armor trim pattern."), event -> {
                     final Map<String, String> trimPattern = new HashMap<>();
                     trimPattern.put(CompatUtils.getKey(material).toString().replace("minecraft:", "").toUpperCase(), CompatUtils.getKey(pattern).toString().replace("minecraft:", "").toUpperCase());
                     itemMap.setTrimPattern(trimPattern);
