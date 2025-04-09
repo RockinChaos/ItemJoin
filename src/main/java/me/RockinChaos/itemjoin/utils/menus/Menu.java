@@ -8288,7 +8288,7 @@ public class Menu {
         SchedulerUtils.runAsync(() -> {
             trimPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
             for (org.bukkit.inventory.meta.trim.TrimMaterial material : Objects.requireNonNull(ItemHandler.getTrimMaterials())) {
-                trimPane.addButton(new Button(ItemHandler.getItem(ItemHandler.TrimMaterial.valueOf(material.getKey().toString().replace("minecraft:", "").toUpperCase()).getMaterial().name(), 1, false, false, "&f" + org.apache.commons.lang.StringUtils.capitalize(material.getKey().toString().replace("minecraft:", "")), "&7", "&7*Click to set this as", "&7the armor trim material."), event -> trimPatternPane(player, itemMap, material)));
+                trimPane.addButton(new Button(ItemHandler.getItem(ItemHandler.TrimMaterial.valueOf(CompatUtils.getKey(material).toString().replace("minecraft:", "").toUpperCase()).getMaterial().name(), 1, false, false, "&f" + org.apache.commons.lang.StringUtils.capitalize(CompatUtils.getKey(material).toString().replace("minecraft:", "")), "&7", "&7*Click to set this as", "&7the armor trim material."), event -> trimPatternPane(player, itemMap, material)));
             }
         });
         trimPane.open(player);
@@ -8306,9 +8306,9 @@ public class Menu {
         SchedulerUtils.runAsync(() -> {
             trimPatternPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the trim material menu."), event -> trimPane(player, itemMap)));
             for (org.bukkit.inventory.meta.trim.TrimPattern pattern : Objects.requireNonNull(ItemHandler.getTrimPatterns())) {
-                trimPatternPane.addButton(new Button(ItemHandler.getItem(ItemHandler.TrimPattern.valueOf(pattern.getKey().toString().replace("minecraft:", "").toUpperCase()).getMaterial().name(), 1, false, false, "&f" + org.apache.commons.lang.StringUtils.capitalize(pattern.getKey().toString().replace("minecraft:", "")), "&7", "&7*Click to set this as", "&7the armor trim pattern."), event -> {
+                trimPatternPane.addButton(new Button(ItemHandler.getItem(ItemHandler.TrimPattern.valueOf(CompatUtils.getKey(pattern).toString().replace("minecraft:", "").toUpperCase()).getMaterial().name(), 1, false, false, "&f" + org.apache.commons.lang.StringUtils.capitalize(CompatUtils.getKey(pattern).toString().replace("minecraft:", "")), "&7", "&7*Click to set this as", "&7the armor trim pattern."), event -> {
                     final Map<String, String> trimPattern = new HashMap<>();
-                    trimPattern.put(material.getKey().toString().replace("minecraft:", "").toUpperCase(), pattern.getKey().toString().replace("minecraft:", "").toUpperCase());
+                    trimPattern.put(CompatUtils.getKey(material).toString().replace("minecraft:", "").toUpperCase(), CompatUtils.getKey(pattern).toString().replace("minecraft:", "").toUpperCase());
                     itemMap.setTrimPattern(trimPattern);
                     creatingPane(player, itemMap);
                 }));
@@ -8653,7 +8653,7 @@ public class Menu {
                         }
                     }
                     final String checkPotion = potionString;
-                    potionPane.addButton(new Button(ItemHandler.getItem("GLASS_BOTTLE", 1, (!checkPotion.equals("NONE")), false, "&f" + CompatUtils.getName(potion), "&7", "&7*Add this potion effect", "&7to the item.",
+                    potionPane.addButton(new Button(ItemHandler.getItem(!checkPotion.equals("NONE") ? "POTION" : "GLASS_BOTTLE", 1, (!checkPotion.equals("NONE")), true, "&f" + CompatUtils.getName(potion), "&7", "&7*Add this potion effect", "&7to the item.",
                             (!checkPotion.equals("NONE") ? "&9&lInformation: &a" + checkPotion : "")), event -> {
                         if (!checkPotion.equals("NONE")) {
                             List<PotionEffect> potionEffects = itemMap.getPotionEffect();

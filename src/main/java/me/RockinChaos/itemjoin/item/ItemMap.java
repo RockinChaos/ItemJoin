@@ -4413,7 +4413,7 @@ public class ItemMap implements Cloneable {
                         slot = EquipmentSlot.valueOf(ItemHandler.getDesignatedSlot(this.material).toUpperCase());
                     }
                     final AttributeModifier modifier = (AttributeModifier) CompatUtils.resolveByVersion("1_21", // still experimental... not even supported across all server platforms...
-                            () -> new AttributeModifier(attribute.getKey(), value, AttributeModifier.Operation.ADD_NUMBER, slot.getGroup()),
+                            () -> new AttributeModifier(CompatUtils.getKey(attribute), value, AttributeModifier.Operation.ADD_NUMBER, slot.getGroup()),
                             () -> LegacyAPI.getAttribute(this.configName + attrib, attrib, value, slot));
                     if (this.tempMeta.getAttributeModifiers() == null || !this.tempMeta.getAttributeModifiers().containsValue(modifier)) {
                         this.tempMeta.addAttributeModifier(attribute, modifier);
