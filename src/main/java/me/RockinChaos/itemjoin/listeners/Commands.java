@@ -446,7 +446,8 @@ public class Commands implements Listener {
                 if (!PlayerHandler.isMenuClick(player, event.getAction()) && itemMap != null && itemMap.isSimilar(player, item)) {
                     if (TimerUtils.isExpired("dd_interact", new CompositeKey(player.getUniqueId(), item))) {
                         TimerUtils.setExpiry("dd_interact", new CompositeKey(player.getUniqueId(), item), 30, TimeUnit.MILLISECONDS);
-                        this.runCommands(player, null, item, action, (action.equals(Action.PHYSICAL.name()) ? "INTERACTED" : action.split("_")[0]), String.valueOf(player.getInventory().getHeldItemSlot()));
+                        final String slot = ServerUtils.hasSpecificUpdate("1_9") && PlayerHandler.getOffHandItem(player).equals(item) ? "OFFHAND" : String.valueOf(player.getInventory().getHeldItemSlot());
+                        this.runCommands(player, null, item, action, (action.equals(Action.PHYSICAL.name()) ? "INTERACTED" : action.split("_")[0]), slot);
                     }
                 }
             }

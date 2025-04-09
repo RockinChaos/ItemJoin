@@ -5173,53 +5173,55 @@ public class ItemMap implements Cloneable {
      * @param damage - The Integer amount to be damaged.
      */
     public void damageItem(final Player player, final String slot, final int damage) {
-        if ((!slot.startsWith("CH") && slot.startsWith("C")) || StringUtils.isInt(slot)) {
-            if (StringUtils.containsIgnoreCase(slot, "CRAFTING")) {
-                final int actualSlot = StringUtils.getSlotConversion(slot);
-                final Inventory topInventory = CompatUtils.getTopInventory(player);
-                final ItemStack item = topInventory.getItem(actualSlot);
-                if (item != null && this.isSimilar(player, item)) {
-                    final ItemMeta itemMeta = item.getItemMeta();
-                    if (ServerUtils.hasSpecificUpdate("1_13") && itemMeta != null) {
-                        int newDamage = ((org.bukkit.inventory.meta.Damageable) itemMeta).getDamage() + damage;
-                        if (item.getType().getMaxDurability() > newDamage) {
-                            ((org.bukkit.inventory.meta.Damageable) itemMeta).setDamage(newDamage);
-                            item.setItemMeta(itemMeta);
-                        } else {
-                            topInventory.setItem(Integer.parseInt(slot), new ItemStack(Material.AIR));
-                        }
-                    } else if (itemMeta != null) {
-                        final int newDurability = LegacyAPI.getDurability(item) - damage;
-                        if (newDurability > 0) {
-                            LegacyAPI.setDurability(item, (short) newDurability);
-                        } else {
-                            topInventory.setItem(Integer.parseInt(slot), new ItemStack(Material.AIR));
-                        }
+        if (StringUtils.containsIgnoreCase(slot, "CRAFTING")) {
+            final int actualSlot = StringUtils.getSlotConversion(slot);
+            final Inventory topInventory = CompatUtils.getTopInventory(player);
+            final ItemStack item = topInventory.getItem(actualSlot);
+            if (item != null && this.isSimilar(player, item)) {
+                final ItemMeta itemMeta = item.getItemMeta();
+                if (ServerUtils.hasSpecificUpdate("1_13") && itemMeta != null) {
+                    int newDamage = ((org.bukkit.inventory.meta.Damageable) itemMeta).getDamage() + damage;
+                    if (item.getType().getMaxDurability() > newDamage) {
+                        ((org.bukkit.inventory.meta.Damageable) itemMeta).setDamage(newDamage);
+                        item.setItemMeta(itemMeta);
+                    } else {
+                        topInventory.setItem(Integer.parseInt(slot), new ItemStack(Material.AIR));
                     }
-                    PlayerHandler.updateInventory(player, 1L);
-                }
-            } else {
-                final ItemStack item = player.getInventory().getItem(Integer.parseInt(slot));
-                if (item != null && this.isSimilar(player, item)) {
-                    final ItemMeta itemMeta = item.getItemMeta();
-                    if (ServerUtils.hasSpecificUpdate("1_13") && itemMeta != null) {
-                        int newDamage = ((org.bukkit.inventory.meta.Damageable) itemMeta).getDamage() + damage;
-                        if (item.getType().getMaxDurability() > newDamage) {
-                            ((org.bukkit.inventory.meta.Damageable) itemMeta).setDamage(newDamage);
-                            item.setItemMeta(itemMeta);
-                        } else {
-                            player.getInventory().setItem(Integer.parseInt(slot), new ItemStack(Material.AIR));
-                        }
-                    } else if (itemMeta != null) {
-                        final int newDurability = LegacyAPI.getDurability(item) - damage;
-                        if (newDurability > 0) {
-                            LegacyAPI.setDurability(item, (short) newDurability);
-                        } else {
-                            player.getInventory().setItem(Integer.parseInt(slot), new ItemStack(Material.AIR));
-                        }
+                } else if (itemMeta != null) {
+                    final int newDurability = LegacyAPI.getDurability(item) - damage;
+                    if (newDurability > 0) {
+                        LegacyAPI.setDurability(item, (short) newDurability);
+                    } else {
+                        topInventory.setItem(Integer.parseInt(slot), new ItemStack(Material.AIR));
                     }
-                    PlayerHandler.updateInventory(player, 1L);
                 }
+                PlayerHandler.updateInventory(player, 1L);
+            }
+        } else if (slot.equalsIgnoreCase("OFFHAND") || StringUtils.isInt(slot)) {
+            final ItemStack item = slot.equalsIgnoreCase("OFFHAND") ? PlayerHandler.getOffHandItem(player) : player.getInventory().getItem(Integer.parseInt(slot));
+            if (item != null && this.isSimilar(player, item)) {
+                final ItemMeta itemMeta = item.getItemMeta();
+                if (ServerUtils.hasSpecificUpdate("1_13") && itemMeta != null) {
+                    int newDamage = ((org.bukkit.inventory.meta.Damageable) itemMeta).getDamage() + damage;
+                    if (item.getType().getMaxDurability() > newDamage) {
+                        ((org.bukkit.inventory.meta.Damageable) itemMeta).setDamage(newDamage);
+                        item.setItemMeta(itemMeta);
+                    } else if (slot.equalsIgnoreCase("OFFHAND")) {
+                        PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR));
+                    } else {
+                        player.getInventory().setItem(Integer.parseInt(slot), new ItemStack(Material.AIR));
+                    }
+                } else if (itemMeta != null) {
+                    final int newDurability = LegacyAPI.getDurability(item) - damage;
+                    if (newDurability > 0) {
+                        LegacyAPI.setDurability(item, (short) newDurability);
+                    } else if (slot.equalsIgnoreCase("OFFHAND")) {
+                        PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR));
+                    } else {
+                        player.getInventory().setItem(Integer.parseInt(slot), new ItemStack(Material.AIR));
+                    }
+                }
+                PlayerHandler.updateInventory(player, 1L);
             }
         }
     }
@@ -5248,12 +5250,12 @@ public class ItemMap implements Cloneable {
             } else {
                 player.getInventory().setItem(Integer.parseInt(slot), itemStack);
             }
+        } else if (slot.equalsIgnoreCase("OFFHAND")) {
+            PlayerHandler.setOffHandItem(player, itemStack);
+        } else if (Objects.requireNonNull(PlayerHandler.getMainHandItem(player)).getType() == Material.AIR) {
+            PlayerHandler.setMainHandItem(player, itemStack);
         } else {
-            if (Objects.requireNonNull(PlayerHandler.getMainHandItem(player)).getType() == Material.AIR) {
-                PlayerHandler.setMainHandItem(player, itemStack);
-            } else {
-                player.getInventory().addItem(itemStack);
-            }
+            player.getInventory().addItem(itemStack);
         }
         this.setAnimations(player);
         this.executeCommands(player, null, this.tempItem, "ON_RECEIVE", "RECEIVED", slot);
