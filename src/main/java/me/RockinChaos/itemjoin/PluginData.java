@@ -22,6 +22,7 @@ import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.ItemHandler.JSONEvent;
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.listeners.Interfaces;
+import me.RockinChaos.core.listeners.PlayerLogin;
 import me.RockinChaos.core.utils.ReflectionUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
@@ -433,6 +434,7 @@ public class PluginData {
     public void registerEvents() {
         Objects.requireNonNull(ItemJoin.getCore().getPlugin().getCommand("itemjoin")).setExecutor(new ChatExecutor());
         Objects.requireNonNull(ItemJoin.getCore().getPlugin().getCommand("itemjoin")).setTabCompleter(new ChatTab());
+        ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new PlayerLogin(), ItemJoin.getCore().getPlugin());
         ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Interfaces(), ItemJoin.getCore().getPlugin());
         ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Interface(), ItemJoin.getCore().getPlugin());
     }
@@ -489,56 +491,43 @@ public class PluginData {
                 this.warnExploitUsers();
             }
             this.registerPrevent();
-            if (isRunning) {
-                if (ItemJoin.getCore().getSQL().refresh()) {
-                    ItemJoin.getCore().getData().setDatabaseData(this.getDatabaseData());
-                    {
-                        ItemJoin.getCore().getSQL().load();
-                    }
-                }
-            } else {
-                ItemJoin.getCore().getSQL();
-                {
-                    ItemJoin.getCore().getData().setDatabaseData(this.getDatabaseData());
-                    {
-                        ItemJoin.getCore().getSQL().load();
-                    }
-                }
+            if (isRunning && ItemJoin.getCore().getSQL().refresh()) {
+                ItemJoin.getCore().getData().setDatabaseData(this.getDatabaseData());
+                ItemJoin.getCore().getSQL().load();
             }
         });
-        {
-            new ItemDesigner();
-            {
-                run(() -> {
-                    ItemJoin.getCore().getData().setStarted(true);
-                    forOnlinePlayers(player -> ItemUtilities.getUtilities().setStatistics(player));
-                    this.setPages();
-                    final ConfigurationSection itemsPath = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items");
-                    int loadedItems = 0;
-                    int customItems = 0;
-                    if (itemsPath != null) {
-                        customItems = itemsPath.getKeys(false).size();
-                        for (String configName : itemsPath.getKeys(false)) {
-                            if (ItemUtilities.getUtilities().getItemMap(configName) != null) {
-                                loadedItems++;
-                            }
-                        }
+        if (!isRunning) {
+            ItemJoin.getCore().getSQL();
+            ItemJoin.getCore().getData().setDatabaseData(this.getDatabaseData());
+            ItemJoin.getCore().getSQL().load();
+        }
+        new ItemDesigner();
+        run(() -> {
+            forOnlinePlayers(player -> ItemUtilities.getUtilities().setStatistics(player));
+            this.setPages();
+            final ConfigurationSection itemsPath = ItemJoin.getCore().getConfig("items.yml").getConfigurationSection("items");
+            int loadedItems = 0;
+            int customItems = 0;
+            if (itemsPath != null) {
+                customItems = itemsPath.getKeys(false).size();
+                for (String configName : itemsPath.getKeys(false)) {
+                    if (ItemUtilities.getUtilities().getItemMap(configName) != null) {
+                        loadedItems++;
                     }
-                    ServerUtils.logInfo(loadedItems + "/" + customItems + " Custom item(s) loaded!");
-                });
-                {
-                    runAsyncLater(100L, () -> {
-                        if (ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Metrics-Logging")) {
-                            final MetricsAPI metrics = new MetricsAPI(ItemJoin.getCore().getPlugin(), 4115);
-                            metrics.addCustomChart(new SimplePie("items", () -> ItemUtilities.getUtilities().getItems().size() + " "));
-                            metrics.addCustomChart(new SimplePie("itemPermissions", () -> ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items") ? "True" : "False"));
-                            ItemJoin.getCore().getDependencies().addCustomCharts(metrics);
-                            ServerUtils.sendErrorStatements(null);
-                        }
-                    });
                 }
             }
-        }
+            ServerUtils.logInfo(loadedItems + "/" + customItems + " Custom item(s) loaded!");
+            ItemJoin.getCore().getData().setStarted(true);
+        });
+        runAsyncLater(100L, () -> {
+            if (ItemJoin.getCore().getConfig("config.yml").getBoolean("General.Metrics-Logging")) {
+                final MetricsAPI metrics = new MetricsAPI(ItemJoin.getCore().getPlugin(), 4115);
+                metrics.addCustomChart(new SimplePie("items", () -> ItemUtilities.getUtilities().getItems().size() + " "));
+                metrics.addCustomChart(new SimplePie("itemPermissions", () -> ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items") ? "True" : "False"));
+                ItemJoin.getCore().getDependencies().addCustomCharts(metrics);
+                ServerUtils.sendErrorStatements(null);
+            }
+        });
     }
 
     /**
@@ -565,9 +554,6 @@ public class PluginData {
         }
         if (StringUtils.containsIgnoreCase(this.getHotbarTriggers(), "REGION-LEAVE") && StringUtils.isRegistered(PlayerGuard.class.getSimpleName())) {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new PlayerGuard(), ItemJoin.getCore().getPlugin());
-        }
-        if (StringUtils.isRegistered(PlayerLogin.class.getSimpleName())) {
-            ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new PlayerLogin(), ItemJoin.getCore().getPlugin());
         }
         if ((!StringUtils.splitIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Prevent." + "Chat"), "FALSE", ",") && !StringUtils.splitIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Prevent." + "Chat"), "DISABLED", ","))) {
             if (StringUtils.isRegistered(Chat.class.getSimpleName())) {
