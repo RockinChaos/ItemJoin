@@ -5504,12 +5504,9 @@ public class ItemMap implements Cloneable {
         if (ItemJoin.getCore().getDependencies().getVault().vaultEnabled() && !materialCost && !(this.getCommandCost(player) < 0)) {
             final double commandCost = this.getCommandCost(player);
             double balance = 0.0;
-            try {
-                balance = ItemJoin.getCore().getDependencies().getVault().getBalance(player);
-            } catch (NullPointerException ignored) {
-            }
+            try { balance = commandCost > 0 ? ItemJoin.getCore().getDependencies().getVault().getBalance(player) : 0.0; } catch (NullPointerException ignored) {}
             final boolean balCost = (balance >= commandCost);
-            if (balCost || commandCost == 0) {
+            if (balCost) {
                 return true;
             } else {
                 final PlaceHolder placeHolders = new PlaceHolder().with(Holder.COST, String.valueOf(commandCost)).with(Holder.BALANCE, String.valueOf(balance));
@@ -5648,10 +5645,7 @@ public class ItemMap implements Cloneable {
         if (ItemJoin.getCore().getDependencies().getVault().vaultEnabled()) {
             final double commandCost = this.getCommandCost(player);
             double balance = 0.0;
-            try {
-                balance = ItemJoin.getCore().getDependencies().getVault().getBalance(player);
-            } catch (NullPointerException ignored) {
-            }
+            try { balance = commandCost > 0 ? ItemJoin.getCore().getDependencies().getVault().getBalance(player) : 0.0; } catch (NullPointerException ignored) {}
             if (balance >= commandCost) {
                 if (commandCost > 0) {
                     try {
