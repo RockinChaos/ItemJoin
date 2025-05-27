@@ -112,19 +112,21 @@ public class Storable implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     private void onInteractEntity(PlayerInteractEntityEvent event) {
-        if (event.getRightClicked().getType().name().equalsIgnoreCase("ITEM_FRAME") || event.getRightClicked().getType().name().equalsIgnoreCase("FOX") || event.getRightClicked().getType().name().equalsIgnoreCase("ALLAY")) {
-            ItemStack item;
-            if (ServerUtils.hasSpecificUpdate("1_9")) {
-                item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
-            } else {
-                item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");
+        try {
+            if (event.getRightClicked().getType().name().equalsIgnoreCase("ITEM_FRAME") || event.getRightClicked().getType().name().equalsIgnoreCase("FOX") || event.getRightClicked().getType().name().equalsIgnoreCase("ALLAY")) {
+                ItemStack item;
+                if (ServerUtils.hasSpecificUpdate("1_9")) {
+                    item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
+                } else {
+                    item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");
+                }
+                Player player = event.getPlayer();
+                if (!ItemUtilities.getUtilities().isAllowed(player, item, "item-store") || !ItemUtilities.getUtilities().isAllowed(player, item, "disposable")) {
+                    event.setCancelled(true);
+                    PlayerHandler.updateInventory(player, 1L);
+                }
             }
-            Player player = event.getPlayer();
-            if (!ItemUtilities.getUtilities().isAllowed(player, item, "item-store") || !ItemUtilities.getUtilities().isAllowed(player, item, "disposable")) {
-                event.setCancelled(true);
-                PlayerHandler.updateInventory(player, 1L);
-            }
-        }
+        } catch (Exception ignored) {} // pale_oak_boat (paper bug) fix (and fixes future entities).
     }
 
     /**
@@ -134,18 +136,20 @@ public class Storable implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     private void onInteractAtEntity(PlayerInteractAtEntityEvent event) {
-        if (event.getRightClicked().getType().name().equalsIgnoreCase("ARMOR_STAND") || event.getRightClicked().getType().name().equalsIgnoreCase("FOX") || event.getRightClicked().getType().name().equalsIgnoreCase("ALLAY")) {
-            ItemStack item;
-            if (ServerUtils.hasSpecificUpdate("1_9")) {
-                item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
-            } else {
-                item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");
+        try {
+            if (event.getRightClicked().getType().name().equalsIgnoreCase("ARMOR_STAND") || event.getRightClicked().getType().name().equalsIgnoreCase("FOX") || event.getRightClicked().getType().name().equalsIgnoreCase("ALLAY")) {
+                ItemStack item;
+                if (ServerUtils.hasSpecificUpdate("1_9")) {
+                    item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
+                } else {
+                    item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");
+                }
+                Player player = event.getPlayer();
+                if (!ItemUtilities.getUtilities().isAllowed(player, item, "item-store") || !ItemUtilities.getUtilities().isAllowed(player, item, "disposable")) {
+                    event.setCancelled(true);
+                    PlayerHandler.updateInventory(player, 1L);
+                }
             }
-            Player player = event.getPlayer();
-            if (!ItemUtilities.getUtilities().isAllowed(player, item, "item-store") || !ItemUtilities.getUtilities().isAllowed(player, item, "disposable")) {
-                event.setCancelled(true);
-                PlayerHandler.updateInventory(player, 1L);
-            }
-        }
+        } catch (Exception ignored) {} // pale_oak_boat (paper bug) fix (and fixes future entities).
     }
 }

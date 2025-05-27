@@ -379,20 +379,22 @@ public class Commands implements Listener {
      */
     @EventHandler()
     private void onEntity(PlayerInteractEntityEvent event) {
-        if (event.getRightClicked() instanceof org.bukkit.entity.ItemFrame) {
-            ItemStack item;
-            if (ServerUtils.hasSpecificUpdate("1_9")) {
-                item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().name());
-            } else {
-                item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");
+        try {
+            if (event.getRightClicked() instanceof org.bukkit.entity.ItemFrame) {
+                ItemStack item;
+                if (ServerUtils.hasSpecificUpdate("1_9")) {
+                    item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().name());
+                } else {
+                    item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");
+                }
+                final Player player = event.getPlayer();
+                final String action = Action.RIGHT_CLICK_BLOCK.name();
+                final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player));
+                if (itemMap != null && itemMap.isSimilar(player, item)) {
+                    this.runCommands(player, null, item, action, action.split("_")[0], String.valueOf(player.getInventory().getHeldItemSlot()));
+                }
             }
-            final Player player = event.getPlayer();
-            final String action = Action.RIGHT_CLICK_BLOCK.name();
-            final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player));
-            if (itemMap != null && itemMap.isSimilar(player, item)) {
-                this.runCommands(player, null, item, action, action.split("_")[0], String.valueOf(player.getInventory().getHeldItemSlot()));
-            }
-        }
+        } catch (Exception ignored) {} // pale_oak_boat (paper bug) fix (and fixes future entities).
     }
 
     /**
@@ -402,20 +404,22 @@ public class Commands implements Listener {
      */
     @EventHandler()
     private void onTargetEntity(PlayerInteractAtEntityEvent event) {
-        if (event.getRightClicked().toString().equalsIgnoreCase("CraftArmorStand")) {
-            ItemStack item;
-            if (ServerUtils.hasSpecificUpdate("1_9")) {
-                item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().name());
-            } else {
-                item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");
+        try {
+            if (event.getRightClicked().toString().equalsIgnoreCase("CraftArmorStand")) {
+                ItemStack item;
+                if (ServerUtils.hasSpecificUpdate("1_9")) {
+                    item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().name());
+                } else {
+                    item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");
+                }
+                final Player player = event.getPlayer();
+                final String action = Action.RIGHT_CLICK_BLOCK.name();
+                final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player));
+                if (itemMap != null && itemMap.isSimilar(player, item)) {
+                    this.runCommands(player, null, item, action, action.split("_")[0], String.valueOf(player.getInventory().getHeldItemSlot()));
+                }
             }
-            final Player player = event.getPlayer();
-            final String action = Action.RIGHT_CLICK_BLOCK.name();
-            final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(PlayerHandler.getHandItem(player));
-            if (itemMap != null && itemMap.isSimilar(player, item)) {
-                this.runCommands(player, null, item, action, action.split("_")[0], String.valueOf(player.getInventory().getHeldItemSlot()));
-            }
-        }
+        } catch (Exception ignored) {} // pale_oak_boat (paper bug) fix (and fixes future entities).
     }
 
     /**

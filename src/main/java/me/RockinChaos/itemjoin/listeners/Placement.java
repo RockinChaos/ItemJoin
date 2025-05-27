@@ -112,23 +112,25 @@ public class Placement implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     private void onFramePlace(PlayerInteractEntityEvent event) {
-        if (event.getRightClicked() instanceof ItemFrame) {
-            try {
-                ItemStack item;
-                if (ServerUtils.hasSpecificUpdate("1_9")) {
-                    item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
-                } else {
-                    item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");
+        try {
+            if (event.getRightClicked() instanceof ItemFrame) {
+                try {
+                    ItemStack item;
+                    if (ServerUtils.hasSpecificUpdate("1_9")) {
+                        item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
+                    } else {
+                        item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");
+                    }
+                    Player player = event.getPlayer();
+                    if (!ItemUtilities.getUtilities().isAllowed(player, item, "placement")) {
+                        event.setCancelled(true);
+                        PlayerHandler.updateInventory(player, 1L);
+                    }
+                } catch (Exception e) {
+                    ServerUtils.sendDebugTrace(e);
                 }
-                Player player = event.getPlayer();
-                if (!ItemUtilities.getUtilities().isAllowed(player, item, "placement")) {
-                    event.setCancelled(true);
-                    PlayerHandler.updateInventory(player, 1L);
-                }
-            } catch (Exception e) {
-                ServerUtils.sendDebugTrace(e);
             }
-        }
+        } catch (Exception ignored) {} // pale_oak_boat (paper bug) fix (and fixes future entities).
     }
 
     /**
@@ -138,39 +140,41 @@ public class Placement implements Listener {
      */
     @EventHandler()
     private void onFrameLock(PlayerInteractEntityEvent event) {
-        if (event.getRightClicked() instanceof ItemFrame) {
-            try {
-                ItemStack item;
-                if (ServerUtils.hasSpecificUpdate("1_9")) {
-                    item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
-                } else {
-                    item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");
-                }
-                Player player = event.getPlayer();
-                if (PlayerHandler.isCreativeMode(player)) {
-                    if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
-                        ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
-                        if (itemMap != null) {
-                            final ItemStack heldItem = PlayerHandler.getHandItem(player);
-                            if (heldItem.getAmount() <= 1) {
-                                if (ServerUtils.hasSpecificUpdate("1_9")) {
-                                    if (event.getHand().equals(EquipmentSlot.HAND)) {
+        try {
+            if (event.getRightClicked() instanceof ItemFrame) {
+                try {
+                    ItemStack item;
+                    if (ServerUtils.hasSpecificUpdate("1_9")) {
+                        item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
+                    } else {
+                        item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");
+                    }
+                    Player player = event.getPlayer();
+                    if (PlayerHandler.isCreativeMode(player)) {
+                        if (!ItemUtilities.getUtilities().isAllowed(player, item, "count-lock")) {
+                            ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
+                            if (itemMap != null) {
+                                final ItemStack heldItem = PlayerHandler.getHandItem(player);
+                                if (heldItem.getAmount() <= 1) {
+                                    if (ServerUtils.hasSpecificUpdate("1_9")) {
+                                        if (event.getHand().equals(EquipmentSlot.HAND)) {
+                                            PlayerHandler.setMainHandItem(player, item);
+                                        } else if (event.getHand().equals(EquipmentSlot.OFF_HAND)) {
+                                            PlayerHandler.setOffHandItem(player, item);
+                                        }
+                                    } else {
                                         PlayerHandler.setMainHandItem(player, item);
-                                    } else if (event.getHand().equals(EquipmentSlot.OFF_HAND)) {
-                                        PlayerHandler.setOffHandItem(player, item);
                                     }
-                                } else {
-                                    PlayerHandler.setMainHandItem(player, item);
+                                } else if (itemMap.isSimilar(player, heldItem)) {
+                                    heldItem.setAmount(itemMap.getCount(player));
                                 }
-                            } else if (itemMap.isSimilar(player, heldItem)) {
-                                heldItem.setAmount(itemMap.getCount(player));
                             }
                         }
                     }
+                } catch (Exception e) {
+                    ServerUtils.sendDebugTrace(e);
                 }
-            } catch (Exception e) {
-                ServerUtils.sendDebugTrace(e);
             }
-        }
+        } catch (Exception ignored) {} // pale_oak_boat (paper bug) fix (and fixes future entities).
     }
 }
