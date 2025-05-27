@@ -710,6 +710,9 @@ public class PluginData {
             if (StringUtils.isRegistered(Storable.class.getSimpleName())) {
                 ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Storable(), ItemJoin.getCore().getPlugin());
             }
+            if (StringUtils.isRegistered(Trade.class.getSimpleName())) {
+                ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Trade(), ItemJoin.getCore().getPlugin());
+            }
         }
         if (itemMap.isMovement() && ServerUtils.hasSpecificUpdate("1_9") && ReflectionUtils.getBukkitClass("event.player.PlayerSwapHandItemsEvent") != null && StringUtils.isRegistered(Offhand.class.getSimpleName())) {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Offhand(), ItemJoin.getCore().getPlugin());
