@@ -19,6 +19,7 @@ package me.RockinChaos.itemjoin.listeners;
 
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.CompatUtils;
+import me.RockinChaos.core.utils.ReflectionUtils;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.itemjoin.item.ItemMap;
@@ -124,11 +125,29 @@ public class Projectile implements Listener {
                         ServerUtils.logSevere("{Projectile} The defined teleport-effect " + itemMap.getTeleportEffect() + " for the item " + itemMap.getConfigName() + " is not valid!");
                     }
                 }
-                if (itemMap.getTeleportSound() != null && !itemMap.getTeleportSound().isEmpty()) {
+                final String teleportSound = itemMap.getTeleportSound();
+                if (teleportSound != null && !teleportSound.isEmpty()) {
+                    float teleportVolume = (float) ((double) itemMap.getTeleportVolume());
+                    float teleportPitch = (float) ((double) itemMap.getTeleportPitch());
                     try {
-                        projectile.getWorld().playSound(projectile.getLocation(), (Sound) CompatUtils.valueOf(Sound.class, itemMap.getTeleportSound()), (float) ((double) itemMap.getTeleportVolume()), (float) ((double) itemMap.getTeleportPitch()));
+                        projectile.getWorld().playSound(projectile.getLocation(), (Sound) CompatUtils.valueOf(Sound.class, teleportSound), teleportVolume, teleportPitch);
                     } catch (Exception e) {
-                        ServerUtils.logSevere("{Projectile} The defined teleport-sound " + itemMap.getTeleportSound() + " for the item " + itemMap.getConfigName() + " is not valid!");
+                        try {
+                            projectile.getWorld().playSound(projectile.getLocation(), teleportSound, teleportVolume, teleportPitch);
+                        } catch (Exception e2) {
+                            try {
+                                projectile.getWorld().playSound(projectile.getLocation(), teleportSound.toLowerCase(), teleportVolume, teleportPitch);
+                            } catch (Exception e3) {
+                                try {
+                                    projectile.getWorld().playSound(projectile.getLocation(), teleportSound.toUpperCase(), teleportVolume, teleportPitch);
+                                } catch (Exception e4) {
+                                    ServerUtils.logSevere("{Projectile} The defined teleport-sound " + teleportSound + " for the item " + itemMap.getConfigName() + " is not valid in Minecraft" + ReflectionUtils.getServerVersion() + ". NOTE: Custom sounds are case-sensitive!");
+                                    if (ServerUtils.hasPreciseUpdate("1_21_3")) {
+                                        ServerUtils.logSevere("{ItemMap} See the Minecraft Wiki for a list of command sounds https://minecraft.fandom.com/wiki/Sounds.json/Java_Edition_values");
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 projectile.remove();

@@ -154,7 +154,7 @@ public class ItemMap implements Cloneable {
     private Integer cooldownSeconds = 0;
     private Integer commandsReceive = 0;
     private String cooldownMessage;
-    private Sound commandSound;
+    private String commandSound;
     private Double commandSoundVolume = 1.0;
     private Double commandSoundPitch = 1.0;
     private String commandParticle;
@@ -371,13 +371,7 @@ public class ItemMap implements Cloneable {
             if (sound != null) {
                 if (sound.contains(":")) {
                     final String[] soundParts = sound.split(":");
-                    this.commandSound = (Sound) CompatUtils.valueOf(Sound.class, soundParts[0]);
-                    if (this.commandSound == null) {
-                        ServerUtils.logSevere("{ItemMap} Your server is running MC " + ReflectionUtils.getServerVersion() + " and this version of Minecraft does not have the defined command-sound " + this.nodeLocation.getString(".commands-sound") + ".");
-                        if (ServerUtils.hasPreciseUpdate("1_21_3")) {
-                            ServerUtils.logSevere("{ItemMap} See the Minecraft Wiki for a list of command sounds https://minecraft.fandom.com/wiki/Sounds.json/Java_Edition_values");
-                        }
-                    }
+                    this.commandSound = soundParts[0];
                     try {
                         this.commandSoundVolume = Double.valueOf(soundParts[1]);
                         this.commandSoundPitch = Double.valueOf(soundParts[2]);
@@ -386,13 +380,7 @@ public class ItemMap implements Cloneable {
                         ServerUtils.sendDebugTrace(e);
                     }
                 } else {
-                    this.commandSound = (Sound) CompatUtils.valueOf(Sound.class, sound);
-                    if (this.commandSound == null) {
-                        ServerUtils.logSevere("{ItemMap} Your server is running MC " + ReflectionUtils.getServerVersion() + " and this version of Minecraft does not have the defined command-sound " + this.nodeLocation.getString(".commands-sound") + ".");
-                        if (ServerUtils.hasPreciseUpdate("1_21_3")) {
-                            ServerUtils.logSevere("{ItemMap} See the Minecraft Wiki for a list of command sounds https://minecraft.fandom.com/wiki/Sounds.json/Java_Edition_values");
-                        }
-                    }
+                    this.commandSound = sound;
                 }
             }
         } catch (Exception e) {
@@ -1594,7 +1582,7 @@ public class ItemMap implements Cloneable {
      *
      * @return The Commands Sound.
      */
-    public Sound getCommandSound() {
+    public String getCommandSound() {
         return this.commandSound;
     }
 
@@ -1603,7 +1591,7 @@ public class ItemMap implements Cloneable {
      *
      * @param sound - The Commands Sound to be set.
      */
-    public void setCommandSound(final Sound sound) {
+    public void setCommandSound(final String sound) {
         this.commandSound = sound;
     }
 
@@ -5666,13 +5654,26 @@ public class ItemMap implements Cloneable {
      * @param player - The Player to have the Sound heard.
      */
     private void playSound(final Player player) {
-        if (this.commandSound != null) {
+        if (this.commandSound != null && !this.commandSound.isEmpty()) {
             try {
-                player.playSound(player.getLocation(), this.commandSound, (float) ((double) this.commandSoundVolume), (float) ((double) this.commandSoundPitch));
+                player.playSound(player.getLocation(), (Sound) CompatUtils.valueOf(Sound.class, this.commandSound), (float) ((double) this.commandSoundVolume), (float) ((double) this.commandSoundPitch));
             } catch (Exception e) {
-                ServerUtils.logSevere("{ItemMap} There was an issue executing the commands-sound you defined.");
-                ServerUtils.logWarn("{ItemMap} " + this.commandSound + " is not a sound in " + ReflectionUtils.getServerVersion() + ".");
-                ServerUtils.sendDebugTrace(e);
+                try {
+                    player.playSound(player.getLocation(), this.commandSound, (float) ((double) this.commandSoundVolume), (float) ((double) this.commandSoundPitch));
+                } catch (Exception e2) {
+                    try {
+                        player.playSound(player.getLocation(), this.commandSound.toLowerCase(), (float) ((double) this.commandSoundVolume), (float) ((double) this.commandSoundPitch));
+                    } catch (Exception e3) {
+                        try {
+                            player.playSound(player.getLocation(), this.commandSound.toUpperCase(), (float) ((double) this.commandSoundVolume), (float) ((double) this.commandSoundPitch));
+                        } catch (Exception e4) {
+                            ServerUtils.logSevere("{ItemMap} The defined commands-sound " + this.commandSound + " for the item " + this.configName + " is not valid in Minecraft" + ReflectionUtils.getServerVersion() + ". NOTE: Custom sounds are case-sensitive!");
+                            if (ServerUtils.hasPreciseUpdate("1_21_3")) {
+                                ServerUtils.logSevere("{ItemMap} See the Minecraft Wiki for a list of command sounds https://minecraft.fandom.com/wiki/Sounds.json/Java_Edition_values");
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -6275,7 +6276,7 @@ public class ItemMap implements Cloneable {
             itemData.set("items." + this.configName + ".toggle", this.toggleCommands);
         }
         if (this.commandSound != null) {
-            itemData.set("items." + this.configName + ".commands-sound", CompatUtils.getName(this.commandSound) + ((this.commandSoundVolume != 1.0 && this.commandSoundPitch != 1.0) ? ":" + this.commandSoundVolume + ":" + this.commandSoundPitch : ""));
+            itemData.set("items." + this.configName + ".commands-sound", this.commandSound + ((this.commandSoundVolume != 1.0 && this.commandSoundPitch != 1.0) ? ":" + this.commandSoundVolume + ":" + this.commandSoundPitch : ""));
         }
         if (this.commandParticle != null && !this.commandParticle.isEmpty()) {
             itemData.set("items." + this.configName + ".commands-particle", this.commandParticle);

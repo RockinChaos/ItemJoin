@@ -4449,7 +4449,7 @@ public class Menu {
                     }));
                 } else {
                     soundPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "MUSIC_DISC_MELLOHI" : "2262"), 1, false, false, "&f" + CompatUtils.getName(sound), "&7", "&7*Click to set the", "&7commands-sound of the item."), event -> {
-                        itemMap.setCommandSound(sound);
+                        itemMap.setCommandSound(CompatUtils.getName(sound));
                         soundVolumePane(player, itemMap, stage);
                     }));
                 }
