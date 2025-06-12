@@ -553,7 +553,7 @@ public class ItemUtilities {
                     this.failCount.put(session, 1);
                 }
                 if (canSend) {
-                    ServerUtils.logDebug("{ItemMap} " + player.getName() + " has failed to receive item: " + itemMap.getConfigName() + ".");
+                    ServerUtils.logDebug("{ItemMap} " + player.getName() + " has failed to receive item: " + itemMap.getConfigName() + (!this.canOverwrite(player, itemMap) ? ", cannot overwrite items!" : "."));
                 }
                 return false;
             } else {
@@ -631,19 +631,19 @@ public class ItemUtilities {
                 return true;
             } else if (CustomSlot.ARBITRARY.isSlot(itemMap.getSlot()) && player.getInventory().firstEmpty() == -1) {
                 return false;
-            } else if (CustomSlot.HELMET.isSlot(itemMap.getSlot()) && player.getInventory().getHelmet() != null) {
+            } else if (CustomSlot.HELMET.isSlot(itemMap.getSlot()) && player.getInventory().getHelmet() != null && player.getInventory().getHelmet().getType() != Material.AIR) {
                 return false;
-            } else if (CustomSlot.CHESTPLATE.isSlot(itemMap.getSlot()) && player.getInventory().getChestplate() != null) {
+            } else if (CustomSlot.CHESTPLATE.isSlot(itemMap.getSlot()) && player.getInventory().getChestplate() != null && player.getInventory().getChestplate().getType() != Material.AIR) {
                 return false;
-            } else if (CustomSlot.LEGGINGS.isSlot(itemMap.getSlot()) && player.getInventory().getLeggings() != null) {
+            } else if (CustomSlot.LEGGINGS.isSlot(itemMap.getSlot()) && player.getInventory().getLeggings() != null && player.getInventory().getLeggings().getType() != Material.AIR) {
                 return false;
-            } else if (CustomSlot.BOOTS.isSlot(itemMap.getSlot()) && player.getInventory().getBoots() != null) {
+            } else if (CustomSlot.BOOTS.isSlot(itemMap.getSlot()) && player.getInventory().getBoots() != null && player.getInventory().getBoots().getType() != Material.AIR) {
                 return false;
             } else if (ServerUtils.hasSpecificUpdate("1_9") && CustomSlot.OFFHAND.isSlot(itemMap.getSlot())) {
                 if (player.getInventory().getItemInOffHand().getType() != Material.AIR) {
                     return false;
                 }
-            } else if (StringUtils.isInt(itemMap.getSlot()) && player.getInventory().getItem(Integer.parseInt(itemMap.getSlot())) != null) {
+            } else if (StringUtils.isInt(itemMap.getSlot()) && player.getInventory().getItem(Integer.parseInt(itemMap.getSlot())) != null && player.getInventory().getItem(Integer.parseInt(itemMap.getSlot())).getType() != Material.AIR) {
                 return false;
             }
         } catch (Exception e) {
