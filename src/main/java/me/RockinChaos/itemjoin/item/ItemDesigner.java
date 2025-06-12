@@ -700,6 +700,8 @@ public class ItemDesigner {
     private void setModelData(final ItemMap itemMap) {
         if (ServerUtils.hasSpecificUpdate("1_14") && itemMap.getNodeLocation().getString(".model-data") != null) {
             itemMap.setModelData(itemMap.getNodeLocation().getString(".model-data"));
+        } else if (ServerUtils.hasPreciseUpdate("1_21_4") && itemMap.getNodeLocation().getString(".model-components") != null) {
+            itemMap.setModelComponents(Arrays.asList(itemMap.getNodeLocation().getString(".model-components.strings"), itemMap.getNodeLocation().getString(".model-components.colors"), itemMap.getNodeLocation().getString(".model-components.flags"), itemMap.getNodeLocation().getString(".model-components.floats")));
         }
     }
 

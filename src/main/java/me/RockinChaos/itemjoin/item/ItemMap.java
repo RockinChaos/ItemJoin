@@ -52,6 +52,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.*;
+import org.bukkit.inventory.meta.components.CustomModelDataComponent;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
@@ -92,6 +93,7 @@ public class ItemMap implements Cloneable {
     private Short durability = null;
     private Integer data = null;
     private String modelData = null;
+    private List<String> modelComponents = null;
     private String author;
     private String title;
     private Object generation;
@@ -591,7 +593,7 @@ public class ItemMap implements Cloneable {
     private void setRegions() {
         final String enabledRegions = this.nodeLocation.getString(".enabled-regions");
         if (enabledRegions != null && !enabledRegions.isEmpty()) {
-            String[] enabledParts = enabledRegions.replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
+            String[] enabledParts = enabledRegions.replaceAll("\\s*,\\s*", ",").split(",");
             for (String region : enabledParts) {
                 this.enabledRegions.add(region);
                 ItemJoin.getCore().getDependencies().getGuard().addLocaleRegion(region);
@@ -602,7 +604,7 @@ public class ItemMap implements Cloneable {
         }
         final String disabledRegions = this.nodeLocation.getString(".disabled-regions");
         if (disabledRegions != null && !disabledRegions.isEmpty()) {
-            String[] disabledParts = disabledRegions.replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
+            String[] disabledParts = disabledRegions.replaceAll("\\s*,\\s*", ",").split(",");
             for (String region : disabledParts) {
                 this.disabledRegions.add(region);
                 ItemJoin.getCore().getDependencies().getGuard().addLocaleRegion(region);
@@ -660,7 +662,7 @@ public class ItemMap implements Cloneable {
         SchedulerUtils.run(() -> {
             final String enabledWorlds = this.nodeLocation.getString(".enabled-worlds");
             if (enabledWorlds != null && !enabledWorlds.isEmpty()) {
-                String[] enabledParts = enabledWorlds.replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
+                String[] enabledParts = enabledWorlds.replaceAll("\\s*,\\s*", ",").split(",");
                 for (String enabledWorld : enabledParts) {
                     if (enabledWorld.equalsIgnoreCase("ALL") || enabledWorld.equalsIgnoreCase("GLOBAL")) {
                         this.enabledWorlds.add("ALL");
@@ -682,7 +684,7 @@ public class ItemMap implements Cloneable {
             }
             final String disabledWorlds = this.nodeLocation.getString(".disabled-worlds");
             if (disabledWorlds != null && !disabledWorlds.isEmpty()) {
-                String[] disabledParts = disabledWorlds.replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
+                String[] disabledParts = disabledWorlds.replaceAll("\\s*,\\s*", ",").split(",");
                 for (String disabledWorld : disabledParts) {
                     if (disabledWorld.equalsIgnoreCase("ALL") || disabledWorld.equalsIgnoreCase("GLOBAL")) {
                         this.disabledWorlds.add("ALL");
@@ -1461,6 +1463,27 @@ public class ItemMap implements Cloneable {
     }
 
     /**
+     * Gets the ItemStack Model Components.
+     *
+     * @return The ItemStack Model Components.
+     */
+    public List<String> getModelComponents() {
+        if (this.modelComponents != null) {
+            return this.modelComponents;
+        }
+        return null;
+    }
+
+    /**
+     * Sets the ItemStack Model Components.
+     *
+     * @param data - The ItemStack Model Components to be set.
+     */
+    public void setModelComponents(final List<String> data) {
+        this.modelComponents = data;
+    }
+
+    /**
      * Gets the ItemStack Model Data.
      *
      * @return The ItemStack Model Data.
@@ -1487,7 +1510,7 @@ public class ItemMap implements Cloneable {
      * @param player - The Player to be used for placeholders.
      */
     private void setModelData(final Player player) {
-        if (modelData != null) {
+        if (this.modelData != null) {
             if (StringUtils.isInt(this.modelData)) {
                 final int modelData = Integer.parseInt(StringUtils.translateLayout(this.modelData, player));
                 if (modelData != 0) {
@@ -1497,11 +1520,68 @@ public class ItemMap implements Cloneable {
                         ServerUtils.logWarn("{ItemMap} The item " + this.getConfigName() + " is using Custom Model Data which is not supported until Minecraft 1.14+.");
                     }
                 }
-            } else if (ServerUtils.hasPreciseUpdate("1_21_4")) {
+            } else if (ServerUtils.hasPreciseUpdate("1_21_3")) {
                 this.tempMeta.setItemModel(NamespacedKey.fromString(StringUtils.translateLayout(this.modelData, player)));
             } else {
                 ServerUtils.logWarn("{ItemMap} The item " + this.getConfigName() + " is using Custom Model Data that is not an integer, item model names are not supported until Minecraft 1.21.4+.");
             }
+        } else {
+            this.setModelComponents(player);
+        }
+    }
+
+    /**
+     * Sets the ItemStack Model Data.
+     *
+     * @param player - The Player to be used for placeholders.
+     */
+    private void setModelComponents(final Player player) {
+        if (this.modelComponents != null && ServerUtils.hasPreciseUpdate("1_21_4")) {
+            final CustomModelDataComponent component = this.tempMeta.getCustomModelDataComponent();
+            if (this.modelComponents.get(0) != null){
+                final List<String> strings = new ArrayList<>();
+                for (final String string : this.modelComponents.get(0).replaceAll("\\s*,\\s*", ",").split(",")) {
+                    strings.add(StringUtils.translateLayout(string.trim(), player));
+                }
+                component.setStrings(strings);
+            }
+            if (this.modelComponents.get(1) != null){
+                final List<Color> colors = new ArrayList<>();
+                for (final String color : this.modelComponents.get(1).replaceAll("\\s*,\\s*", ",").split(",")) {
+                    try {
+                        colors.add(DyeColor.valueOf(StringUtils.translateLayout(color, player).toUpperCase()).getColor());
+                    } catch (IllegalArgumentException e) {
+                        ServerUtils.logSevere("{ItemMap} Invalid Model Component Color: " + color + " for " + this.getConfigName() + ".");
+                        ServerUtils.sendDebugTrace(e);
+                    }
+                }
+                component.setColors(colors);
+            }
+            if (this.modelComponents.get(2) != null){
+                final List<Boolean> flags = new ArrayList<>();
+                for (final String bool : this.modelComponents.get(2).replaceAll("\\s*,\\s*", ",").split(",")) {
+                    try {
+                        flags.add(Boolean.parseBoolean(StringUtils.translateLayout(bool, player).trim()));
+                    } catch (Exception e) {
+                        ServerUtils.logSevere("{ItemMap} Invalid Model Component Flag: " + bool + " for " + this.getConfigName() + ".");
+                        ServerUtils.sendDebugTrace(e);
+                    }
+                }
+                component.setFlags(flags);
+            }
+            if (this.modelComponents.get(3) != null){
+                final List<Float> floats = new ArrayList<>();
+                for (final String _float : this.modelComponents.get(3).replaceAll("\\s*,\\s*", ",").split(",")) {
+                    try {
+                        floats.add(Float.parseFloat(StringUtils.translateLayout(_float, player).trim()));
+                    } catch (NumberFormatException e) {
+                        ServerUtils.logSevere("{ItemMap} Invalid Model Component Float: " + _float + " for " + this.getConfigName() + ".");
+                        ServerUtils.sendDebugTrace(e);
+                    }
+                }
+                component.setFloats(floats);
+            }
+            this.tempMeta.setCustomModelDataComponent(component);
         }
     }
 
@@ -6015,6 +6095,20 @@ public class ItemMap implements Cloneable {
         }
         if (this.modelData != null && !this.modelData.isEmpty()) {
             itemData.set("items." + this.configName + ".model-data", this.modelData);
+        }
+        if (this.modelComponents != null && !this.modelComponents.isEmpty()) {
+            if (this.modelComponents.get(0) != null) {
+                itemData.set("items." + this.configName + ".model-components.strings", this.modelComponents.get(0));
+            }
+            if (this.modelComponents.get(1) != null) {
+                itemData.set("items." + this.configName + ".model-components.colors", this.modelComponents.get(1));
+            }
+            if (this.modelComponents.get(2) != null) {
+                itemData.set("items." + this.configName + ".model-components.flags", this.modelComponents.get(2));
+            }
+            if (this.modelComponents.get(3) != null) {
+                itemData.set("items." + this.configName + ".model-components.floats", this.modelComponents.get(3));
+            }
         }
         if (this.author != null && !this.author.isEmpty()) {
             itemData.set("items." + this.configName + ".author", this.author.replace(ChatColor.COLOR_CHAR, '&'));

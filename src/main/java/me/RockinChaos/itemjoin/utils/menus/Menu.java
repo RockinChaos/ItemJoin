@@ -55,6 +55,7 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.*;
+import org.bukkit.inventory.meta.components.CustomModelDataComponent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -62,6 +63,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -964,7 +966,7 @@ public class Menu {
             creatingPane.addButton(new Button(ItemHandler.getItem("GLASS", 1, false, false, "&c&lSlot", "&7", "&7*Set the slot that the", "&7item will be given in.", (itemMap.getMultipleSlots() != null &&
                     !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSLOT: &a" + itemMap.getSlot().toUpperCase())), event -> switchPane(player, itemMap, 1)));
             creatingPane.addButton(new Button(ItemHandler.getItem("DIAMOND", itemMap.getCount(player), false, false, "&b&lCount", "&7", "&7*Set the amount of the", "&7item to be given.", "&9&lCOUNT: &a" +
-                    (itemMap.getCount(player) != 1 ? itemMap.getRawCount() : "1")), event -> countPane(player, itemMap)));
+                    (itemMap.getCount(player) != 1 ? itemMap.getRawCount() : "1")), event -> countPane(player, itemMap, 0)));
             creatingPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, false, "&b&lName", "&7", "&7*Set the name of the item.", "&9&lNAME: &f" + StringUtils.nullCheck(itemMap.getCustomName())), event -> { // false - Temp identifier
                 final InventoryHolder inventoryHolder = event.getInventory().getHolder();
                 if (itemMap.getDynamicNames() != null && itemMap.isAnimated()) {
@@ -2709,7 +2711,7 @@ public class Menu {
             }));
             List<String> enabledWorlds = new ArrayList<>();
             final String configSection = ItemJoin.getCore().getConfig("config.yml").getString(section);
-            String[] enabledParts = (configSection != null ? configSection.replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",") : new String[1]);
+            String[] enabledParts = (configSection != null ? configSection.replaceAll("\\s*,\\s*", ",").split(",") : new String[1]);
             for (String enabledWorld : enabledParts) {
                 if (enabledWorld != null && (enabledWorld.equalsIgnoreCase("ALL") || enabledWorld.equalsIgnoreCase("GLOBAL"))) {
                     enabledWorlds.add("ALL");
@@ -2790,7 +2792,7 @@ public class Menu {
             List<String> enabledWorlds = new ArrayList<>();
             final String overwrite = ItemJoin.getCore().getConfig("items.yml").getString("items-Overwrite");
             if (overwrite != null) {
-                String[] enabledParts = overwrite.replace(" ,  ", ",").replace(" , ", ",").replace(",  ", ",").replace(", ", ",").split(",");
+                String[] enabledParts = overwrite.replaceAll("\\s*,\\s*", ",").split(",");
                 for (String enabledWorld : enabledParts) {
                     if (enabledWorld.equalsIgnoreCase("ALL") || enabledWorld.equalsIgnoreCase("GLOBAL")) {
                         enabledWorlds.add("ALL");
@@ -3338,28 +3340,63 @@ public class Menu {
      *
      * @param player  - The Player to have the Pane opened.
      * @param itemMap - The ItemMap currently being modified.
+     * @param type    - The count type.
      */
-    private static void countPane(final Player player, final ItemMap itemMap) {
+    private static void countPane(final Player player, final ItemMap itemMap, final int type) {
         Interface countPane = new Interface(true, 6, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
-            countPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> creatingPane(player, itemMap)));
-            countPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom Count", "&7", "&7*Click to set a custom count", "&7value for the item.", "&7", "&c&lNote: &7You can use placeholders", "&7as long as they parse to a number."), event -> {
+            countPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the " + (type == 0 ? "item definition" : "model components") + " menu."), event -> {
+                if (type == 0) {
+                    creatingPane(player, itemMap);
+                } else if (type == 1) {
+                    modelComponentsPane(player, itemMap);
+                }
+            }));
+            countPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "YELLOW_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:4"), 1, false, false, "&e&lCustom " + (type == 0 ? "Count" : "Float"), "&7", "&7*Click to set a custom " + (type == 0 ? "count" : "model components float"), "&7value for the item.", "&7", "&c&lNote: &7You can use placeholders", "&7as long as they parse to a number."), event -> {
                 player.closeInventory();
-                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "ITEM COUNT").with(Holder.INPUT_EXAMPLE, "48");
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, type == 0 ? "ITEM COUNT" : "COMPONENTS FLOAT").with(Holder.INPUT_EXAMPLE, "48");
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
                 final String count = ChatColor.stripColor(event.getMessage());
                 final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, count);
                 if (StringUtils.isInt(count)) {
-                    itemMap.setCount(count);
-                    final PlaceHolder placeHolder = new PlaceHolder().with(Holder.INPUT, "ITEM COUNT");
+                    if (type == 0) {
+                        itemMap.setCount(count);
+                    } else if (type == 1) {
+                        List<Float> floats = new ArrayList<>();
+                        if (itemMap.getModelComponents() != null && itemMap.getModelComponents().get(3) != null) {
+                            for (final String _float : itemMap.getModelComponents().get(3).replaceAll("\\s*,\\s*", ",").split(",")) {
+                                try {
+                                    floats.add(Float.parseFloat(StringUtils.translateLayout(_float, player).toUpperCase()));
+                                } catch (IllegalArgumentException e) { }
+                            }
+                        }
+                        if (floats.contains(Float.valueOf(count))) {
+                            floats.remove(Float.valueOf(count));
+                        } else {
+                            floats.add(Float.valueOf(count));
+                        }
+                        final List<String> modelComponents = itemMap.getModelComponents() != null ? itemMap.getModelComponents() : Arrays.asList(null, null, null, null);
+                        modelComponents.set(3, floats.stream().map(String::valueOf).collect(Collectors.joining(", ")));
+                        itemMap.setModelComponents(modelComponents);
+                        countPane(player, itemMap, type);
+                    }
+                    final PlaceHolder placeHolder = new PlaceHolder().with(Holder.INPUT, type == 0 ? "ITEM COUNT" : "COMPONENTS FLOAT");
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolder);
                 } else if (count.contains("%")) {
                     final String translateCount = StringUtils.translateLayout(count, player).replaceAll("[^\\d.]", "").replace("-", "").replace(".", "").replace(" ", "");
                     if (StringUtils.isInt(translateCount)) {
-                        itemMap.setCount(count);
-                        final PlaceHolder placeHolder = new PlaceHolder().with(Holder.INPUT, "ITEM COUNT");
+                        if (type == 0) {
+                            itemMap.setCount(count);
+                        } else if (type == 1) {
+                            String floats = itemMap.getModelComponents() != null && itemMap.getModelComponents().get(3) != null ? itemMap.getModelComponents().get(3) : "";
+                            final List<String> modelComponents = itemMap.getModelComponents() != null ? itemMap.getModelComponents() : Arrays.asList(null, null, null, null);
+                            modelComponents.set(3, (floats.isEmpty() ? ", " : "") + count);
+                            itemMap.setModelComponents(modelComponents);
+                            countPane(player, itemMap, type);
+                        }
+                        final PlaceHolder placeHolder = new PlaceHolder().with(Holder.INPUT, type == 0 ? "ITEM COUNT" : "COMPONENTS FLOAT");
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolder);
                     } else {
                         ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
@@ -3367,13 +3404,38 @@ public class Menu {
                 } else {
                     ItemJoin.getCore().getLang().sendLangMessage("commands.menu.noInteger", player, placeHolders);
                 }
-                creatingPane(event.getPlayer(), itemMap);
+                if (type == 0) {
+                    creatingPane(event.getPlayer(), itemMap);
+                } else if (type == 1) {
+                    countPane(event.getPlayer(), itemMap, type);
+                }
             }));
             for (int i = 1; i <= 64; i++) {
                 final int k = i;
-                countPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), k, false, false, "&9&lCount: &a&l" + k, "&7", "&7*Click to set the", "&7count of the item."), event -> {
-                    itemMap.setCount(k + "");
-                    creatingPane(player, itemMap);
+                final boolean typeEnabled = type == 1 && StringUtils.containsValue(itemMap.getModelComponents() != null && itemMap.getModelComponents().get(3) != null ? Arrays.asList(itemMap.getModelComponents().get(3).replaceAll("\\s*,\\s*", ",").split(",")) : new ArrayList<>(), Float.valueOf(k) + "");
+                countPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "BLUE_STAINED_GLASS_PANE" : "STAINED_GLASS_PANE:11"), k, typeEnabled, false, "&9&l" + (type == 0 ? "Count" : "Float") + ": &a&l" + k, "&7", "&7*Click to set the", "&7" + (type == 0 ? "count" : "model components float") + " of the item.", typeEnabled ? "&7" : "", typeEnabled ? "&9&lENABLED: &aTRUE" : ""), event -> {
+                    if (type == 0) {
+                        itemMap.setCount(k + "");
+                        creatingPane(player, itemMap);
+                    } else if (type == 1) {
+                        List<Float> floats = new ArrayList<>();
+                        if (itemMap.getModelComponents() != null && itemMap.getModelComponents().get(3) != null) {
+                            for (final String _float : itemMap.getModelComponents().get(3).replaceAll("\\s*,\\s*", ",").split(",")) {
+                                try {
+                                    floats.add(Float.parseFloat(StringUtils.translateLayout(_float, player).toUpperCase()));
+                                } catch (IllegalArgumentException e) { }
+                            }
+                        }
+                        if (floats.contains((float) k)) {
+                            floats.remove((float) k);
+                        } else {
+                            floats.add((float) k);
+                        }
+                        final List<String> modelComponents = itemMap.getModelComponents() != null ? itemMap.getModelComponents() : Arrays.asList(null, null, null, null);
+                        modelComponents.set(3, floats.stream().map(String::valueOf).collect(Collectors.joining(", ")));
+                        itemMap.setModelComponents(modelComponents);
+                        countPane(player, itemMap, type);
+                    }
                 }));
             }
         });
@@ -3400,7 +3462,7 @@ public class Menu {
                     damagePane(player, itemMap);
                 }
             }));
-            dataPane.addButton(new Button(fillerPaneBItem), 2);
+            dataPane.addButton(new Button(fillerPaneBItem));
             dataPane.addButton(new Button(ItemHandler.getItem("STICK", 1, false, false, "&a&lDamage Data", "&7", "&7*Set the custom data of the item.", "&7This is the damage value assigned", "&7to the custom resource texture.", (ServerUtils.hasSpecificUpdate("1_14") ? "&7" : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&c&l&nWARNING:&e This setting is only for" : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&eMinecraft versions below 1.14." : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&eYou are using a newer version of Minecraft" : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&eso things may not function as expected." : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&7" : ""), (ServerUtils.hasSpecificUpdate("1_14") ? "&eIt is highly recommended to use &l&nModel Data." : ""), "&9&lDAMAGE DATA: &a" + StringUtils.nullCheck(itemMap.getData() + "&7")), event -> {
                 if (!StringUtils.nullCheck(itemMap.getData() + "&7").equals("NONE")) {
                     itemMap.setData(null);
@@ -3409,7 +3471,7 @@ public class Menu {
                     durabilityDataPane(player, itemMap);
                 }
             }));
-            dataPane.addButton(new Button(fillerPaneBItem), 2);
+            dataPane.addButton(new Button(fillerPaneBItem));
             dataPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, false, "&e&lModel Data", "&7", "&7*Set the custom model data of the item.", "&7This is the custom texture.",
                     !ServerUtils.hasSpecificUpdate("1_14") ? "&c&l[ERROR] &7This version of Minecraft does" : "", !ServerUtils.hasSpecificUpdate("1_14") ? "&7not support custom model data." : "",
                     !ServerUtils.hasSpecificUpdate("1_14") ? "&7This was implemented in 1.14+." : "", "&9&lMODEL DATA: &a" + StringUtils.nullCheck(itemMap.getModelData() + "&7")), event -> {
@@ -3421,15 +3483,17 @@ public class Menu {
                 }
             }));
             dataPane.addButton(new Button(fillerPaneBItem));
-            dataPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu"), event -> {
-                setTriggers(itemMap);
-                creatingPane(player, itemMap);
+            dataPane.addButton(new Button(ItemHandler.getItem(ServerUtils.hasSpecificUpdate("1_13") ? "COMPARATOR" : "404", 1, false, false, "&e&lModel Components", "&7", "&7*Set the custom model components of the item.", "&7This is the texture strings, colors, flags, and floats.",
+                    !ServerUtils.hasPreciseUpdate("1_21_5") ? "&c&l[ERROR] &7This version of Minecraft does" : "", !ServerUtils.hasPreciseUpdate("1_21_5") ? "&7not support custom model components." : "",
+                    !ServerUtils.hasPreciseUpdate("1_21_5") ? "&7This was implemented in 1.21.5+." : "", "&9&lMODEL COMPONENTS: &a" + (itemMap.getModelComponents() != null ? "YES" : "NONE")), event -> {
+                if (ServerUtils.hasPreciseUpdate("1_21_5")) {
+                    modelComponentsPane(player, itemMap);
+                }
             }));
+            dataPane.addButton(new Button(fillerPaneBItem));
+            dataPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu"), event -> creatingPane(player, itemMap)));
             dataPane.addButton(new Button(fillerPaneBItem), 7);
-            dataPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu"), event -> {
-                setTriggers(itemMap);
-                creatingPane(player, itemMap);
-            }));
+            dataPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu"), event -> creatingPane(player, itemMap)));
         });
         dataPane.open(player);
     }
@@ -3490,7 +3554,7 @@ public class Menu {
     private static void modelDataPane(final Player player, final ItemMap itemMap) {
         Interface texturePane = new Interface(true, 6, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
-            texturePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the item definition menu."), event -> dataPane(player, itemMap)));
+            texturePane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the data definition menu."), event -> dataPane(player, itemMap)));
             texturePane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, true, false, "&e&lCustom Model Data", "&7", "&7*Click to set the custom model data", "&7value for the item."), event -> {
                 player.closeInventory();
                 final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "MODEL DATA").with(Holder.INPUT_EXAMPLE, ServerUtils.hasPreciseUpdate("1_21_4") ? "example:custom_sword" : "1193");
@@ -3522,6 +3586,178 @@ public class Menu {
             }
         });
         texturePane.open(player);
+    }
+
+    /**
+     * Opens the Pane for the Player.
+     * This Pane is for modifying an items' model components.
+     *
+     * @param player  - The Player to have the Pane opened.
+     * @param itemMap - The ItemMap currently being modified.
+     */
+    private static void modelComponentsPane(final Player player, final ItemMap itemMap) {
+        Interface componentsPane = new Interface(false, 2, exitButton, GUIName, player);
+        SchedulerUtils.runAsync(() -> {
+            componentsPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the data definition menu."), event -> dataPane(player, itemMap)));
+            componentsPane.addButton(new Button(fillerPaneBItem));
+            componentsPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, false, "&a&LStrings(s)", "&7", "&7*Define the individual strings of the", "&7custom model components.",
+                    "&9&LStrings(s): &a" + (!StringUtils.nullCheck((itemMap.getModelComponents() != null && itemMap.getModelComponents().get(0) != null ? itemMap.getModelComponents().get(0).toString() : null)).equals("NONE") ? (itemMap.getModelComponents() != null && itemMap.getModelComponents().get(0) != null ? itemMap.getModelComponents().get(0).toString() : null) : "NONE")), event -> componentsStringsPane(player, itemMap)));
+            componentsPane.addButton(new Button(fillerPaneBItem));
+            componentsPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIME_DYE" : "351:10"), 1, false, false, "&a&lColor(s)", "&7", "&7*Define the individual colors of the", "&7custom model components.",
+                    "&9&lColor(s): &a" + (!StringUtils.nullCheck((itemMap.getModelComponents() != null && itemMap.getModelComponents().get(1) != null ? itemMap.getModelComponents().get(1).toString() : null)).equals("NONE") ? (itemMap.getModelComponents() != null && itemMap.getModelComponents().get(1) != null ? itemMap.getModelComponents().get(1).toString() : null) : "NONE")), event -> colorPane(player, itemMap, 1)));
+            componentsPane.addButton(new Button(fillerPaneBItem));
+            componentsPane.addButton(new Button(ItemHandler.getItem("LEVER", 1, false, false, "&a&lFlags(s)", "&7", "&7*Define the individual flags of the", "&7custom model components.",
+                    "&9&lFlags(s): &a" + (!StringUtils.nullCheck((itemMap.getModelComponents() != null && itemMap.getModelComponents().get(2) != null ? itemMap.getModelComponents().get(2).toString() : null)).equals("NONE") ? (itemMap.getModelComponents() != null && itemMap.getModelComponents().get(2) != null ? itemMap.getModelComponents().get(2).toString() : null) : "NONE")), event -> componentsFlagPane(player, itemMap)));
+            componentsPane.addButton(new Button(fillerPaneBItem));
+            componentsPane.addButton(new Button(ItemHandler.getItem("GLASS_BOTTLE", 1, false, false, "&a&lFloats(s)", "&7", "&7*Define the individual floats of the", "&7custom model components.",
+                    "&9&lFloats(s): &a" + (!StringUtils.nullCheck((itemMap.getModelComponents() != null && itemMap.getModelComponents().get(3) != null ? itemMap.getModelComponents().get(3).toString() : null)).equals("NONE") ? (itemMap.getModelComponents() != null && itemMap.getModelComponents().get(3) != null ? itemMap.getModelComponents().get(3).toString() : null) : "NONE")), event -> countPane(player, itemMap, 1)));
+            componentsPane.addButton(new Button(fillerPaneBItem));
+            componentsPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the data definition menu"), event -> dataPane(player, itemMap)));
+            componentsPane.addButton(new Button(fillerPaneBItem), 7);
+            componentsPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the data definition menu"), event -> dataPane(player, itemMap)));
+        });
+        componentsPane.open(player);
+    }
+
+    /**
+     * Opens the Pane for the Player.
+     * This Pane is for modifying an items' model components flags.
+     *
+     * @param player  - The Player to have the Pane opened.
+     * @param itemMap - The ItemMap currently being modified.
+     */
+    private static void componentsStringsPane(final Player player, final ItemMap itemMap) {
+        Interface stringsPane = new Interface(true, 2, exitButton, GUIName, player);
+        SchedulerUtils.runAsync(() -> {
+            stringsPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the data definition menu."), event -> modelComponentsPane(player, itemMap)));
+            stringsPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, false, "&eAdd String", "&7", "&7*Add a new string", "&7to the component strings."), event -> {
+                player.closeInventory();
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "COMPONENTS STRING").with(Holder.INPUT_EXAMPLE, "&bcustom_sword");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
+            }, event -> {
+                final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "COMPONENTS STRING");
+                ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputSet", player, placeHolders);
+                List<String> strings = new ArrayList<>();
+                if (itemMap.getModelComponents() != null && itemMap.getModelComponents().get(0) != null) {
+                    for (final String string : itemMap.getModelComponents().get(0).replaceAll("\\s*,\\s*", ",").split(",")) {
+                        try {
+                            strings.add(string);
+                        } catch (IllegalArgumentException e) { }
+                    }
+                }
+                String input = ChatColor.stripColor(event.getMessage());
+                if (StringUtils.containsValue(strings, input)) {
+                    strings.remove(input);
+                } else {
+                    strings.add(input);
+                }
+                final List<String> modelComponents = itemMap.getModelComponents() != null ? itemMap.getModelComponents() : Arrays.asList(null, null, null, null);
+                modelComponents.set(0, String.join(", ", strings));
+                itemMap.setModelComponents(modelComponents);
+                componentsStringsPane(player, itemMap);
+            }));
+            List<String> strings = new ArrayList<>();
+            if (itemMap.getModelComponents() != null && itemMap.getModelComponents().get(0) != null) {
+                for (final String string : itemMap.getModelComponents().get(0).replaceAll("\\s*,\\s*", ",").split(",")) {
+                    try {
+                        strings.add(string);
+                    } catch (IllegalArgumentException e) { }
+                }
+            }
+            for (int i = 0; i < strings.size(); i++) {
+                final int index = i;
+                String string = strings.get(index);
+                if (string != null) {
+                    stringsPane.addButton(new Button(ItemHandler.getItem("NAME_TAG", 1, false, false, "&a&l" + string, "&7", "&7*Click to &4&nremove&7 this string", "&7from the custom model components."), event -> {
+                        strings.remove(index);
+                        final List<String> modelComponents = itemMap.getModelComponents() != null ? itemMap.getModelComponents() : Arrays.asList(null, null, null, null);
+                        modelComponents.set(0, String.join(", ", strings));
+                        itemMap.setModelComponents(modelComponents);
+                        componentsStringsPane(player, itemMap);
+                    }));
+                }
+            }
+        });
+        stringsPane.open(player);
+    }
+
+    /**
+     * Opens the Pane for the Player.
+     * This Pane is for modifying an items' model components flags.
+     *
+     * @param player  - The Player to have the Pane opened.
+     * @param itemMap - The ItemMap currently being modified.
+     */
+    private static void componentsFlagPane(final Player player, final ItemMap itemMap) {
+        Interface flagsPane = new Interface(true, 2, exitButton, GUIName, player);
+        SchedulerUtils.runAsync(() -> {
+            flagsPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the data definition menu."), event -> modelComponentsPane(player, itemMap)));
+            flagsPane.addButton(new Button(ItemHandler.getItem("FEATHER", 1, false, false, "&a&lAdd Flag", "&7", "&7*Add a true / false flag", "&7for the custom model components."), event -> {
+                Interface boolPane = new Interface(true, 2, exitButton, GUIName, player);
+                SchedulerUtils.runAsync(() -> {
+                    boolPane.addButton(new Button(fillerPaneBItem), 3);
+                    boolPane.addButton(new Button(ItemHandler.getItem("GREEN_WOOL", 1, false, false, "&a&lTrue", "&7", "&7*Add the true flag", "&7to the custom model components."), event_2 -> {
+                        List<Boolean> flags = new ArrayList<>();
+                        if (itemMap.getModelComponents() != null && itemMap.getModelComponents().get(2) != null) {
+                            for (final String flag : itemMap.getModelComponents().get(2).replaceAll("\\s*,\\s*", ",").split(",")) {
+                                try {
+                                    flags.add(Boolean.valueOf(StringUtils.translateLayout(flag, player).toUpperCase()));
+                                } catch (IllegalArgumentException e) { }
+                            }
+                        }
+                        flags.add(true);
+                        final List<String> modelComponents = itemMap.getModelComponents() != null ? itemMap.getModelComponents() : Arrays.asList(null, null, null, null);
+                        modelComponents.set(2, flags.stream().map(String::valueOf).collect(Collectors.joining(", ")));
+                        itemMap.setModelComponents(modelComponents);
+                        componentsFlagPane(player, itemMap);
+                    }));
+                    boolPane.addButton(new Button(fillerPaneBItem));
+                    boolPane.addButton(new Button(ItemHandler.getItem("RED_WOOL", 1, false, false, "&4&LFalse", "&7", "&7*Add the false flag", "&7to the custom model components."), event_2 -> {
+                        List<Boolean> flags = new ArrayList<>();
+                        if (itemMap.getModelComponents() != null && itemMap.getModelComponents().get(2) != null) {
+                            for (final String flag : itemMap.getModelComponents().get(2).replaceAll("\\s*,\\s*", ",").split(",")) {
+                                try {
+                                    flags.add(Boolean.valueOf(StringUtils.translateLayout(flag, player).toUpperCase()));
+                                } catch (IllegalArgumentException e) { }
+                            }
+                        }
+                        flags.add(false);
+                        final List<String> modelComponents = itemMap.getModelComponents() != null ? itemMap.getModelComponents() : Arrays.asList(null, null, null, null);
+                        modelComponents.set(2, flags.stream().map(String::valueOf).collect(Collectors.joining(", ")));
+                        itemMap.setModelComponents(modelComponents);
+                        componentsFlagPane(player, itemMap);
+                    }));
+                    boolPane.addButton(new Button(fillerPaneBItem), 3);
+                    boolPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the components flags definition menu"), event_2 -> flagsPane.open(player)));
+                    boolPane.addButton(new Button(fillerPaneBItem), 7);
+                    boolPane.addButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the components flags definition menu"), event_2 -> flagsPane.open(player)));
+                });
+                boolPane.open(player);
+            }));
+            List<Boolean> flags = new ArrayList<>();
+            if (itemMap.getModelComponents() != null && itemMap.getModelComponents().get(2) != null) {
+                for (final String flag : itemMap.getModelComponents().get(2).replaceAll("\\s*,\\s*", ",").split(",")) {
+                    try {
+                        flags.add(Boolean.valueOf(StringUtils.translateLayout(flag, player).toUpperCase()));
+                    } catch (IllegalArgumentException e) { }
+                }
+            }
+            for (int i = 0; i < flags.size(); i++) {
+                final int index = i;
+                boolean flag = flags.get(index);
+                if (flags.get(index) != null) {
+                    flagsPane.addButton(new Button(ItemHandler.getItem(flag ? "GREEN_WOOL" : "RED_WOOL", 1, false, false, flag ? "&a&lTrue" : "&4&LFalse", "&7", "&7*Click to &4&nremove&7 the " + (flag ? "true" : "false") + " flag", "&7from the custom model components."), event -> {
+                        flags.remove(index);
+                        final List<String> modelComponents = itemMap.getModelComponents() != null ? itemMap.getModelComponents() : Arrays.asList(null, null, null, null);
+                        modelComponents.set(2, flags.stream().map(String::valueOf).collect(Collectors.joining(", ")));
+                        itemMap.setModelComponents(modelComponents);
+                        componentsFlagPane(player, itemMap);
+                    }));
+                }
+            }
+        });
+        flagsPane.open(player);
     }
 
     /**
@@ -8858,22 +9094,42 @@ public class Menu {
      *
      * @param player  - The Player to have the Pane opened.
      * @param itemMap - The ItemMap currently being modified.
+     * @param type    - The color type being handled.
      */
-    private static void colorPane(final Player player, final ItemMap itemMap) {
+    private static void colorPane(final Player player, final ItemMap itemMap, final int type) {
         Interface colorPane = new Interface(true, 6, exitButton, GUIName, player);
         SchedulerUtils.runAsync(() -> {
-            colorPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the special settings menu."), event -> otherPane(player, itemMap)));
+            colorPane.setReturnButton(new Button(ItemHandler.getItem("BARRIER", 1, false, false, "&c&l&nReturn", "&7", "&7*Returns you to the " + (type == 0 ? "special settings" : "model components") + " menu."), event -> {
+                if (type == 0) {
+                    otherPane(player, itemMap);
+                } else {
+                    modelComponentsPane(player, itemMap);
+                }
+            }));
             for (DyeColor color : DyeColor.values()) {
-                colorPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? color.name() + "_DYE" : "351:8"), 1, StringUtils.containsValue(itemMap.getFireworkColor(), color.name()), false, "&f" + color.name(),
-                        "&7", "&7*This will be the color", "&7of your firework charge.", "&9&lENABLED: &a" + (StringUtils.containsValue(itemMap.getFireworkColor(), color.name()) + "").toUpperCase()), event -> {
-                    List<DyeColor> colors = itemMap.getFireworkColor();
-                    if (StringUtils.containsIgnoreCase(itemMap.getFireworkColor().toString(), color.name())) {
+                colorPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? color.name() + "_DYE" : "351:8"), 1, StringUtils.containsValue(type == 0 ? itemMap.getFireworkColor() : (itemMap.getModelComponents() != null && itemMap.getModelComponents().get(1) != null ? Arrays.asList(itemMap.getModelComponents().get(1).replaceAll("\\s*,\\s*", ",").split(",")) : new ArrayList<>()), color.name()), false, "&f" + color.name(),
+                        "&7", "&7*This will be the color", "&7of your " + (type == 0 ? "firework charge" : "model components") + ".", "&9&lENABLED: &a" + (StringUtils.containsValue(type == 0 ? itemMap.getFireworkColor() : (itemMap.getModelComponents() != null && itemMap.getModelComponents().get(1) != null ? Arrays.asList(itemMap.getModelComponents().get(1).replaceAll("\\s*,\\s*", ",").split(",")) : new ArrayList<>()), color.name()) + "").toUpperCase()), event -> {
+                    List<DyeColor> colors = type == 0 ? itemMap.getFireworkColor() : new ArrayList<>();
+                    if (type == 1 && itemMap.getModelComponents() != null && itemMap.getModelComponents().get(1) != null) {
+                        for (final String _color : itemMap.getModelComponents().get(1).replaceAll("\\s*,\\s*", ",").split(",")) {
+                            try {
+                                colors.add(DyeColor.valueOf(StringUtils.translateLayout(_color, player).toUpperCase()));
+                            } catch (IllegalArgumentException e) { }
+                        }
+                    }
+                    if ((type == 0 && StringUtils.containsIgnoreCase(itemMap.getFireworkColor().toString(), color.name())) || (type == 1 && colors.contains(color))) {
                         colors.remove(color);
                     } else {
                         colors.add(color);
-                        itemMap.setFireworkColor(colors);
+                        if (type == 0) {
+                            itemMap.setFireworkColor(colors);
+                        } else {
+                            final List<String> modelComponents = itemMap.getModelComponents() != null ? itemMap.getModelComponents() : Arrays.asList(null, null, null, null);
+                            modelComponents.set(1, colors.stream().map(DyeColor::name).collect(Collectors.joining(", ")));
+                            itemMap.setModelComponents(modelComponents);
+                        }
                     }
-                    colorPane(player, itemMap);
+                    colorPane(player, itemMap, type);
                 }));
             }
         });
@@ -9263,7 +9519,7 @@ public class Menu {
                     }
                 }));
                 otherPane.addButton(new Button(ItemHandler.getItem((ServerUtils.hasSpecificUpdate("1_13") ? "LIME_DYE" : "351:10"), 1, false, false, "&a&lColor(s)", "&7", "&7*Define the individual colors of the", "&7firework effect type.",
-                        "&9&lColor(s): &a" + (!StringUtils.nullCheck(colorList.toString()).equals("NONE") ? colorList.toString() : "NONE")), event -> colorPane(player, itemMap)));
+                        "&9&lColor(s): &a" + (!StringUtils.nullCheck(colorList.toString()).equals("NONE") ? colorList.toString() : "NONE")), event -> colorPane(player, itemMap, 0)));
                 otherPane.addButton(new Button(fillerPaneGItem), 2);
             } else if (itemMap.getMaterial().toString().contains("LEATHER_") && (ServerUtils.hasSpecificUpdate("1_14") || !itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_HORSE_ARMOR"))) {
                 Interface colorPane = new Interface(true, 6, exitButton, GUIName, player);
@@ -9465,7 +9721,7 @@ public class Menu {
                             + itemMap.getMaterial().toString() + ((itemMap.getDataValue() != null && itemMap.getDataValue() != 0) ? ":" + itemMap.getDataValue() : ""),
                     (itemMap.getMultipleSlots() != null && !itemMap.getMultipleSlots().isEmpty() ? "&9&lSlot(s): &a" + slotList : "&9&lSlot: &a" + itemMap.getSlot().toUpperCase()), (itemMap.getCount(player) != 1 && itemMap.getCount(player) != 0) ? "&9&lCount: &a" + itemMap.getCount(player) : "",
                     ((!StringUtils.nullCheck(itemMap.getCustomName()).equals("NONE") && (!itemMaterial.equalsIgnoreCase(itemMap.getCustomName()))) ? "&9&lName: &a" + itemMap.getCustomName() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getCustomLore().toString()), "NONE") ? "&9&lLore: &a" + (StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").length() > 40 ? StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",").substring(0, 40) : StringUtils.nullCheck(itemMap.getCustomLore().toString()).replace(",,", ",").replace(", ,", ",")) : ""),
-                    (!StringUtils.nullCheck(itemMap.getDurability() + "&7").equals("NONE") ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getData() + "&7"), "NONE") ? "&9&lTexture Data: &a" + itemMap.getData() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getModelData() + "&7"), "NONE") ? "&9&LModel Data: &a" + itemMap.getModelData() : ""), (useCommands ? "&9&lCommands: &aYES" : ""), (useToggle ? "&9&lToggleable: &aYES" : ""),
+                    (!StringUtils.nullCheck(itemMap.getDurability() + "&7").equals("NONE") ? "&9&lDurability: &a" + itemMap.getDurability() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getData() + "&7"), "NONE") ? "&9&lTexture Data: &a" + itemMap.getData() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getModelData() + "&7"), "NONE") ? "&9&LModel Data: &a" + itemMap.getModelData() : ""), (itemMap.getModelComponents() != null ? "&9&lModel Components: &aYES" : ""), (useCommands ? "&9&lCommands: &aYES" : ""), (useToggle ? "&9&lToggleable: &aYES" : ""),
                     (!StringUtils.nullCheck(itemMap.getItemCost()).equals("NONE") ? "&9&lCommands-Item: &a" + itemMap.getItemCost() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getCommandCost(player) + "&7"), "NONE") ? "&9&lCommands-Cost: &a" + itemMap.getCommandCost(player) : ""),
                     (!StringUtils.nullCheck(itemMap.getCommandReceive() + "&7").equals("NONE") ? "&9&lCommands-Receive: &a" + itemMap.getCommandReceive() : ""),
                     (!StringUtils.nullCheck(itemMap.getCommandSequence() + "").equals("NONE") ? "&9&lCommands-Sequence: &a" + itemMap.getCommandSequence() : ""), (!Objects.equals(StringUtils.nullCheck(itemMap.getCommandCooldown() + "&7"), "NONE") ? "&9&lCommands-Cooldown: &a" + itemMap.getCommandCooldown() + " second(s)" : ""),
@@ -9503,13 +9759,52 @@ public class Menu {
                     itemMeta.setCustomModelData(modelData);
                     item.setItemMeta(itemMeta);
                 }
-            } else if (ServerUtils.hasPreciseUpdate("1_21_4")) {
+            } else if (ServerUtils.hasPreciseUpdate("1_21_3")) {
                 ItemMeta itemMeta = item.getItemMeta();
                 if (itemMeta != null) {
                     itemMeta.setItemModel(NamespacedKey.fromString(StringUtils.translateLayout(itemMap.getModelData(), player)));
                     item.setItemMeta(itemMeta);
                 }
             }
+        } else if (ServerUtils.hasPreciseUpdate("1_21_4") && itemMap.getModelComponents() != null) {
+            ItemMeta itemMeta = item.getItemMeta();
+            final CustomModelDataComponent component = itemMeta.getCustomModelDataComponent();
+            if (itemMap.getModelComponents().get(0) != null){
+                final List<String> strings = new ArrayList<>();
+                for (final String string : itemMap.getModelComponents().get(0).replaceAll("\\s*,\\s*", ",").split(",")) {
+                    strings.add(StringUtils.translateLayout(string.trim(), player));
+                }
+                component.setStrings(strings);
+            }
+            if (itemMap.getModelComponents().get(1) != null){
+                final List<Color> colors = new ArrayList<>();
+                for (final String color : itemMap.getModelComponents().get(1).replaceAll("\\s*,\\s*", ",").split(",")) {
+                    try {
+                        colors.add(DyeColor.valueOf(StringUtils.translateLayout(color, player).toUpperCase()).getColor());
+                    } catch (NumberFormatException ignored) { }
+                }
+                component.setColors(colors);
+            }
+            if (itemMap.getModelComponents().get(2) != null){
+                final List<Boolean> flags = new ArrayList<>();
+                for (final String bool : itemMap.getModelComponents().get(2).replaceAll("\\s*,\\s*", ",").split(",")) {
+                    try {
+                        flags.add(Boolean.parseBoolean(StringUtils.translateLayout(bool, player).trim()));
+                    } catch (NumberFormatException ignored) { }
+                }
+                component.setFlags(flags);
+            }
+            if (itemMap.getModelComponents().get(3) != null){
+                final List<Float> floats = new ArrayList<>();
+                for (final String _float : itemMap.getModelComponents().get(3).replaceAll("\\s*,\\s*", ",").split(",")) {
+                    try {
+                        floats.add(Float.parseFloat(StringUtils.translateLayout(_float, player).trim()));
+                    } catch (NumberFormatException ignored) { }
+                }
+                component.setFloats(floats);
+            }
+            itemMeta.setCustomModelDataComponent(component);
+            item.setItemMeta(itemMeta);
         }
         if (itemMap.getDurability() != null && (itemMap.getData() == null || itemMap.getData() == 0)) {
             ItemMeta itemMeta = item.getItemMeta();
