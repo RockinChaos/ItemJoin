@@ -608,7 +608,7 @@ public class ItemUtilities {
      */
     public boolean canOverwrite(final Player player, final ItemMap itemMap) {
         try {
-            if ((itemMap.isCraftingItem() && StringUtils.getSlotConversion(itemMap.getSlot()) == 0) || this.isOverwritable(player, itemMap) || (itemMap.isDropFull() || ((itemMap.isGiveNext() || itemMap.isMoveNext()) && player.getInventory().firstEmpty() != -1))) {
+            if ((itemMap.isCraftingItem() && StringUtils.getSlotConversion(itemMap.getSlot()) == 0) || this.isOverwritable(player, itemMap) || itemMap.isAlwaysGive() || (itemMap.isDropFull() || ((itemMap.isGiveNext() || itemMap.isMoveNext()) && player.getInventory().firstEmpty() != -1))) {
                 return true;
             }
         } catch (Exception e) {
@@ -754,13 +754,14 @@ public class ItemUtilities {
         SchedulerUtils.run(() -> {
             boolean isGiven = false;
             final ItemStack item = itemMap.getItem(player).clone();
+            final ItemStack existingItem = ItemHandler.getItem(player, itemMap.getSlot()).clone();
             this.shiftItem(player, itemMap);
             final int nextSlot = this.nextItem(player, itemMap);
             final boolean overWrite = itemMap.isOverwritable() || ItemJoin.getCore().getConfig("items.yml").getBoolean("items-Overwrite");
             if (size > 1) {
                 item.setAmount(size);
             }
-            if ((size > 1 || itemMap.isAlwaysGive()) && !overWrite) {
+            if ((size > 1 || itemMap.isAlwaysGive()) && !overWrite && existingItem.getType() != Material.AIR) {
                 isGiven = true;
                 player.getInventory().addItem(item);
             } else if (nextSlot != 0) {
