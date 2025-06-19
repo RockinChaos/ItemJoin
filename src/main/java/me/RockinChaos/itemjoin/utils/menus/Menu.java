@@ -764,7 +764,7 @@ public class Menu {
             if (ServerUtils.hasPreciseUpdate("1_20_5")) {
                 final Object componentMap = ReflectionUtils.getMethod(itemClass, MinecraftMethod.getComponents.getMethod()).invoke(nms);
                 final Object customDataType = ReflectionUtils.getField(ReflectionUtils.getMinecraftClass("DataComponents"), ReflectionUtils.MinecraftField.CustomData.getField()).get(null);
-                final Object customDataOptional = ReflectionUtils.getMethod(ReflectionUtils.getMinecraftClass("DataComponentMap"), MinecraftMethod.get.getMethod(), ReflectionUtils.getMinecraftClass("DataComponentType")).invoke(componentMap, customDataType);
+                final Object customDataOptional = ReflectionUtils.getMethod(ReflectionUtils.getMinecraftClass(ServerUtils.hasPreciseUpdate("1_21_5") ? "DataComponentGetter" : "DataComponentMap"), MinecraftMethod.get.getMethod(), ReflectionUtils.getMinecraftClass("DataComponentType")).invoke(componentMap, customDataType);
                 if (customDataOptional != null) {
                     tag = ReflectionUtils.getMethod(customDataOptional.getClass(), MinecraftMethod.copyTag.getMethod()).invoke(customDataOptional);
                 }
