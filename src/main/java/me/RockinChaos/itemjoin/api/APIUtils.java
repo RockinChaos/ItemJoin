@@ -184,6 +184,16 @@ public class APIUtils {
         return null;
     }
 
+
+    /**
+     * Fetches all itemNodes of the custom items that are currently defined.
+     *
+     * @return List of all available itemNodes.
+     */
+    public List<String> getNodes() {
+        return ItemUtilities.getUtilities().getItems().stream().map(ItemMap::getConfigName).collect(Collectors.toList());
+    }
+
     /**
      * Fetches the mapping of the custom item.
      *

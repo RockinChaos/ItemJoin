@@ -99,6 +99,23 @@ public class ItemJoinAPI {
     }
 
     /**
+     * Fetches all itemNodes of the custom items that are currently defined.
+     * <p>
+     * The {@code itemNode} refers to a YAML key where the custom item data is defined.
+     * For example, in the YAML below, "example-item" is the itemNode:
+     * <pre>
+     * example-item:
+     *   id: DIAMOND
+     *   slot: 0
+     * </pre>
+     *
+     * @return List of all available itemNodes.
+     */
+    public List<String> getNodes() {
+        return this.apiUtils.getNodes();
+    }
+
+    /**
      * Fetches the itemflags that are defined for the custom item.
      *
      * @param itemNode that is the custom items config node.
