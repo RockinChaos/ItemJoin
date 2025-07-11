@@ -31,113 +31,152 @@ public class ItemJoinAPI {
     /**
      * Gives all custom items to the specified player.
      *
-     * @param player - that will receive the items.
+     * @param player that will receive the items.
      */
-    public void getItems(Player player) {
+    public void getItems(final Player player) {
         this.apiUtils.setItems(player);
     }
 
     /**
-     * Checks if the itemstack is a custom item.
+     * Checks if the ItemStack is an ItemJoin item.
      *
-     * @param item - that will be checked.
-     * @return Boolean is a custom item.
+     * @param item that will be checked.
+     * @return If the ItemStack is a custom item.
      */
-    public boolean isCustom(ItemStack item) {
+    public boolean isCustom(final ItemStack item) {
         return this.apiUtils.isCustom(item, null);
     }
 
     /**
-     * Checks if the itemstack in the said world is a custom item.
+     * Checks if the ItemStack in the said world is an ItemJoin item.
      *
-     * @param item  - that is being checked.
-     * @param world - that the item is said to be in.
-     * @return Boolean is a custom item.
+     * @param item that is being checked.
+     * @param world that the item is said to be in.
+     * @return If the ItemStack in the specified world is a custom item.
      */
-    public boolean isCustom(ItemStack item, World world) {
+    public boolean isCustom(final ItemStack item, final World world) {
         return this.apiUtils.isCustom(item, world);
     }
 
     /**
      * Fetches the ItemStack defined for the provided itemNode.
+     * <p>
+     * The {@code itemNode} refers to a YAML key where the custom item data is defined.
+     * For example, in the YAML below, "example-item" is the itemNode:
+     * <pre>
+     * example-item:
+     *   id: DIAMOND
+     *   slot: 0
+     * </pre>
      *
-     * @param player   - that will receive the item.
-     * @param itemNode - that is the custom items config node.
-     * @return ItemStack found custom item.
+     * @param player that will receive the item.
+     * @param itemNode The YAML key representing the custom item configuration.
+     * @return The ItemStack of the found custom item.
      */
-    public ItemStack getItemStack(Player player, String itemNode) {
+    public ItemStack getItemStack(final Player player, final String itemNode) {
         return this.apiUtils.getItemStack(player, itemNode);
     }
 
     /**
      * Fetches the config node name of the custom item.
      *
-     * @param item - that will be checked.
+     * @param item that will be checked.
      * @return String node of the custom item.
      */
-    public String getNode(ItemStack item) {
+    public String getNode(final ItemStack item) {
         return this.apiUtils.getNode(item, null);
     }
 
     /**
      * Fetches the config node name of the custom item.
      *
-     * @param item  - that will be checked.
-     * @param world - that the item is said to be in.
+     * @param item that will be checked.
+     * @param world that the item is said to be in.
      * @return String node of the custom item.
      */
-    public String getNode(ItemStack item, World world) {
+    public String getNode(final ItemStack item, final World world) {
         return this.apiUtils.getNode(item, world);
     }
 
     /**
      * Fetches the itemflags that are defined for the custom item.
      *
-     * @param itemNode - that is the custom items config node.
+     * @param itemNode that is the custom items config node.
      * @return List of itemflags for the custom item.
      */
-    public List<String> getItemflags(String itemNode) {
+    public List<String> getItemflags(final String itemNode) {
         return this.apiUtils.getItemflags(itemNode);
     }
 
     /**
      * Fetches commands that are defined for the custom item.
+     * <p>
+     * The {@code itemNode} refers to a YAML key where the custom item data is defined.
+     * For example, in the YAML below, "example-item" is the itemNode:
+     * <pre>
+     * example-item:
+     *   id: DIAMOND
+     *   slot: 0
+     * </pre>
      *
-     * @param itemNode - that is the custom items config node.
+     * @param itemNode The YAML key representing the custom item configuration.
      * @return List of commands for the custom item.
      */
-    public List<String> getCommands(String itemNode) {
+    public List<String> getCommands(final String itemNode) {
         return this.apiUtils.getCommands(itemNode);
     }
 
     /**
      * Fetches triggers that are defined for the custom item.
+     * <p>
+     * The {@code itemNode} refers to a YAML key where the custom item data is defined.
+     * For example, in the YAML below, "example-item" is the itemNode:
+     * <pre>
+     * example-item:
+     *   id: DIAMOND
+     *   slot: 0
+     * </pre>
      *
-     * @param itemNode - that is the custom items config node.
+     * @param itemNode The YAML key representing the custom item configuration.
      * @return List of triggers for the custom item.
      */
-    public List<String> getTriggers(String itemNode) {
+    public List<String> getTriggers(final String itemNode) {
         return this.apiUtils.getTriggers(itemNode);
     }
 
     /**
      * Fetches the slot that the custom item is defined to be set to.
+     * <p>
+     * The {@code itemNode} refers to a YAML key where the custom item data is defined.
+     * For example, in the YAML below, "example-item" is the itemNode:
+     * <pre>
+     * example-item:
+     *   id: DIAMOND
+     *   slot: 0
+     * </pre>
      *
-     * @param itemNode - that is the custom items config node.
-     * @return String of integer or custom slot for the custom item.
+     * @param itemNode The YAML key representing the custom item configuration.
+     * @return The integer slot or custom slot for the custom item.
      */
-    public String getSlot(String itemNode) {
+    public String getSlot(final String itemNode) {
         return this.apiUtils.getSlot(itemNode);
     }
 
     /**
      * Fetches all slots that the custom item is defined to be set to.
-     * In the instance that the custom item is a MultiSlot item.
+     * <p>
+     * The {@code itemNode} refers to a YAML key where the custom item data is defined.
+     * For example, in the YAML below, "example-item" is the itemNode:
+     * <pre>
+     * example-item:
+     *   id: DIAMOND
+     *   slot: 0
+     * </pre>
      *
-     * @param itemNode - that is the custom items config node.
+     * @param itemNode The YAML key representing the custom item configuration.
      * @return List of slots for the custom item.
      */
-    public List<String> getMultipleSlots(String itemNode) {
+    public List<String> getMultipleSlots(final String itemNode) {
         return this.apiUtils.getMultipleSlots(itemNode);
     }
 }

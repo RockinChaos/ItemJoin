@@ -32,13 +32,14 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class APIUtils {
 
     /**
      * Gives all ItemJoin items to the specified player.
      *
-     * @param player - that will receive the items.
+     * @param player that will receive the items.
      */
     public void setItems(final Player player) {
         ItemMap probable = null;
@@ -63,11 +64,11 @@ public class APIUtils {
     }
 
     /**
-     * Checks if the itemstack in the said world is a custom item.
+     * Checks if the ItemStack in the said world is a custom item.
      *
-     * @param item  - that is being checked.
-     * @param world - that the item is said to be in.
-     * @return Boolean is a custom item.
+     * @param item that is being checked.
+     * @param world that the item is said to be in.
+     * @return If the ItemStack in the specified world is a custom item.
      */
     public boolean isCustom(final ItemStack item, final World world) {
         ItemMap itemMap = this.getMap(item, world, null);
@@ -77,9 +78,9 @@ public class APIUtils {
     /**
      * Fetches the ItemStack defined for the provided itemNode.
      *
-     * @param player   - the player to find the specific custom item.
-     * @param itemNode - that is the custom items config node.
-     * @return ItemStack found custom item.
+     * @param player the player to find the specific custom item.
+     * @param itemNode that is the custom items config node.
+     * @return The ItemStack of the found custom item.
      */
     public ItemStack getItemStack(final Player player, final String itemNode) {
         final ItemMap itemMap = this.getMap(null, null, itemNode);
@@ -92,8 +93,8 @@ public class APIUtils {
     /**
      * Fetches the config node name of the custom item.
      *
-     * @param item  - that will be checked.
-     * @param world - that the item is said to be in.
+     * @param item that will be checked.
+     * @param world that the item is said to be in.
      * @return String node of the custom item.
      */
     public String getNode(final ItemStack item, final World world) {
@@ -107,7 +108,7 @@ public class APIUtils {
     /**
      * Fetches the itemflags that are defined for the custom item.
      *
-     * @param itemNode - that is the custom items config node.
+     * @param itemNode that is the custom items config node.
      * @return List of itemflags for the custom item.
      */
     public List<String> getItemflags(final String itemNode) {
@@ -123,7 +124,7 @@ public class APIUtils {
     /**
      * Fetches commands that are defined for the custom item.
      *
-     * @param itemNode - that is the custom items config node.
+     * @param itemNode that is the custom items config node.
      * @return List of commands for the custom item.
      */
     public List<String> getCommands(final String itemNode) {
@@ -141,7 +142,7 @@ public class APIUtils {
     /**
      * Fetches triggers that are defined for the custom item.
      *
-     * @param itemNode - that is the custom items config node.
+     * @param itemNode that is the custom items config node.
      * @return List of triggers for the custom item.
      */
     public List<String> getTriggers(final String itemNode) {
@@ -157,8 +158,8 @@ public class APIUtils {
     /**
      * Fetches the slot that the custom item is defined to be set to.
      *
-     * @param itemNode - that is the custom items config node.
-     * @return String of integer or custom slot for the custom item.
+     * @param itemNode that is the custom items config node.
+     * @return The integer slot or custom slot for the custom item.
      */
     public String getSlot(final String itemNode) {
         ItemMap itemMap = this.getMap(null, null, itemNode);
@@ -172,7 +173,7 @@ public class APIUtils {
      * Fetches all slots that the custom item is defined to be set to.
      * In the instance that the custom item is a MultiSlot item.
      *
-     * @param itemNode - that is the custom items config node.
+     * @param itemNode that is the custom items config node.
      * @return List of slots for the custom item.
      */
     public List<String> getMultipleSlots(final String itemNode) {
@@ -186,9 +187,9 @@ public class APIUtils {
     /**
      * Fetches the mapping of the custom item.
      *
-     * @param item     - that will be checked.
-     * @param world    - that the custom item is said to be in.
-     * @param itemNode - that is the custom items config node.
+     * @param item that will be checked.
+     * @param world that the custom item is said to be in.
+     * @param itemNode that is the custom items config node.
      * @return ItemMap that is the located custom item.
      */
     private ItemMap getMap(final ItemStack item, final World world, final String itemNode) {
