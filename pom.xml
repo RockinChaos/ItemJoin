@@ -225,13 +225,6 @@
             <version>4.1.65.Final</version>
             <scope>provided</scope>
         </dependency>
-        <!--Maven WorldUtils API-->
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>3.18.0</version>
-            <scope>provided</scope>
-        </dependency>
         <!--Google API-->
         <dependency>
             <groupId>com.googlecode.json-simple</groupId>
