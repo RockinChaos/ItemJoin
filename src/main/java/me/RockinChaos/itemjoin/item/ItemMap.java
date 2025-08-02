@@ -4940,6 +4940,7 @@ public class ItemMap implements Cloneable {
      */
     private void setFlags() {
         if (this.hideFlags || this.glowing) {
+            CompatUtils.setDummyAttributes(this.tempMeta);
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ENCHANTS);
         }
         if (this.hideFlags) {
