@@ -450,30 +450,30 @@ public class ChatExecutor implements CommandExecutor {
         final boolean opPermissionRequired = ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items-OP");
         final boolean permissionRequired = ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items");
         if (page == 1) {
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.*") ? "&a[✔]" : "&c[✘]") + " ItemJoin.*");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.all") ? "&a[✔]" : "&c[✘]") + " ItemJoin.All");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.use") ? "&a[✔]" : "&c[✘]") + " ItemJoin.Use");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.reload") ? "&a[✔]" : "&c[✘]") + " ItemJoin.Reload");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.updates") ? "&a[✔]" : "&c[✘]") + " ItemJoin.Updates");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.upgrade") ? "&a[✔]" : "&c[✘]") + " ItemJoin.Upgrade");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.permissions") ? "&a[✔]" : "&c[✘]") + " ItemJoin.Permissions");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.query") ? "&a[✔]" : "&c[✘]") + " ItemJoin.Query");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.get") ? "&a[✔]" : "&c[✘]") + " ItemJoin.Get");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.remove") ? "&a[✔]" : "&c[✘]") + " ItemJoin.Remove");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.enable") ? "&a[✔]" : "&c[✘]") + " ItemJoin.Enable");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.disable") ? "&a[✔]" : "&c[✘]") + " ItemJoin.Disable");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.get.others") ? "&a[✔]" : "&c[✘]") + " ItemJoin.Get.Others");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.remove.others") ? "&a[✔]" : "&c[✘]") + " ItemJoin.Remove.Others");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.enable.others") ? "&a[✔]" : "&c[✘]") + " ItemJoin.Enable.Others");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.disable.others") ? "&a[✔]" : "&c[✘]") + " ItemJoin.Disable.Others");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.bypass.inventorymodify") ? "&a[✔]" : "&c[✘]") + " ItemJoin.Bypass.InventoryModify");
+            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.*") ? "&a[✔] ItemJoin&r&a.*" : "&c[✘] ItemJoin&r&c.*"));
+            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.all") ? "&a[✔] ItemJoin&r&a.All" : "&c[✘] ItemJoin&r&c.All"));
+            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.use") ? "&a[✔] ItemJoin&r&a.Use" : "&c[✘] ItemJoin&r&c.Use"));
+            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.reload") ? "&a[✔] ItemJoin&r&a.Reload" : "&c[✘] ItemJoin&r&c.Reload"));
+            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.updates") ? "&a[✔] ItemJoin&r&a.Updates" : "&c[✘] ItemJoin&r&c.Updates"));
+            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.upgrade") ? "&a[✔] ItemJoin&r&a.Upgrade" : "&c[✘] ItemJoin&r&c.Upgrade"));
+            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.permissions") ? "&a[✔] ItemJoin&r&a.Permissions" : "&c[✘] ItemJoin&r&c.Permissions"));
+            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.query") ? "&a[✔] ItemJoin&r&a.Query" : "&c[✘] ItemJoin&r&c.Query"));
+            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.get") ? "&a[✔] ItemJoin&r&a.Get" : "&c[✘] ItemJoin&r&c.Get"));
+            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.remove") ? "&a[✔] ItemJoin&r&a.Remove" : "&c[✘] ItemJoin&r&c.Remove"));
+            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.enable") ? "&a[✔] ItemJoin&r&a.Enable" : "&c[✘] ItemJoin&r&c.Enable"));
+            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.disable") ? "&a[✔] ItemJoin&r&a.Disable" : "&c[✘] ItemJoin&r&c.Disable"));
+            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.get.others") ? "&a[✔] ItemJoin&r&a.Get&r&a.Others" : "&c[✘] ItemJoin&r&c.Get&r&c.Others"));
+            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.remove.others") ? "&a[✔] ItemJoin&r&a.Remove&r&a.Others" : "&c[✘] ItemJoin&r&c.Remove&r&c.Others"));
+            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.enable.others") ? "&a[✔] ItemJoin&r&a.Enable&r&a.Others" : "&c[✘] ItemJoin&r&c.Enable&r&c.Others"));
+            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.disable.others") ? "&a[✔] ItemJoin&r&a.Disable&r&a.Others" : "&c[✘] ItemJoin&r&c.Disable&r&c.Others"));
+            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.bypass.inventorymodify") ? "&a[✔] ItemJoin&r&a.Bypass&r&a.InventoryModify" : "&c[✘] ItemJoin&r&c.Bypass&r&c.InventoryModify"));
             for (World world : Bukkit.getWorlds()) {
                 ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin." + world.getName() + ".*")
                         && ((opPermissionRequired && sender.isOp()
                         ? sender.isPermissionSet("itemjoin." + world.getName() + ".*") : !opPermissionRequired)
                         || (permissionRequired && !sender.isOp()
                         ? sender.isPermissionSet("itemjoin." + world.getName() + ".*") : !permissionRequired))
-                        ? "&a[✔]" : "&c[✘]") + " ItemJoin." + world.getName() + ".*");
+                        ? "&a[✔] ItemJoin&r&a." + world.getName() + "&r&a.*" : "&c[✘] ItemJoin&r&c." + world.getName() + "&r&c.*"));
             }
         } else if (page != 0) {
             List<String> customPermissions = new ArrayList<>();
@@ -492,9 +492,9 @@ public class ChatExecutor implements CommandExecutor {
                     if ((!customPermissions.contains(PermissionsHandler.customPermissions(item.getPermissionNode(), world.getName() + "." + item.getConfigName()))) && item.inWorld(world) && ((probable != null && item.getConfigName().equals(probable.getConfigName())) || item.getProbability() == -1)) {
                         customPermissions.add(PermissionsHandler.customPermissions(item.getPermissionNode(), world.getName() + "." + item.getConfigName()));
                         if (item.hasPermission(((Player) sender), world)) {
-                            inputMessage.add("&a[✔] " + PermissionsHandler.customPermissions(item.getPermissionNode(), world.getName() + "." + item.getConfigName()));
+                            inputMessage.add("&a[✔] " + PermissionsHandler.customPermissions(item.getPermissionNode(), world.getName() + "." + item.getConfigName()).replace(".", "&r&a."));
                         } else {
-                            inputMessage.add("&c[✘] " + PermissionsHandler.customPermissions(item.getPermissionNode(), world.getName() + "." + item.getConfigName()));
+                            inputMessage.add("&c[✘] " + PermissionsHandler.customPermissions(item.getPermissionNode(), world.getName() + "." + item.getConfigName()).replace(".", "&r&c."));
                         }
                     }
                 }
