@@ -46,7 +46,7 @@ public class Trade implements Listener {
         }
         final ItemStack[] contents = cloneContents;
         SchedulerUtils.run(() -> {
-            if (contents != null && (!ItemUtilities.getUtilities().isAllowed(player, CompatUtils.getTopInventory(event.getView()).getItem(0), "item-store") || !ItemUtilities.getUtilities().isAllowed(player, CompatUtils.getTopInventory(event.getView()).getItem(1), "item-store"))) {
+            if (contents != null && (!ItemUtilities.getUtilities().isAllowed(player, CompatUtils.getTopInventory(event).getItem(0), "item-store") || !ItemUtilities.getUtilities().isAllowed(player, CompatUtils.getTopInventory(event).getItem(1), "item-store"))) {
                 ItemHandler.restoreContents(player.getInventory(), contents);
                 CompatUtils.getTopInventory(player).clear();
                 PlayerHandler.updateInventory(player, 1L);
