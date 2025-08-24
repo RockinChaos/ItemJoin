@@ -4226,7 +4226,7 @@ public class ItemMap implements Cloneable {
             return item.getItemMeta().getDisplayName().equalsIgnoreCase(this.tempMeta.getDisplayName());
         } else if (item.hasItemMeta() && !Objects.requireNonNull(item.getItemMeta()).hasDisplayName() && this.tempMeta != null && !this.tempMeta.hasDisplayName() && item.getItemMeta().hasLore() && this.tempMeta.hasLore()) {
             return Objects.requireNonNull(item.getItemMeta().getLore()).toString().equalsIgnoreCase(Objects.requireNonNull(this.tempMeta.getLore()).toString());
-        } else return this.tempMeta == null;
+        } else return this.tempMeta == null || (!item.hasItemMeta() && !this.tempMeta.hasDisplayName() && !this.tempMeta.hasLore());
     }
 /*  ================================================================================================================================================================================= */
 
