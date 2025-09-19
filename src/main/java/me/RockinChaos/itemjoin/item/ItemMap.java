@@ -4366,42 +4366,53 @@ public class ItemMap implements Cloneable {
      * Updates the ItemStack to be specific to the Player.
      *
      * @param player - The Player to have their ItemStack generated.
+     * @param caughtError - If this is a chain resulting from a pervious error.
      * @return The Player specific ItemStack.
      */
-    public ItemMap updateItem(final Player player) {
-        if (this.tempItem != null) {
-            this.setSkullDatabase();
-            this.setUnbreaking();
-            this.setEnchantments(player);
-            this.setGlowing();
-            this.setMapImage();
-            this.setJSONBookPages(player);
-            this.setNBTData();
-            this.tempMeta = this.tempItem != null ? this.tempItem.getItemMeta() : null;
-        }
-        if (tempMeta != null) {
-            this.setCustomName(player);
-            this.setCustomLore(player);
-            this.setSkull(player);
-            this.setDurability();
-            this.setData();
-            this.setModelData(player);
-            this.setPotionEffects();
-            this.setBanners();
-            this.setArmorTrim();
-            this.setFireworks();
-            this.setFireChargeColor();
-            this.setDye(player);
-            this.setBookInfo(player);
-            this.setUnbreakable();
-            this.setAttributes();
-            this.setAttributeFlags();
-            this.setEnchantmentsFlags();
-            this.setFlags();
-            this.setContents(player);
-            this.tempItem.setItemMeta(this.tempMeta);
-            this.tempItem.setAmount(this.getCount(player));
-            this.setTempItem(LegacyAPI.setAttributes(this.tempItem, this.configName, this.attributes));
+    public ItemMap updateItem(final Player player, final boolean... caughtError) {
+        try {
+            if (this.tempItem != null) {
+                this.setSkullDatabase();
+                this.setUnbreaking();
+                this.setEnchantments(player);
+                this.setGlowing();
+                this.setMapImage();
+                this.setJSONBookPages(player);
+                this.setNBTData();
+                this.tempMeta = this.tempItem != null ? this.tempItem.getItemMeta() : null;
+            }
+            if (tempMeta != null) {
+                this.setCustomName(player);
+                this.setCustomLore(player);
+                this.setSkull(player);
+                this.setDurability();
+                this.setData();
+                this.setModelData(player);
+                this.setPotionEffects();
+                this.setBanners();
+                this.setArmorTrim();
+                this.setFireworks();
+                this.setFireChargeColor();
+                this.setDye(player);
+                this.setBookInfo(player);
+                this.setUnbreakable();
+                this.setAttributes();
+                this.setAttributeFlags();
+                this.setEnchantmentsFlags();
+                this.setFlags();
+                this.setContents(player);
+                this.tempItem.setItemMeta(this.tempMeta);
+                this.tempItem.setAmount(this.getCount(player));
+                this.setTempItem(LegacyAPI.setAttributes(this.tempItem, this.configName, this.attributes));
+            }
+        } catch (Exception e) {
+            if (caughtError.length <= 0){
+                this.renderItemStack();
+                return this.updateItem(player, true);
+            } else {
+                ServerUtils.logSevere("{ItemMap} Failed to update the custom item: " + this.nodeLocation + ".");
+                ServerUtils.sendSevereTrace(e);
+            }
         }
         return this;
     }
