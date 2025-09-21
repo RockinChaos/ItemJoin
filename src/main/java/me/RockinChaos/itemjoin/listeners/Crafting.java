@@ -23,6 +23,7 @@ import me.RockinChaos.core.utils.CompatUtils;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
+import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.core.utils.protocol.events.PlayerAutoCraftEvent;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemMap;
@@ -36,6 +37,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.inventory.InventoryType.SlotType;
@@ -45,6 +47,7 @@ import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -232,6 +235,40 @@ public class Crafting implements Listener {
                     }
                 }
             });
+        }
+    }
+
+    /**
+     * Prevents glitching of the crafting items on death with keepInventory enabled.
+     *
+     * @param event - PlayerDeathEvent.
+     */
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    private void onDeathCrafting(PlayerDeathEvent event) {
+        final Player player = event.getEntity();
+        if (LegacyAPI.hasGameRule(player.getWorld(), "keepInventory")) {
+            ItemUtilities.getUtilities().closeAnimations(player);
+            final List<ItemStack> drops = new ArrayList<>(event.getDrops());
+            for (final ItemStack stack : drops) {
+                if (stack != null) {
+                    for (ItemMap itemMap : ItemUtilities.getUtilities().getCraftingItems()) {
+                        if ((itemMap.isCraftingItem() && itemMap.isReal(stack))) {
+                            player.getInventory().remove(stack);
+                            event.getDrops().remove(stack);
+                        }
+                    }
+                }
+            }
+            final ItemStack[] inventory = player.getInventory().getContents();
+            if (ItemHandler.isContentsEmpty(inventory)) {
+                for (int i = 0; i < inventory.length; i++) {
+                    for (ItemMap itemMap : ItemUtilities.getUtilities().getCraftingItems()) {
+                        if ((itemMap.isCraftingItem() && itemMap.isReal(inventory[i]))) {
+                            player.getInventory().setItem(i, new ItemStack(Material.AIR));
+                        }
+                    }
+                }
+            }
         }
     }
 

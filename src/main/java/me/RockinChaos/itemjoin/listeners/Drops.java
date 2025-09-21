@@ -182,7 +182,7 @@ public class Drops implements Listener {
     /**
      * Prevents the player from dropping the custom item on death.
      *
-     * @param event - PlayerItemConsumeEvent.
+     * @param event - PlayerDeathEvent.
      */
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     private void onDeathDrops(PlayerDeathEvent event) {
