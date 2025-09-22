@@ -5847,15 +5847,20 @@ public class ItemMap implements Cloneable {
      * Checks if the Player is on Interact Cooldown.
      *
      * @param player - The Player to be checked.
+     * @param item   - The ItemStack being placed on cooldown.
      * @return If the Player is on Interact Cooldown.
      */
-    public boolean onInteractCooldown(final Player player) {
+    public boolean onInteractCooldown(final Player player, final ItemStack item) {
         long playersCooldownList = 0L;
         if (this.playersOnInteractCooldown.containsKey(PlayerHandler.getPlayerID(player) + ".items." + this.configName)) {
             playersCooldownList = this.playersOnInteractCooldown.get(PlayerHandler.getPlayerID(player) + ".items." + this.configName);
         }
         if (System.currentTimeMillis() - playersCooldownList >= this.interactCooldown * 1000) {
             this.playersOnInteractCooldown.put(PlayerHandler.getPlayerID(player) + ".items." + this.configName, System.currentTimeMillis());
+            if (ServerUtils.hasPreciseUpdate("1_21_3")) {
+                final ItemStack cloneStack = item.clone();
+                SchedulerUtils.run(() -> player.setCooldown(cloneStack, this.interactCooldown * 20));
+            }
             return false;
         } else {
             if (this.onSpamCooldown(player)) {
