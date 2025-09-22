@@ -22,17 +22,22 @@ import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
-import me.RockinChaos.core.utils.types.ActionBlocks;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -65,23 +70,97 @@ public class Interact implements Listener {
 
     /**
      * Sets the custom item on cooldown upon interaction.
+     * Handles various bucket liquids.
      *
      * @param event - PlayerInteractEvent
      */
-    @EventHandler()
-    private void onInteractCooldown(PlayerInteractEvent event) {
-        final Player player = event.getPlayer();
+    @EventHandler(ignoreCancelled = true)
+    public void onInteractCooldown(PlayerInteractEvent event) {
         final ItemStack item = event.getItem();
-        if ((event.hasItem() && event.getAction() != Action.PHYSICAL) && (event.getAction() == Action.RIGHT_CLICK_AIR || (event.getAction() == Action.RIGHT_CLICK_BLOCK && (player.isSneaking() || !ActionBlocks.isActionBlocks(Objects.requireNonNull(event.getClickedBlock()).getType()))))) {
-            final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
-            if (itemMap != null && itemMap.getInteractCooldown() != 0) {
-                long lockDuration = !this.interactLock.isEmpty() && this.interactLock.get(item) != null ? System.currentTimeMillis() - this.interactLock.get(item) : -1;
-                this.interactLock.put(item, System.currentTimeMillis());
-                if (itemMap.onInteractCooldown(player)) {
-                    if (lockDuration == -1 || lockDuration > 30) {
-                        event.setCancelled(true);
-                        PlayerHandler.updateInventory(player);
-                    }
+        if (item != null && (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR)) {
+            switch (item.getType().name()) {
+                case "LAVA_BUCKET":
+                case "WATER_BUCKET":
+                case "MILK_BUCKET":
+                case "COD_BUCKET":
+                case "SALMON_BUCKET":
+                case "PUFFERFISH_BUCKET":
+                case "TROPICAL_FISH_BUCKET":
+                    this.handleUseCooldown(event.getPlayer(), item, event);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Sets the custom item on cooldown upon shooting a bow.
+     * Handles Bows and Crossbows.
+     *
+     * @param event - EntityShootBowEvent
+     */
+    @EventHandler(ignoreCancelled = true)
+    public void onBowShootCooldown(final EntityShootBowEvent event) {
+        if (event.getEntity() instanceof Player) {
+            this.handleUseCooldown((Player) event.getEntity(), event.getBow(), event);
+        }
+    }
+
+    /**
+     * Sets the custom item on cooldown upon consuming an item.
+     * Handles Food and Potions.
+     *
+     * @param event - PlayerItemConsumeEvent
+     */
+    @EventHandler(ignoreCancelled = true)
+    public void onConsumeCooldown(final PlayerItemConsumeEvent event) {
+        this.handleUseCooldown(event.getPlayer(), event.getItem(), event);
+    }
+
+    /**
+     * Sets the custom item on cooldown upon placing a block.
+     * Handles placing Blocks.
+     *
+     * @param event - BlockPlaceEvent
+     */
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockPlaceCooldown(final BlockPlaceEvent event) {
+        final Player player = event.getPlayer();
+        this.handleUseCooldown(player, PlayerHandler.getPerfectHandItem(player, ServerUtils.hasSpecificUpdate("1_9") ? event.getHand().name() : ""), event);
+    }
+
+    /**
+     * Sets the custom item on cooldown upon launching an item.
+     * Handles throwing Ender Pearls, Snowballs, Eggs, etc.
+     *
+     * @param event - ProjectileLaunchEvent
+     */
+    @EventHandler(ignoreCancelled = true)
+    public void onProjectileLaunchCooldown(final ProjectileLaunchEvent event) {
+        if (event.getEntity().getShooter() instanceof Player) {
+            final Player player = ((Player)event.getEntity().getShooter());
+            final ItemStack item = PlayerHandler.getMainHandItem(player).getType() != Material.AIR && StringUtils.containsIgnoreCase(PlayerHandler.getMainHandItem(player).getType().name(), (event.getEntity().getType().name())) ? PlayerHandler.getMainHandItem(player) : PlayerHandler.getOffHandItem(player).getType() != Material.AIR && StringUtils.containsIgnoreCase(PlayerHandler.getOffHandItem(player).getType().name(), (event.getEntity().getType().name())) ? PlayerHandler.getOffHandItem(player) : PlayerHandler.getMainHandItem(player);
+            this.handleUseCooldown(player, item, event);
+        }
+    }
+
+    /**
+     * Sets the custom item on cooldown.
+     *
+     * @param player - The Player who triggered the event.
+     * @param item   - The item that triggered the event.
+     * @param event  - The event to cancel if the item is on cooldown.
+     */
+    private void handleUseCooldown(final Player player, final ItemStack item, final Cancellable event) {
+        final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(item);
+        if (itemMap != null && itemMap.getInteractCooldown() > 0) {
+            final long lockDuration = !this.interactLock.isEmpty() && this.interactLock.get(item) != null ? System.currentTimeMillis() - this.interactLock.get(item) : -1;
+            this.interactLock.put(item, System.currentTimeMillis());
+            if (itemMap.onInteractCooldown(player, item)) {
+                if (lockDuration == -1 || lockDuration > 30) {
+                    event.setCancelled(true);
+                    PlayerHandler.updateInventory(player);
                 }
             }
         }
