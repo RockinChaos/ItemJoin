@@ -659,6 +659,7 @@ public class ChatExecutor implements CommandExecutor {
                 }
                 return;
             }
+            final List<String> multiSlots = new ArrayList<>();
             final Map<String, Integer> arbitraryMap = new HashMap<>();
             for (final ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
                 if (itemMap.getConfigName().equalsIgnoreCase(args[1]) && (!arbitraryMap.containsKey(itemMap.getConfigName()) || arbitraryMap.get(itemMap.getConfigName()) != 0) && argsPlayer != null) {
@@ -673,7 +674,7 @@ public class ChatExecutor implements CommandExecutor {
                         arbitraryMap.put(itemMap.getConfigName(), (arbitrary - count));
                     }
                     final String customName = StringUtils.translateLayout(itemMap.getCustomName(), argsPlayer);
-                    final boolean canGive = (!remove && itemMap.inWorld(argsPlayer.getWorld()) && (itemMap.conditionMet(argsPlayer, "trigger-conditions", true, false) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer, false))));
+                    final boolean canGive = (!remove && itemMap.inWorld(argsPlayer.getWorld()) && (itemMap.conditionMet(argsPlayer, "trigger-conditions", true, false) && (amount != 0 || itemMap.isAlwaysGive() || multiSlots.contains(itemMap.getConfigName()) || !itemMap.hasItem(argsPlayer, false))));
                     placeHolder.with(Holder.ITEM, customName).with(Holder.AMOUNT, Integer.toString((amount == 0 ? 1 : amount)));
                     placeHolders.with(Holder.ITEM, customName);
                     if ((remove && itemMap.hasItem(argsPlayer, true)) || (canGive && ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap))) {
@@ -694,6 +695,8 @@ public class ChatExecutor implements CommandExecutor {
                                 if (arbitraryMap.containsKey(itemMap.getConfigName())) {
                                     final int arbitraryCount = arbitraryMap.get(itemMap.getConfigName()) - 1;
                                     arbitraryMap.put(itemMap.getConfigName(), arbitraryCount);
+                                } else if (!itemMap.getMultipleSlots().isEmpty() && !multiSlots.contains(itemMap.getConfigName())) {
+                                    multiSlots.add(itemMap.getConfigName());
                                 }
                             }
                             placeHolders.with(Holder.TARGET_PLAYER, sender.getName()).with(Holder.AMOUNT, Integer.toString((amount == 0 ? 1 : amount)));
@@ -785,10 +788,11 @@ public class ChatExecutor implements CommandExecutor {
                 return;
             }
             placeHolders.with(Holder.ITEM, StringUtils.translateLayout(itemMapExist.getCustomName(), argsPlayer)).with(Holder.TARGET_PLAYER, sender.getName()).with(Holder.AMOUNT, amount == 0 ? "&lAll" : Integer.toString(amount));
+            final List<String> multiSlots = new ArrayList<>();
             for (final ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
                 if (itemMap.getConfigName().equalsIgnoreCase(args[1])) {
                     if (remove || !itemMap.isCMDPermissionNeeded() || itemMap.hasPermission(argsPlayer, argsPlayer.getWorld())) {
-                        final boolean canGive = (!remove && itemMap.inWorld(argsPlayer.getWorld()) && (itemMap.conditionMet(argsPlayer, "trigger-conditions", true, false) && (amount != 0 || itemMap.isAlwaysGive() || !itemMap.hasItem(argsPlayer, false))));
+                        final boolean canGive = (!remove && itemMap.inWorld(argsPlayer.getWorld()) && (itemMap.conditionMet(argsPlayer, "trigger-conditions", true, false) && (amount != 0 || itemMap.isAlwaysGive() || multiSlots.contains(itemMap.getConfigName()) || !itemMap.hasItem(argsPlayer, false))));
                         if ((remove && itemMap.hasItem(argsPlayer, true)) || (canGive && ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap))) {
                             if (StringUtils.getSlotConversion(itemMap.getSlot()) != 0 && PlayerHandler.isCraftingInv(argsPlayer)) {
                                 final ItemStack topItem = CompatUtils.getTopInventory(argsPlayer).getItem(0);
@@ -800,6 +804,9 @@ public class ChatExecutor implements CommandExecutor {
                                 itemMap.removeFrom(argsPlayer, amount);
                             } else {
                                 itemMap.giveTo(argsPlayer, amount);
+                                if (!itemMap.getMultipleSlots().isEmpty() && !multiSlots.contains(itemMap.getConfigName())) {
+                                    multiSlots.add(itemMap.getConfigName());
+                                }
                             }
                             if (!messageSent && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
                                 ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.removedYou" : "get.givenYou"), argsPlayer, placeHolders);
@@ -877,6 +884,7 @@ public class ChatExecutor implements CommandExecutor {
             if (probable == null) {
                 probable = (ItemMap) ItemJoin.getCore().getChances().getRandom(argsPlayer);
             }
+            final List<String> multiSlots = new ArrayList<>();
             final Map<String, Integer> arbitraryMap = new HashMap<>();
             for (ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
                 final boolean isAllowed = (!arbitraryMap.containsKey(itemMap.getConfigName()) || arbitraryMap.get(itemMap.getConfigName()) != 0) && (remove || itemMap.inWorld(argsPlayer.getWorld()) && (probable != null && itemMap.getConfigName().equals(probable.getConfigName()) || itemMap.getProbability() == -1) && (!itemMap.isCMDPermissionNeeded() || itemMap.hasPermission(argsPlayer, argsPlayer.getWorld())));
@@ -891,7 +899,7 @@ public class ChatExecutor implements CommandExecutor {
                         }
                         arbitraryMap.put(itemMap.getConfigName(), (arbitrary - count));
                     }
-                    if ((remove && itemMap.hasItem(argsPlayer, true)) || ((!remove && !itemMap.hasItem(argsPlayer, false)) || (!remove && itemMap.isAlwaysGive()))) {
+                    if ((remove && itemMap.hasItem(argsPlayer, true)) || ((!remove && !itemMap.hasItem(argsPlayer, false)) || (!remove && (itemMap.isAlwaysGive() || multiSlots.contains(itemMap.getConfigName()))))) {
                         if (remove || itemMap.conditionMet(argsPlayer, "trigger-conditions", true, false)) {
                             if (remove) {
                                 itemMap.removeFrom(argsPlayer);
@@ -900,6 +908,8 @@ public class ChatExecutor implements CommandExecutor {
                                 if (arbitraryMap.containsKey(itemMap.getConfigName())) {
                                     final int arbitraryCount = arbitraryMap.get(itemMap.getConfigName()) - 1;
                                     arbitraryMap.put(itemMap.getConfigName(), arbitraryCount);
+                                } else if (!itemMap.getMultipleSlots().isEmpty() && !multiSlots.contains(itemMap.getConfigName())) {
+                                    multiSlots.add(itemMap.getConfigName());
                                 }
                             }
                             if (!itemGiven) {
@@ -910,7 +920,7 @@ public class ChatExecutor implements CommandExecutor {
                     }
                 } else if (!failedPermissions && !itemMap.hasPermission(argsPlayer, argsPlayer.getWorld())) {
                     failedPermissions = true;
-                } else if (!remove && isAllowed && (!itemMap.hasItem(argsPlayer, false) || itemMap.isAlwaysGive())) {
+                } else if (!remove && isAllowed && (!itemMap.hasItem(argsPlayer, false) || itemMap.isAlwaysGive() || multiSlots.contains(itemMap.getConfigName()))) {
                     failedCount++;
                 }
             }

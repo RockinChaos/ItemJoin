@@ -52,10 +52,14 @@ public class APIUtils {
             probable = (ItemMap) ItemJoin.getCore().getChances().getRandom(player);
         }
         final int session = StringUtils.getRandom(1, 80000);
+        final List<String> multiSlots = new ArrayList<>();
         for (final ItemMap item : ItemUtilities.getUtilities().getItems()) {
             if (item.inWorld(player.getWorld()) && ((probable != null && item.getConfigName().equals(probable.getConfigName())) || item.getProbability() == -1) && PluginData.getInfo().isEnabled(player, item.getConfigName())
-                    && item.isLimitMode(player.getGameMode()) && item.hasPermission(player, player.getWorld()) && ItemUtilities.getUtilities().isObtainable(player, item, session, TriggerType.DEFAULT, "IJ_WORLD")) {
+                    && item.isLimitMode(player.getGameMode()) && item.hasPermission(player, player.getWorld()) && ItemUtilities.getUtilities().isObtainable(player, item, session, TriggerType.DEFAULT, "IJ_WORLD", multiSlots)) {
                 item.giveTo(player);
+                if (!item.getMultipleSlots().isEmpty() && !multiSlots.contains(item.getConfigName())) {
+                    multiSlots.add(item.getConfigName());
+                }
             }
             item.setAnimations(player);
         }

@@ -279,6 +279,7 @@ public class ItemUtilities {
         if (type.equals(TriggerType.WORLD_SWITCH) || type.equals(TriggerType.JOIN)) {
             world = player.getWorld();
         }
+        final List<String> multiSlots = new ArrayList<>();
         for (ItemMap item : this.getItems()) {
             item.setAnimations(player);
             if (((type.equals(TriggerType.JOIN) && item.isGiveOnJoin() && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions)))
@@ -292,9 +293,12 @@ public class ItemUtilities {
                     || (type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && (StringUtils.containsValue(regions, "IJ_WORLD") || item.inRegion(regions))))
                     && item.inWorld(world) && item.isLimitMode(gameMode) && ((probable != null && item.getConfigName().equals(probable.getConfigName())) || item.getProbability() == -1)
                     && item.conditionMet(player, "trigger-conditions", true, false) && PluginData.getInfo().isEnabled(player, item.getConfigName()) && item.hasPermission(player, world)
-                    && this.isObtainable(player, item, session, type, targetRegion)) {
+                    && this.isObtainable(player, item, session, type, targetRegion, multiSlots)) {
                 item.giveTo(player);
                 hasActioned = true;
+                if (!item.getMultipleSlots().isEmpty() && !multiSlots.contains(item.getConfigName())) {
+                    multiSlots.add(item.getConfigName());
+                }
             } else if (((type.equals(TriggerType.LIMIT_SWITCH) && item.isUseOnLimitSwitch() && !item.isLimitMode(gameMode)) || (type.equals(TriggerType.PERMISSION_SWITCH) && !item.hasPermission(player, world)) || (((type.name().startsWith("REGION") && (item.isGiveOnRegionAccess()
                     && ((item.inRegion(targetRegion) && !item.inRegion(regions)) || (!item.inRegion(targetRegion) && !item.inRegion(regions))))) || (type.name().startsWith("REGION") && (item.isGiveOnRegionEgress() && item.inRegion(targetRegion) && item.inRegion(regions)))))) && item.hasItem(player, false)) {
                 item.removeFrom(player);
@@ -538,9 +542,9 @@ public class ItemUtilities {
      * @param region  - The region the player is in.
      * @return If the ItemMap is Obtainable.
      */
-    public boolean isObtainable(final Player player, final ItemMap itemMap, final int session, final TriggerType type, final String region) {
+    public boolean isObtainable(final Player player, final ItemMap itemMap, final int session, final TriggerType type, final String region, final List<String> multiSlots) {
         final boolean canSend = canSend(player, type, region);
-        if (!itemMap.hasItem(player, false) || itemMap.isAlwaysGive()) {
+        if (!itemMap.hasItem(player, false) || itemMap.isAlwaysGive() || multiSlots.contains(itemMap.getConfigName())) {
             final DataObject firstJoin = ((itemMap.isOnlyFirstLife() || itemMap.isOnlyFirstWild()) && type.equals(TriggerType.JOIN) || itemMap.isOnlyFirstJoin() ? (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.FIRST_JOIN, PlayerHandler.getPlayerID(player), "", itemMap.getConfigName())) : null);
             final DataObject firstWorld = itemMap.isOnlyFirstWorld() ? (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.FIRST_WORLD, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName())) : null;
             final DataObject ipLimit = itemMap.isIpLimited() ? (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.IP_LIMITS, PlayerHandler.getPlayerID(player), player.getWorld().getName(), itemMap.getConfigName(), Objects.requireNonNull(player.getAddress()).getHostString())) : null;
