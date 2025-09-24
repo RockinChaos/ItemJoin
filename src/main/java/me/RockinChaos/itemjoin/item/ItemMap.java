@@ -5405,7 +5405,7 @@ public class ItemMap implements Cloneable {
             if (itemMap.warmDelay != 0) {
                 delay = 20L;
             }
-            SchedulerUtils.runLater(delay, () -> {
+            final Runnable runnable = () -> {
                 if ((!player.isDead() || action.equalsIgnoreCase("ON_DEATH")) && player.isOnline()) {
                     if (this.isExecuted(player, altPlayer, action, clickType, slot)) {
                         if (itemMap.itemCost == null || itemMap.itemCost.isEmpty()) {
@@ -5425,7 +5425,12 @@ public class ItemMap implements Cloneable {
                 if (itemMap.warmDelay != 0) {
                     itemMap.delWarmPending(player);
                 }
-            });
+            };
+            if (delay <= 0) {
+                runnable.run();
+            } else {
+                SchedulerUtils.runLater(delay, runnable);
+            }
         }
     }
 

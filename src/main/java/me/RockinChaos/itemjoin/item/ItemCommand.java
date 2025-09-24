@@ -266,10 +266,8 @@ public class ItemCommand {
      */
     private void taskOnHold(final Player player, final Player altPlayer, final String slot, final int cooldown, final ItemMap itemMap) {
         this.cycleTask = SchedulerUtils.runAsyncAtInterval(cooldown, 0L, () -> {
-            if (itemMap.isSimilar(player, PlayerHandler.getMainHandItem(player))) {
-                this.sendDispatch(player, altPlayer, this.executorType, slot);
-            } else if (itemMap.isSimilar(player, PlayerHandler.getOffHandItem(player))) {
-                this.sendDispatch(player, altPlayer, this.executorType, slot);
+            if (itemMap.isSimilar(player, PlayerHandler.getMainHandItem(player)) || itemMap.isSimilar(player, PlayerHandler.getOffHandItem(player))) {
+                SchedulerUtils.run(() -> this.sendDispatch(player, altPlayer, this.executorType, slot));
             } else {
                 this.cancelTask();
             }
@@ -293,12 +291,17 @@ public class ItemCommand {
      * @param receive   - the number of times to execute the ItemCommand.
      */
     private void taskOnReceive(final Player player, final Player altPlayer, final String slot, final int cooldown, final int receive) {
-        SchedulerUtils.runAsyncLater(cooldown, () -> {
+        final Runnable runnable = () -> {
             if (receive != 0) {
                 this.sendDispatch(player, altPlayer, this.executorType, slot);
                 this.taskOnReceive(player, altPlayer, slot, cooldown, (receive - 1));
             }
-        });
+        };
+        if (cooldown <= 0) {
+            runnable.run();
+        } else {
+            SchedulerUtils.runLater(cooldown, runnable);
+        }
     }
 
     /**
@@ -454,7 +457,7 @@ public class ItemCommand {
     private void sendDispatch(final Player player, final Player altPlayer, final Executor cmdType, final String slot) {
         final World world = player.getWorld();
         this.setPending(player, true);
-        SchedulerUtils.runLater(this.delay, () -> {
+        final Runnable runnable = () -> {
             synchronized ("IJ_DISPATCH") {
                 this.allowDispatch(player, world);
                 this.setPending(player, false);
@@ -495,7 +498,12 @@ public class ItemCommand {
                     this.setExecute(player, false);
                 }
             }
-        });
+        };
+        if (this.delay <= 0) {
+            runnable.run();
+        } else {
+            SchedulerUtils.runLater(this.delay, runnable);
+        }
     }
 
     /**
