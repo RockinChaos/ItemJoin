@@ -17,8 +17,6 @@
  */
 package me.RockinChaos.itemjoin.utils.menus;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.*;
@@ -58,9 +56,12 @@ import org.bukkit.inventory.meta.*;
 import org.bukkit.inventory.meta.components.CustomModelDataComponent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.profile.PlayerProfile;
+import org.bukkit.profile.PlayerTextures;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.net.URI;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -9831,12 +9832,30 @@ public class Menu {
             } else if (itemMap.getSkullTexture() != null && !itemMap.isHeadDatabase()) {
                 try {
                     if (itemMeta != null) {
-                        final UUID uuid = UUID.randomUUID();
-                        final GameProfile gameProfile = new GameProfile(uuid, uuid.toString().replaceAll("_", "").replaceAll("-", "").substring(0, 16));
-                        gameProfile.getProperties().put("textures", new Property("textures", itemMap.getSkullTexture()));
-                        Field declaredField = itemMeta.getClass().getDeclaredField("profile");
-                        declaredField.setAccessible(true);
-                        declaredField.set(itemMeta, gameProfile);
+                        final String skullTexture = itemMap.getSkullTexture();
+                        if (ServerUtils.hasPreciseUpdate("1_18_2")) {
+                            PlayerProfile playerProfile;
+                            final UUID uuid = UUID.randomUUID();
+                            playerProfile = Bukkit.createPlayerProfile(uuid, uuid.toString().replaceAll("_", "").replaceAll("-", "").substring(0, 16));
+                            final PlayerTextures textures = playerProfile.getTextures();
+                            final URI textureURI = StringUtils.toTextureURI(skullTexture);
+                            if (textureURI != null) {
+                                try {
+                                    textures.setSkin(textureURI.toURL());
+                                    playerProfile.setTextures(textures);
+                                } catch (Exception e) {
+                                    ServerUtils.logSevere("{Menu} Failed to set skull texture URL: " + skullTexture);
+                                    ServerUtils.sendDebugTrace(e);
+                                }
+                            } else {
+                                ServerUtils.logSevere("{Menu} The specified skull-texture is INVALID: " + skullTexture + ".");
+                            }
+                            ((SkullMeta) itemMeta).setOwnerProfile(playerProfile);
+                        } else {
+                            Field declaredField = itemMeta.getClass().getDeclaredField("profile");
+                            declaredField.setAccessible(true);
+                            declaredField.set(itemMeta, CompatUtils.newGameProfile(UUID.randomUUID(), skullTexture));
+                        }
                     }
                 } catch (Exception e) {
                     ServerUtils.sendDebugTrace(e);

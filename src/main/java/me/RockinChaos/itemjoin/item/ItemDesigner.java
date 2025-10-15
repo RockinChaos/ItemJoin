@@ -17,15 +17,10 @@
  */
 package me.RockinChaos.itemjoin.item;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
 import me.RockinChaos.core.handlers.ItemHandler;
 import me.RockinChaos.core.handlers.ItemHandler.JSONEvent;
-import me.RockinChaos.core.utils.ReflectionUtils;
+import me.RockinChaos.core.utils.*;
 import me.RockinChaos.core.utils.ReflectionUtils.MinecraftMethod;
-import me.RockinChaos.core.utils.SchedulerUtils;
-import me.RockinChaos.core.utils.ServerUtils;
-import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.PluginData;
@@ -987,14 +982,7 @@ public class ItemDesigner {
                 }
                 String texture = this.getActualTexture(itemMap);
                 if (!StringUtils.containsIgnoreCase(texture, "hdb-")) {
-                    final UUID uuid = UUID.randomUUID();
-                    GameProfile gameProfile = new GameProfile(uuid, uuid.toString().replaceAll("_", "").replaceAll("-", "").substring(0, 16));
-                    gameProfile.getProperties().put("textures", new Property("textures", texture));
-                    try {
-                        itemMap.setSkullTexture(texture);
-                    } catch (Exception e) {
-                        ServerUtils.sendDebugTrace(e);
-                    }
+                    itemMap.setSkullTexture(texture);
                 }
             }
         }
