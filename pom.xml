@@ -17,6 +17,7 @@
         <chaoscore.version>1.1.4-SNAPSHOT</chaoscore.version>
         <spigot.version>1.21.10-R0.1-SNAPSHOT</spigot.version>
 
+        <authlib.version>7.0.61</authlib.version>
         <worldguard.version>7.0.4-SNAPSHOT</worldguard.version>
 
         <build.version>${env.BUILD_NUMBER}</build.version>
@@ -195,6 +196,13 @@
             <groupId>com.sk89q.worldguard</groupId>
             <artifactId>worldguard-bukkit</artifactId>
             <version>${worldguard.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!--Mojang AuthLib API-->
+        <dependency>
+            <groupId>com.mojang</groupId>
+            <artifactId>authlib</artifactId>
+            <version>${authlib.version}</version>
             <scope>provided</scope>
         </dependency>
         <!--Apache API-->
