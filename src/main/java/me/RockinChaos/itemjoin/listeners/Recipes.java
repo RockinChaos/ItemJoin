@@ -22,26 +22,37 @@ import me.RockinChaos.core.utils.CompatUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.core.utils.api.LegacyAPI;
+import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemRecipe;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.Crafter;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.CrafterCraftEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Recipes implements Listener {
+
+    public Recipes() {
+        if (ServerUtils.hasSpecificUpdate("1_21") && StringUtils.isRegistered(CrafterRecipes.class.getSimpleName())) {
+            ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new CrafterRecipes(), ItemJoin.getCore().getPlugin());
+        }
+    }
 
     /**
      * Prevents the player from using the custom item in a crafting recipe.
@@ -50,8 +61,9 @@ public class Recipes implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     private void onPlayerCraft(final PrepareItemCraftEvent event) {
-        final Player player = (Player) event.getInventory().getHolder();
-        if (player != null) {
+        final InventoryHolder holder = event.getInventory().getHolder();
+        if (holder instanceof Player) {
+            final Player player = (Player) holder;
             final Inventory topInventory = CompatUtils.getTopInventory(player);
             for (int i = 0; i < topInventory.getSize(); i++) {
                 final ItemStack item = topInventory.getItem(i);
@@ -94,49 +106,48 @@ public class Recipes implements Listener {
     }
 
     /**
-     * Called when the player tries to craft a recipe with a custom item.
+     * Called when the player prepares to craft a recipe with a custom item.
      *
      * @param event - PrepareItemCraftEvent
      */
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPrepareRecipe(final PrepareItemCraftEvent event) {
-        if (event.getRecipe() != null) {
-            if (event.getRecipe().getResult().getType() != Material.AIR) {
-                final Player player = CompatUtils.getPlayer(event.getView());
-                final List<ItemMap> mapList = new ArrayList<>();
-                final ItemMap checkMap = ItemUtilities.getUtilities().getItemMap(event.getRecipe().getResult());
-                if (checkMap != null && checkMap.isRecipe()) {
-                    mapList.add(checkMap);
-                } else {
-                    return;
+        final ItemStack result = event.getRecipe() != null ? event.getRecipe().getResult() : event.getInventory().getResult();
+        if (result != null && result.getType() != Material.AIR) {
+            final Player player = CompatUtils.getPlayer(event.getView());
+            final List<ItemMap> mapList = new ArrayList<>();
+            final ItemMap checkMap = ItemUtilities.getUtilities().getItemMap(result);
+            if (checkMap != null && checkMap.isRecipe()) {
+                mapList.add(checkMap);
+            } else {
+                return;
+            }
+            for (ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
+                if (itemMap != null && itemMap.isRecipe()) {
+                    mapList.add(itemMap);
                 }
-                for (ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
-                    if (itemMap != null && itemMap.isRecipe()) {
-                        mapList.add(itemMap);
+            }
+            final Inventory inventoryClone = Bukkit.createInventory(null, 9);
+            int setSlot = 0;
+            for (int i = 0; i < event.getInventory().getSize(); i++) {
+                final ItemStack item = event.getInventory().getItem(i);
+                if (setSlot >= 9) {
+                    break;
+                } else if (i > 0 || !checkMap.isSimilar(player, item)) {
+                    if (item != null) {
+                        inventoryClone.setItem(setSlot, item);
                     }
+                    setSlot++;
                 }
-                final Inventory inventoryClone = Bukkit.createInventory(null, 9);
-                int setSlot = 0;
-                for (int i = 0; i < event.getInventory().getSize(); i++) {
-                    final ItemStack item = event.getInventory().getItem(i);
-                    if (setSlot >= 9) {
+            }
+            if (!mapList.isEmpty()) {
+                for (ItemMap itemMap : mapList) {
+                    if (handleRecipe(itemMap, event.getInventory(), inventoryClone, player, false, false, null)) {
                         break;
-                    } else if (i > 0 || !checkMap.isSimilar(player, item)) {
-                        if (item != null) {
-                            inventoryClone.setItem(setSlot, item);
-                        }
-                        setSlot++;
                     }
                 }
-                if (!mapList.isEmpty()) {
-                    for (ItemMap itemMap : mapList) {
-                        if (this.handleRecipe(itemMap, event.getInventory(), inventoryClone, player, false, false, null)) {
-                            break;
-                        }
-                    }
-                } else {
-                    this.handleRecipe(checkMap, event.getInventory(), inventoryClone, player, false, false, null);
-                }
+            } else {
+                handleRecipe(checkMap, event.getInventory(), inventoryClone, player, false, false, null);
             }
         }
     }
@@ -144,7 +155,7 @@ public class Recipes implements Listener {
     /**
      * Called when the player tries to craft a recipe with a custom item.
      *
-     * @param event - PrepareItemCraftEvent
+     * @param event - CraftItemEvent
      */
     @EventHandler()
     public void onCraftRecipe(final CraftItemEvent event) {
@@ -163,7 +174,7 @@ public class Recipes implements Listener {
                     setSlot++;
                 }
             }
-            this.handleRecipe(checkMap, event.getInventory(), inventoryClone, CompatUtils.getPlayer(event.getView()), true, event.isShiftClick(), event);
+            handleRecipe(checkMap, event.getInventory(), inventoryClone, CompatUtils.getPlayer(event.getView()), true, event.isShiftClick(), event);
         }
     }
 
@@ -176,14 +187,17 @@ public class Recipes implements Listener {
      * @param player         - The player being referenced.
      * @param isCrafted      - If the event is a Crafted Event or Prepared Event.
      * @param isShiftClick   - If the Player is Shift-Clicking to craft.
+     * @param event          - The event instance to cancel.
      * @return If the loop should break.
      */
-    private boolean handleRecipe(final ItemMap itemMap, final CraftingInventory craftInventory, final Inventory inventoryClone, final Player player, final boolean isCrafted, final boolean isShiftClick, final CraftItemEvent event) {
-        if (!itemMap.hasPermission(player, player.getWorld())) {
+    private static boolean handleRecipe(final ItemMap itemMap, final CraftingInventory craftInventory, final Inventory inventoryClone, final Player player, final boolean isCrafted, final boolean isShiftClick, final Cancellable event) {
+        if (player != null && !itemMap.hasPermission(player, player.getWorld())) {
             craftInventory.setResult(new ItemStack(Material.AIR));
         } else {
-            final ItemStack result = (craftInventory.getResult() != null ? craftInventory.getResult().clone() : new ItemStack(Material.AIR));
+            final boolean isCrafter = event != null && event.getClass().getSimpleName().equalsIgnoreCase("CrafterCraftEvent");
+            final ItemStack result = (craftInventory != null && craftInventory.getResult() != null ? craftInventory.getResult().clone() : isCrafter ? ((CrafterCraftEvent) event).getResult() : new ItemStack(Material.AIR));
             final boolean isLegacy = !ServerUtils.hasSpecificUpdate("1_13");
+            final Inventory craftedInventory = craftInventory != null ? craftInventory : isCrafter ? ((Crafter) ((CrafterCraftEvent) event).getBlock().getState()).getInventory() : null;
             boolean success = false;
             for (final List<Character> tempRecipe : itemMap.getRecipe()) {
                 if (!success) {
@@ -197,17 +211,17 @@ public class Recipes implements Listener {
                         }
                     }
                     if (!isCrafted) {
-                        confirmations = this.getConfirmations(itemMap, player, inventoryClone);
-                    } else {
+                        confirmations = getConfirmations(itemMap, player, inventoryClone);
+                    } else if (craftedInventory != null) {
                         boolean cycleShift = true;
-                        while (this.getConfirmations(itemMap, player, inventoryClone) == ingredientSize && cycleShift) {
+                        while (getConfirmations(itemMap, player, inventoryClone) == ingredientSize && cycleShift) {
                             cycleShift = isShiftClick;
                             for (int i = 0; i < inventoryClone.getSize(); i++) {
                                 final ItemStack item = inventoryClone.getItem(i);
                                 if (item != null) {
                                     for (Character ingredient : itemMap.getIngredients().keySet()) {
                                         final ItemRecipe itemRecipe = itemMap.getIngredients().get(ingredient);
-                                        ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(itemRecipe.getMap());
+                                        final ItemMap ingredMap = ItemUtilities.getUtilities().getItemMap(itemRecipe.getMap());
                                         if ((((ingredMap == null
                                                 && itemRecipe.getMaterial().equals(item.getType())
                                                 && (!isLegacy || (LegacyAPI.getDataValue(item) == itemRecipe.getData()))))
@@ -216,13 +230,13 @@ public class Recipes implements Listener {
                                                 && item.getAmount() >= itemRecipe.getCount()) {
                                             int removal = (item.getAmount() - itemRecipe.getCount());
                                             if (removal <= 0) {
-                                                craftInventory.setItem((i + 1), new ItemStack(Material.AIR));
+                                                craftedInventory.setItem(isCrafter ? i : (i + 1), new ItemStack(Material.AIR));
                                                 inventoryClone.setItem(i, new ItemStack(Material.AIR));
                                             } else {
-                                                final ItemStack craftItem = craftInventory.getItem((i + 1));
+                                                final ItemStack craftItem = craftedInventory.getItem(isCrafter ? i : (i + 1));
                                                 if (craftItem != null) {
-                                                    craftItem.setAmount(removal);
-                                                    item.setAmount(removal);
+                                                    craftItem.setAmount(removal + (isCrafter ? 1 : 0));
+                                                    item.setAmount(removal + (isCrafter ? 1 : 0));
                                                 }
                                             }
                                             removed = true;
@@ -234,25 +248,37 @@ public class Recipes implements Listener {
                         }
                     }
                     if (!isCrafted && confirmations == ingredientSize) {
-                        craftInventory.setResult(itemMap.getItem(player));
+                        if (craftInventory != null) {
+                            craftInventory.setResult(itemMap.getItem(player));
+                        } else if (isCrafter) {
+                            ((CrafterCraftEvent) event).setResult(itemMap.getItem(player));
+                        }
                         return true;
                     } else if (!isCrafted) {
-                        craftInventory.setResult(new ItemStack(Material.AIR));
+                        if (craftInventory != null) {
+                            craftInventory.setResult(new ItemStack(Material.AIR));
+                        } else if (isCrafter) {
+                            ((CrafterCraftEvent) event).setResult(new ItemStack(Material.AIR));
+                        }
                     } else if (removed) {
                         if (resultSize > 0 && isShiftClick) {
                             result.setAmount(resultSize);
                         }
-                        event.setCancelled(true);
-                        if (isShiftClick) {
-                            success = true;
-                            player.getInventory().addItem(result);
-                        } else if (CompatUtils.getCursor(player).getType() != Material.AIR && CompatUtils.getCursor(player).isSimilar(result)) {
-                            success = true;
-                            CompatUtils.getCursor(player).setAmount(CompatUtils.getCursor(player).getAmount() + result.getAmount());
-                        } else {
-                            success = true;
-                            CompatUtils.setCursor(player, result);
+                        if (player != null && event != null) {
+                            event.setCancelled(true);
+                            if (isShiftClick) {
+                                success = true;
+                                player.getInventory().addItem(result);
+                            } else if (CompatUtils.getCursor(player).getType() != Material.AIR && CompatUtils.getCursor(player).isSimilar(result)) {
+                                success = true;
+                                CompatUtils.getCursor(player).setAmount(CompatUtils.getCursor(player).getAmount() + result.getAmount());
+                            } else {
+                                success = true;
+                                CompatUtils.setCursor(player, result);
+                            }
                         }
+                    } else if (isCrafter && event != null) {
+                        event.setCancelled(true);
                     }
                 }
             }
@@ -268,7 +294,7 @@ public class Recipes implements Listener {
      * @param inventoryClone - The clone of CraftingInventory reference.
      * @return If the loop should break.
      */
-    private int getConfirmations(final ItemMap itemMap, final Player player, final Inventory inventoryClone) {
+    private static int getConfirmations(final ItemMap itemMap, final Player player, final Inventory inventoryClone) {
         int confirmations = 0;
         for (int i = 0; i < inventoryClone.getSize(); i++) {
             final ItemStack item = inventoryClone.getItem(i);
@@ -283,5 +309,36 @@ public class Recipes implements Listener {
             }
         }
         return confirmations;
+    }
+
+    /**
+     * Listener for handling Crafter block crafting events.
+     * Automatically registered when the parent Recipes class is instantiated on 1.21+ servers.
+     *
+     * @since 1.21
+     */
+    public static class CrafterRecipes implements Listener {
+
+        /**
+         * Called when the player tries to craft a recipe with a custom item.
+         * NOTE: Crafters were added in 1.21.
+         *
+         * @param event - CrafterCraftEvent
+         */
+        @EventHandler()
+        public void onCrafterRecipe(final CrafterCraftEvent event) {
+            final ItemMap checkMap = ItemUtilities.getUtilities().getItemMap(event.getRecipe().getResult());
+            if (checkMap != null && checkMap.isRecipe()) {
+                final Inventory inventoryClone = Bukkit.createInventory(null, 18);
+                final Inventory crafterInventory = ((Crafter) event.getBlock().getState()).getInventory();
+                for (int i = 0; i < 9; i++) {
+                    final ItemStack item = crafterInventory.getItem(i);
+                    if (item != null && !checkMap.isSimilar(null, item)) {
+                        inventoryClone.setItem(i, item.clone());
+                    }
+                }
+                handleRecipe(checkMap, null, inventoryClone, null, true, false, event);
+            }
+        }
     }
 }
