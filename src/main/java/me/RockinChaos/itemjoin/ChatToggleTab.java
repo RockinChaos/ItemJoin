@@ -23,6 +23,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
 import org.bukkit.util.StringUtil;
 
 import javax.annotation.Nonnull;
@@ -46,19 +47,24 @@ public class ChatToggleTab implements TabCompleter {
         final List<String> completions = new ArrayList<>();
         final List<String> commands = new ArrayList<>();
         if (!(sender instanceof ConsoleCommandSender)) {
-            StringBuilder fullCommand = new StringBuilder(command.getName());
-            for (String length : args) {
-                fullCommand.append(" ").append(length);
-            }
+            String baseCommand = command.getName();
+            String typed = String.join(" ", args);
+            String fullCommand = baseCommand + (typed.isEmpty() ? "" : " " + typed);
             for (ItemMap item : ItemUtilities.getUtilities().getItems()) {
                 for (String cmd : item.getToggleCommands()) {
-                    if (cmd.startsWith(fullCommand.toString()) && !cmd.equalsIgnoreCase(fullCommand.toString().trim()) && (item.getToggleNode() != null && !item.getToggleNode().isEmpty() && sender.hasPermission(item.getToggleNode()))) {
-                        commands.add(cmd.replaceFirst(fullCommand.toString(), ""));
+                    if (cmd.startsWith(baseCommand) && !cmd.equalsIgnoreCase(fullCommand.trim()) && ((item.getToggleNode() != null && !item.getToggleNode().isEmpty() && sender.hasPermission(item.getToggleNode())) || ((item.getToggleNode() == null || item.getToggleNode().isEmpty()) && item.hasPermission((Player) sender, ((Player) sender).getWorld())))) {
+                        String[] split = cmd.split(" ", 2);
+                        if (split.length > 1) {
+                            String next = split[1];
+                            if (next.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) {
+                                commands.add(next);
+                            }
+                        }
                     }
                 }
             }
         }
-        StringUtil.copyPartialMatches(args[(args.length - 1)], commands, completions);
+        StringUtil.copyPartialMatches(args.length > 0 ? args[args.length - 1] : "", commands, completions);
         Collections.sort(completions);
         return completions;
     }
