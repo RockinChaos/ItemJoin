@@ -74,18 +74,23 @@ public class ChatToggleExecutor implements CommandExecutor {
                     }
                 } else if ((dataObject != null && Boolean.valueOf(dataObject.getEnabled()).equals(false)) && ((itemMap.getToggleNode() == null || itemMap.getToggleNode().isEmpty()) || (itemMap.getToggleNode() != null && !itemMap.getToggleNode().isEmpty() && sender.hasPermission(itemMap.getToggleNode())))) {
                     if (PluginData.getInfo().isEnabled(player, "ALL")) {
-                        ItemJoin.getCore().getSQL().removeData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(player), "Global", itemMap.getConfigName(), String.valueOf(false)));
-                        {
-                            placeHolders.with(Holder.STATE, "on");
-                            if (!itemMap.hasItem(player, true)) {
-                                itemMap.giveTo(player);
+                          if (ItemUtilities.getUtilities().canOverwrite(player, itemMap)) {
+                            ItemJoin.getCore().getSQL().removeData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(player), "Global", itemMap.getConfigName(), String.valueOf(false)));
+                            {
+                                placeHolders.with(Holder.STATE, "on");
+                                if (!itemMap.hasItem(player, true)) {
+                                    itemMap.giveTo(player);
+                                }
+                                final String toggleMessage = (itemMap.getToggleMessage() != null ? StringUtils.translateLayout(itemMap.getToggleMessage(), player, placeHolders) : null);
+                                if (toggleMessage != null) {
+                                    ServerUtils.messageSender(player, toggleMessage, false);
+                                } else {
+                                    ItemJoin.getCore().getLang().sendLangMessage("commands.enabled.toggleEnable", player, placeHolders);
+                                }
                             }
-                            final String toggleMessage = (itemMap.getToggleMessage() != null ? StringUtils.translateLayout(itemMap.getToggleMessage(), player, placeHolders): null);
-                            if (toggleMessage != null) {
-                                ServerUtils.messageSender(player, toggleMessage, false);
-                            } else {
-                                ItemJoin.getCore().getLang().sendLangMessage("commands.enabled.toggleEnable", player, placeHolders);
-                            }
+                        } else {
+                            placeHolders.with(Holder.FAIL_COUNT, String.valueOf(1));
+                            ItemJoin.getCore().getLang().sendLangMessage("general.failedOverwrite", player, placeHolders);
                         }
                     } else {
                         ItemJoin.getCore().getLang().sendLangMessage("commands.enabled.togglePlayerFailed", sender, placeHolders);
