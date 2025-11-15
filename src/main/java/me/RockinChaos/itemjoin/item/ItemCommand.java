@@ -265,7 +265,7 @@ public class ItemCommand {
      * @param itemMap   - the ItemMap of the custom item.
      */
     private void taskOnHold(final Player player, final Player altPlayer, final String slot, final int cooldown, final ItemMap itemMap) {
-        this.cycleTask = SchedulerUtils.runAsyncAtInterval(cooldown, 0L, () -> {
+        this.cycleTask = SchedulerUtils.runAsyncAtInterval(0L, cooldown, () -> {
             if (itemMap.isSimilar(player, PlayerHandler.getMainHandItem(player)) || itemMap.isSimilar(player, PlayerHandler.getOffHandItem(player))) {
                 SchedulerUtils.run(() -> this.sendDispatch(player, altPlayer, this.executorType, slot));
             } else {
