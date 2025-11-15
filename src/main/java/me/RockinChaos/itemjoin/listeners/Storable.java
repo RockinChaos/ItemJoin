@@ -22,14 +22,19 @@ import me.RockinChaos.core.utils.CompatUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -127,6 +132,24 @@ public class Storable implements Listener {
                 }
             }
         } catch (Exception ignored) {} // pale_oak_boat (paper bug) fix (and fixes future entities).
+    }
+
+    /**
+     * Prevents the player from storing the custom item in blocks e.g; DECORATED_POT and FLOWER_POT.
+     *
+     * @param event - PlayerInteractEvent
+     */
+    @EventHandler(priority = EventPriority.LOW)
+    private void onInteractStored(PlayerInteractEvent event) {
+        final ItemStack item = event.getItem();
+        final Player player = event.getPlayer();
+        final Block clickedBlock = event.getClickedBlock();
+        if ((!PlayerHandler.isMenuClick(player, event.getAction()) && (event.hasItem() && event.getAction() == Action.RIGHT_CLICK_BLOCK && clickedBlock != null &&
+                (clickedBlock.getType().name().equalsIgnoreCase("FLOWER_POT") || clickedBlock.getType().name().equalsIgnoreCase("DECORATED_POT")
+                || StringUtils.containsIgnoreCase(clickedBlock.getType().name(), "POTTED_")) && !ItemUtilities.getUtilities().isAllowed(player, item, "item-store")))) {
+            event.setUseItemInHand(Event.Result.DENY);
+            event.setUseInteractedBlock(Event.Result.DENY);
+        }
     }
 
     /**
