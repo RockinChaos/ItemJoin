@@ -213,21 +213,34 @@ public class Drops implements Listener {
                     event.getDrops().remove(stack);
                 }
             }
-            if (!CompatUtils.isInventoryEmpty(topInventory)) {
-                for (int craftInventory = 0; craftInventory < topInventory.getSize(); craftInventory++) {
-                    final ItemStack stack = topInventory.getItem(craftInventory);
-                    if (stack != null && (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops") || !ItemUtilities.getUtilities().isAllowed(player, stack, "erase-drops") || !ItemUtilities.getUtilities().isAllowed(player, stack, "death-keep"))) {
-                        topInventory.remove(stack);
-                    }
-                    final int setSlot = craftInventory;
-                    final AtomicInteger cycleTask = new AtomicInteger();
-                    cycleTask.set(SchedulerUtils.runAsyncAtInterval(20L, 40L, () -> {
-                        if (player.isOnline() && !player.isDead() && PlayerHandler.isCraftingInv(player)) {
-                            handleKeepItem(player, stack, setSlot, "top_inventory");
-                            SchedulerUtils.cancelTask(cycleTask.get());
-                        }
-                    }));
+            sanitizeCraftingInventory(player, topInventory);
+        } else {
+            sanitizeCraftingInventory(player, topInventory);
+        }
+    }
+
+    /**
+     * Removes disallowed items from the player's crafting inventory and schedules
+     * a task to restore valid items once the player is confirmed to be in their own inventory, online, and not dead again.
+     *
+     * @param player        - The player being processed.
+     * @param topInventory  - The crafting/top inventory to check.
+     */
+    private void sanitizeCraftingInventory(final Player player, final Inventory topInventory) {
+        if (!CompatUtils.isInventoryEmpty(topInventory)) {
+            for (int craftInventory = 0; craftInventory < topInventory.getSize(); craftInventory++) {
+                final ItemStack stack = topInventory.getItem(craftInventory);
+                if (stack != null && (!ItemUtilities.getUtilities().isAllowed(player, stack, "death-drops") || !ItemUtilities.getUtilities().isAllowed(player, stack, "erase-drops") || !ItemUtilities.getUtilities().isAllowed(player, stack, "death-keep"))) {
+                    topInventory.remove(stack);
                 }
+                final int setSlot = craftInventory;
+                final AtomicInteger cycleTask = new AtomicInteger();
+                cycleTask.set(SchedulerUtils.runAtInterval(20L, 40L, () -> {
+                    if (player.isOnline() && !player.isDead() && PlayerHandler.isCraftingInv(player)) {
+                        handleKeepItem(player, stack, setSlot, "top_inventory");
+                        SchedulerUtils.cancelTask(cycleTask.get());
+                    }
+                }));
             }
         }
     }
@@ -243,36 +256,32 @@ public class Drops implements Listener {
     private void handleKeepItem(final Player player, final ItemStack item, final int slot, final String itemType) {
         if (item != null && !ItemUtilities.getUtilities().isAllowed(player, item, "death-keep")) {
             final ItemStack keepItem = item.clone();
-            SchedulerUtils.run(() -> {
-                if (player.isOnline()) {
-                    final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(keepItem);
-                    switch (itemType) {
-                        case "helmet":
-                            player.getInventory().setHelmet(keepItem);
-                            break;
-                        case "chest":
-                            player.getInventory().setChestplate(keepItem);
-                            break;
-                        case "legs":
-                            player.getInventory().setLeggings(keepItem);
-                            break;
-                        case "boots":
-                            player.getInventory().setBoots(keepItem);
-                            break;
-                        case "offhand":
-                            player.getInventory().setItemInOffHand(keepItem);
-                            break;
-                        case "bottom_inventory":
-                            CompatUtils.getBottomInventory(player).setItem(slot, keepItem);
-                            break;
-                        case "top_inventory":
-                            CompatUtils.getTopInventory(player).setItem(slot, keepItem);
-                            break;
-                    }
-                    itemMap.setAnimations(player);
-                    ServerUtils.logDebug("{Drops} " + player.getName() + " has triggered the DEATH-KEEP itemflag for " + itemMap.getConfigName() + ".");
-                }
-            });
+            final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(keepItem);
+            switch (itemType) {
+                case "helmet":
+                    player.getInventory().setHelmet(keepItem);
+                    break;
+                case "chest":
+                    player.getInventory().setChestplate(keepItem);
+                    break;
+                case "legs":
+                    player.getInventory().setLeggings(keepItem);
+                    break;
+                case "boots":
+                    player.getInventory().setBoots(keepItem);
+                    break;
+                case "offhand":
+                    player.getInventory().setItemInOffHand(keepItem);
+                    break;
+                case "bottom_inventory":
+                    CompatUtils.getBottomInventory(player).setItem(slot, keepItem);
+                    break;
+                case "top_inventory":
+                    CompatUtils.getTopInventory(player).setItem(slot, keepItem);
+                    break;
+            }
+            itemMap.setAnimations(player);
+            ServerUtils.logDebug("{Drops} " + player.getName() + " has triggered the DEATH-KEEP itemflag for " + itemMap.getConfigName() + ".");
         }
     }
 
