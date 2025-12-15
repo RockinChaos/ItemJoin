@@ -15,7 +15,7 @@
 
     <properties>
         <chaoscore.version>1.1.5-SNAPSHOT</chaoscore.version>
-        <spigot.version>1.21.10-R0.1-SNAPSHOT</spigot.version>
+        <spigot.version>1.21.11-R0.1-SNAPSHOT</spigot.version>
 
         <authlib.version>7.0.61</authlib.version>
         <worldguard.version>7.0.4-SNAPSHOT</worldguard.version>

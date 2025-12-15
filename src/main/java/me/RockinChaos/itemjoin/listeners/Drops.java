@@ -25,6 +25,7 @@ import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import org.bukkit.GameRule;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -100,7 +101,7 @@ public class Drops implements Listener {
         final Player player = event.getEntity();
         ItemUtilities.getUtilities().closeAnimations(player);
         if (PluginData.getInfo().isPreventString(player, "Death-Drops")) {
-            if (PluginData.getInfo().isPreventBypass(player) && !LegacyAPI.hasGameRule(player.getWorld(), "keepInventory")) {
+            if (PluginData.getInfo().isPreventBypass(player) && (ServerUtils.hasPreciseUpdate("1_21_11") ? !Boolean.TRUE.equals(player.getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY)) : !LegacyAPI.hasGameRule(player.getWorld(), "keepInventory"))) {
                 player.getInventory().clear();
                 CompatUtils.getTopInventory(player).clear();
                 event.getDrops().clear();
@@ -195,7 +196,7 @@ public class Drops implements Listener {
         final ItemStack bootsItem = player.getInventory().getBoots();
         final ItemStack offHandItem = PlayerHandler.getOffHandItem(player);
         ItemUtilities.getUtilities().closeAnimations(player);
-        if (!LegacyAPI.hasGameRule(player.getWorld(), "keepInventory")) {
+        if ((ServerUtils.hasPreciseUpdate("1_21_11") ? !Boolean.TRUE.equals(player.getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY)) : !LegacyAPI.hasGameRule(player.getWorld(), "keepInventory"))) {
             if (!CompatUtils.isInventoryEmpty(bottomInventory)) {
                 for (int playerInventory = 0; playerInventory < bottomInventory.getSize(); playerInventory++) {
                     this.handleKeepItem(player, bottomInventory.getItem(playerInventory), playerInventory, "bottom_inventory");
