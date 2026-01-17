@@ -70,8 +70,16 @@ public class ItemUtilities {
         if (player == null || item == null) {
             return true;
         }
-        ItemMap itemMap = this.getItemMap(item);
-        return itemMap == null || !itemMap.isAllowedItem(player, item, itemflag);
+        final ItemMap itemMap = this.getItemMap(item);
+        final boolean isAllowed = itemMap == null || !itemMap.isAllowedItem(player, item, itemflag);
+        if (itemMap != null && !isAllowed) {
+            final String flagMessage = itemMap.getFlagMessages().get(itemflag);
+            if (flagMessage != null && TimerUtils.isExpired(itemflag + "-message", player.getUniqueId())) {
+                player.sendMessage(StringUtils.translateLayout(flagMessage, player));
+                TimerUtils.setExpiry(itemflag + "-message", player.getUniqueId(), 200, TimeUnit.MILLISECONDS);
+            }
+        }
+        return isAllowed;
     }
 
     /**

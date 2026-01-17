@@ -221,6 +221,7 @@ public class ItemMap implements Cloneable {
     private boolean onlyFirstLife = false;
     private boolean onlyFirstWild = false;
     private boolean onlyFirstWorld = false;
+    private Map<String, String> flagMessages = new HashMap<>();
     /*  ============================================== */
     private boolean ipLimited = false;
     /*  ==============================================
@@ -488,8 +489,11 @@ public class ItemMap implements Cloneable {
             this.vanillaControl = StringUtils.splitIgnoreCase(this.itemflags, "vanilla-control", ",");
             this.disposable = StringUtils.splitIgnoreCase(this.itemflags, "disposable", ",");
             this.blockPlacement = StringUtils.splitIgnoreCase(this.itemflags, "placement", ",");
+            if (this.nodeLocation.getString(".placement-message") != null) this.flagMessages.put("placement", this.nodeLocation.getString(".placement-message"));
             this.blockMovement = StringUtils.splitIgnoreCase(this.itemflags, "inventory-modify", ",") || StringUtils.splitIgnoreCase(this.itemflags, "inventory-close", ",");
+            if (this.nodeLocation.getString(".inventory-modify-message") != null) this.flagMessages.put("inventory-modify", this.nodeLocation.getString(".inventory-modify-message"));
             this.blockEquip = StringUtils.splitIgnoreCase(this.itemflags, "cancel-equip", ",");
+            if (this.nodeLocation.getString(".cancel-equip-message") != null) this.flagMessages.put("cancel-equip", this.nodeLocation.getString(".cancel-equip-message"));
             this.closeInventory = StringUtils.splitIgnoreCase(this.itemflags, "inventory-close", ",");
             this.itemChangeable = StringUtils.splitIgnoreCase(this.itemflags, "item-changeable", ",");
             this.alwaysGive = StringUtils.splitIgnoreCase(this.itemflags, "always-give", ",");
@@ -508,18 +512,26 @@ public class ItemMap implements Cloneable {
             this.moveNext = StringUtils.splitIgnoreCase(this.itemflags, "move-next", ",");
             this.dropFull = StringUtils.splitIgnoreCase(this.itemflags, "drop-full", ",");
             this.itemStore = StringUtils.splitIgnoreCase(this.itemflags, "item-store", ",");
+            if (this.nodeLocation.getString(".item-store-message") != null) this.flagMessages.put("item-store", this.nodeLocation.getString(".item-store-message"));
             this.itemModify = StringUtils.splitIgnoreCase(this.itemflags, "item-modifiable", ",");
+            if (this.nodeLocation.getString(".item-modifiable-message") != null) this.flagMessages.put("item-modifiable", this.nodeLocation.getString(".item-modifiable-message"));
             this.noCrafting = StringUtils.splitIgnoreCase(this.itemflags, "item-craftable", ",");
+            if (this.nodeLocation.getString(".item-craftable-message") != null) this.flagMessages.put("item-craftable", this.nodeLocation.getString(".item-craftable-message"));
             this.noRepairing = StringUtils.splitIgnoreCase(this.itemflags, "item-repairable", ",");
+            if (this.nodeLocation.getString(".item-repairable-message") != null) this.flagMessages.put("item-repairable", this.nodeLocation.getString(".item-repairable-message"));
             this.cancelEvents = StringUtils.splitIgnoreCase(this.itemflags, "cancel-events", ",");
             this.countLock = StringUtils.splitIgnoreCase(this.itemflags, "count-lock", ",");
             this.teleportArrow = StringUtils.splitIgnoreCase(this.itemflags, "teleport", ",");
             this.overwritable = StringUtils.splitIgnoreCase(this.itemflags, "overwrite", ",");
             this.ipLimited = StringUtils.splitIgnoreCase(this.itemflags, "ip-limit", ",");
+            if (this.nodeLocation.getString(".ip-limit-message") != null) this.flagMessages.put("ip-limit", this.nodeLocation.getString(".ip-limit-message"));
             this.deathKeepable = StringUtils.splitIgnoreCase(this.itemflags, "death-keep", ",");
             this.deathDroppable = StringUtils.splitIgnoreCase(this.itemflags, "death-drops", ",");
+            if (this.nodeLocation.getString(".death-drops-message") != null) this.flagMessages.put("death-drops", this.nodeLocation.getString(".death-drops-message"));
             this.selfDroppable = StringUtils.splitIgnoreCase(this.itemflags, "self-drops", ",");
+            if (this.nodeLocation.getString(".self-drops-message") != null) this.flagMessages.put("self-drops", this.nodeLocation.getString(".self-drops-message"));
             this.eraseDroppable = StringUtils.splitIgnoreCase(this.itemflags, "erase-drops", ",");
+            if (this.nodeLocation.getString(".erase-drops-message") != null) this.flagMessages.put("erase-drops", this.nodeLocation.getString(".erase-drops-message"));
 
             /* Shared with Triggers */
             this.setOnlyFirstJoin((StringUtils.splitIgnoreCase(this.itemflags, "first-join", ",") || this.onlyFirstJoin));
@@ -1324,6 +1336,24 @@ public class ItemMap implements Cloneable {
      */
     public void setItemFlags(final String itemflags) {
         this.itemflags = itemflags;
+    }
+
+    /**
+     * Gets the ItemFlags Messages.
+     *
+     * @return The ItemFlags Messages.
+     */
+    public Map<String, String> getFlagMessages() {
+        return this.flagMessages;
+    }
+
+    /**
+     * Sets the ItemFlag Messages.
+     *
+     * @param flagMessages - The ItemFlag Messages to be set.
+     */
+    public void setFlagMessages(final Map<String, String> flagMessages) {
+        this.flagMessages = flagMessages;
     }
 
     /**
@@ -6458,6 +6488,11 @@ public class ItemMap implements Cloneable {
         }
         if (this.itemflags != null && !this.itemflags.isEmpty()) {
             itemData.set("items." + this.configName + ".itemflags", this.itemflags);
+        }
+        if (this.flagMessages != null && !this.flagMessages.isEmpty()) {
+            for (Map.Entry<String, String> entry : this.flagMessages.entrySet()) {
+                itemData.set("items." + this.configName + "." + entry.getKey(), entry.getValue());
+            }
         }
         if (this.triggers != null && !this.triggers.isEmpty()) {
             final String defaultTriggers = ItemJoin.getCore().getConfig("config.yml").getString("Settings.Default-Triggers");
