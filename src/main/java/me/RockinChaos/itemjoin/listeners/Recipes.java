@@ -19,6 +19,7 @@ package me.RockinChaos.itemjoin.listeners;
 
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.CompatUtils;
+import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.core.utils.api.LegacyAPI;
@@ -69,10 +70,12 @@ public class Recipes implements Listener {
                 final ItemStack item = topInventory.getItem(i);
                 if (item != null && item.getType() != Material.AIR) {
                     if (!ItemUtilities.getUtilities().isAllowed(player, item, "item-craftable")) {
-                        ItemStack reAdd = item.clone();
+                        final ItemStack reAdd = item.clone();
                         topInventory.setItem(i, null);
-                        player.getInventory().addItem(reAdd);
-                        PlayerHandler.updateInventory(player, 1L);
+                        SchedulerUtils.runLater(1L, () -> {
+                            player.getInventory().addItem(reAdd);
+                            PlayerHandler.updateInventory(player, 1L);
+                        });
                         break;
                     }
                 }
