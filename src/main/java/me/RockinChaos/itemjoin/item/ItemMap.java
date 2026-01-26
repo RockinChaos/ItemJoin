@@ -4239,7 +4239,7 @@ public class ItemMap implements Cloneable {
         if (this.skullOwner != null) {
             this.tempMeta = ItemHandler.setSkullOwner(this.tempMeta, player, StringUtils.translateLayout(this.skullOwner, player));
         } else if (this.skullTexture != null && !this.headDatabase) {
-            this.tempMeta = ItemHandler.setSkullTexture(player, this.tempMeta, StringUtils.toTextureUUID(player, this.configName, this.skullTexture));
+            this.tempMeta = ItemHandler.setSkullTexture(this.tempMeta, StringUtils.toTextureUUID(player, this.configName, this.skullTexture));
         }
     }
 

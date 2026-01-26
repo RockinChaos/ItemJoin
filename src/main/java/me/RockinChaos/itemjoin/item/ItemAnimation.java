@@ -468,7 +468,7 @@ public class ItemAnimation {
             if (ownerString != null) {
                 ItemHandler.setSkullOwner(tempMeta, player, StringUtils.translateLayout(ItemHandler.cutDelay(ownerString), player));
             } else if (textureString != null && !textureString.contains("hdb-") && !this.itemMap.isHeadDatabase()) {
-                ItemHandler.setSkullTexture(player, tempMeta, ItemHandler.cutDelay(StringUtils.toTextureUUID(player, this.itemMap.getConfigName(), textureString)));
+                ItemHandler.setSkullTexture(tempMeta, ItemHandler.cutDelay(StringUtils.toTextureUUID(player, this.itemMap.getConfigName(), textureString)));
             }
             reviseItem.setItemMeta(tempMeta);
         }
