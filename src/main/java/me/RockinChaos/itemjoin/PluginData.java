@@ -28,7 +28,6 @@ import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.core.utils.api.MetricsAPI;
 import me.RockinChaos.core.utils.api.MetricsAPI.SimplePie;
-import me.RockinChaos.core.utils.api.ProtocolAPI;
 import me.RockinChaos.core.utils.protocol.ProtocolManager;
 import me.RockinChaos.core.utils.sql.Database;
 import me.RockinChaos.itemjoin.item.ItemDesigner;
@@ -571,10 +570,8 @@ public class PluginData {
         if ((!StringUtils.splitIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Prevent." + "itemMovement"), "FALSE", ",") && !StringUtils.splitIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Prevent." + "itemMovement"), "DISABLED", ","))) {
             if (StringUtils.isRegistered(Clicking.class.getSimpleName())) {
                 ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Clicking(), ItemJoin.getCore().getPlugin());
-                if (!ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolManager.isDead()) {
+                if (ProtocolManager.isDead()) {
                     ProtocolManager.handleProtocols();
-                } else if (ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolAPI.isHandling()) {
-                    ProtocolAPI.handleProtocols();
                 }
             }
         }
@@ -631,10 +628,8 @@ public class PluginData {
             PlayerHandler.cycleCrafting();
             runLater(40L, () -> {
                 forOnlinePlayers(player -> this.restoreCraftItems(player, TriggerType.DEFAULT));
-                if (!ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolManager.isDead()) {
+                if (ProtocolManager.isDead()) {
                     ProtocolManager.handleProtocols();
-                } else if (ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolAPI.isHandling()) {
-                    ProtocolAPI.handleProtocols();
                 }
             });
             if (StringUtils.isRegistered(PlayerQuit.class.getSimpleName())) {
@@ -645,10 +640,8 @@ public class PluginData {
         if ((itemMap.isMovement() || itemMap.isEquip() || itemMap.isInventoryClose())) {
             if (StringUtils.isRegistered(Clicking.class.getSimpleName())) {
                 ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Clicking(), ItemJoin.getCore().getPlugin());
-                if (!ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolManager.isDead()) {
+                if (ProtocolManager.isDead()) {
                     ProtocolManager.handleProtocols();
-                } else if (ItemJoin.getCore().getDependencies().protocolEnabled() && ProtocolAPI.isHandling()) {
-                    ProtocolAPI.handleProtocols();
                 }
             }
             if (ItemJoin.getCore().getDependencies().chestSortEnabled()) {
