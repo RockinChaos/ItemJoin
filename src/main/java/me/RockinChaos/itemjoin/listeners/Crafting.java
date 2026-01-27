@@ -245,7 +245,7 @@ public class Crafting implements Listener {
     private void onCraftingWorldSwitch(PlayerChangedWorldEvent event) {
         final Player player = event.getPlayer();
         final ItemStack[] inventory = player.getInventory().getContents();
-        if (ItemHandler.isContentsEmpty(inventory)) {
+        if (!ItemHandler.isContentsEmpty(inventory)) {
             for (int i = 0; i < inventory.length; i++) {
                 for (ItemMap itemMap : ItemUtilities.getUtilities().getCraftingItems()) {
                     if ((itemMap.isCraftingItem() && itemMap.isReal(inventory[i]))) {
@@ -291,7 +291,7 @@ public class Crafting implements Listener {
     private void handleClose(final Consumer<Integer> input, final Player player, final Object view, final ItemStack[] inventory, final boolean slotZero) {
         if (PlayerHandler.isCraftingInv(view)) {
             final Inventory topInventory = CompatUtils.getTopInventory(player);
-            if (ItemHandler.isContentsEmpty(inventory)) {
+            if (!ItemHandler.isContentsEmpty(inventory)) {
                 boolean isCrafting = false;
                 for (int i = 0; i <= 4; i++) {
                     for (ItemMap itemMap : ItemUtilities.getUtilities().getCraftingItems()) {
@@ -406,6 +406,7 @@ public class Crafting implements Listener {
                     final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(contents[i]);
                     if (contents[i] != null && itemMap != null) {
                         topInventory.setItem(i, contents[i]);
+                        if (i != 0) PlayerHandler.updateInventory(player, contents[i], 0L);
                         SchedulerUtils.runLater(1L, () -> {
                             if (PlayerHandler.isCraftingInv(player)) {
                                 PlayerHandler.updateInventory(player, itemMap.getItemStack(player), 0L);
@@ -417,6 +418,12 @@ public class Crafting implements Listener {
                 final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(contents[0]);
                 if (contents[0] != null && itemMap != null) {
                     topInventory.setItem(0, contents[0]);
+                    for (int i = 4; i >= 1; i--) {
+                        final ItemMap craftMap = ItemUtilities.getUtilities().getItemMap(contents[i]);
+                        if (contents[i] != null && craftMap != null) {
+                            PlayerHandler.updateInventory(player, contents[i].clone(), 0L);
+                        }
+                    }
                     SchedulerUtils.runLater(1L, () -> {
                         if (PlayerHandler.isCraftingInv(player)) {
                             PlayerHandler.updateInventory(player, itemMap.getItemStack(player), 0L);
