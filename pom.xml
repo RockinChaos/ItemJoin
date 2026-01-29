@@ -207,9 +207,9 @@
         </dependency>
         <!--Apache API-->
         <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.7</version>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.17.1</version>
             <scope>provided</scope>
         </dependency>
         <!--Netty API-->
