@@ -446,6 +446,7 @@ public class PluginData {
     public void registerClasses(final boolean silent) {
         final boolean isRunning = ItemJoin.getCore().isStarted();
         ServerUtils.clearErrorStatements();
+        ReflectionUtils.refresh();
         ItemJoin.getCore().getData().refresh();
         ItemJoin.getCore().getFilter().refresh();
         ItemJoin.getCore().getBungee().refresh();

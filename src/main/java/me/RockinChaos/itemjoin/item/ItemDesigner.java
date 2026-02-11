@@ -437,8 +437,15 @@ public class ItemDesigner {
     private void setNBTData(final ItemMap itemMap) {
         if (ItemJoin.getCore().getData().dataTagsEnabled() && !itemMap.isVanilla() && !itemMap.isVanillaControl() && !itemMap.isVanillaStatus()) {
             try {
-                final Object tag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
-                tag.getClass().getMethod(MinecraftMethod.setString.getMethod(), String.class, String.class).invoke(tag, "ItemJoin Name", itemMap.getConfigName());
+                final Class<?> nbtTagCompoundClass = ReflectionUtils.getMinecraftClass("NBTTagCompound");
+                final Class<?> nbtTagListClass = ReflectionUtils.getMinecraftClass("NBTTagList");
+                final Class<?> nbtTagStringClass = ReflectionUtils.getMinecraftClass("NBTTagString");
+                final Class<?> nbtBaseClass = ReflectionUtils.getMinecraftClass("NBTBase");
+                final String setStringMethod = MinecraftMethod.setString.getMethod();
+                final String valueOfMethod = MinecraftMethod.valueOf.getMethod();
+                final String addTagMethod = ServerUtils.hasSpecificUpdate("1_21") ? MinecraftMethod.addTag.getMethod() : MinecraftMethod.add.getMethod();
+                final Object tag = ReflectionUtils.getConstructor(nbtTagCompoundClass).invoke();
+                ReflectionUtils.getMethod(tag.getClass(), setStringMethod, String.class, String.class).invoke(tag, "ItemJoin Name", itemMap.getConfigName());
                 final String itemProperties = itemMap.getNodeLocation().getString(".properties");
                 if (itemProperties != null && !itemProperties.isEmpty()) {
                     final Map<Object, Object> tagValues = new HashMap<>();
@@ -459,14 +466,14 @@ public class ItemDesigner {
                             value = new StringBuilder(value.toString().replace("[", "").replace("]", ""));
                             final String[] valueParts = value.toString().split("#");
                             final List<String> listNBT = new ArrayList<>(Arrays.asList(valueParts));
-                            tagList = ReflectionUtils.getMinecraftClass("NBTTagList").getConstructor().newInstance();
+                            tagList = ReflectionUtils.getConstructor(nbtTagListClass).invoke();
                             for (final String nbt : listNBT) {
-                                final Object tagString = ReflectionUtils.getMinecraftClass("NBTTagString").getMethod(MinecraftMethod.valueOf.getMethod(), String.class).invoke(null, nbt);
-                                tagList.getClass().getMethod(ServerUtils.hasSpecificUpdate("1_21") ? MinecraftMethod.addTag.getMethod() : MinecraftMethod.add.getMethod(), int.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagList, 0, tagString);
+                                final Object tagString = ReflectionUtils.getMethod(nbtTagStringClass, valueOfMethod, String.class).invoke(null, nbt);
+                                ReflectionUtils.getMethod(tagList.getClass(), addTagMethod, int.class, nbtBaseClass).invoke(tagList, 0, tagString);
                             }
                         }
-                        final Object propertyTag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
-                        propertyTag.getClass().getMethod(MinecraftMethod.setString.getMethod(), String.class, String.class).invoke(propertyTag, tagName, value.toString());
+                        final Object propertyTag = ReflectionUtils.getConstructor(nbtTagCompoundClass).invoke();
+                        ReflectionUtils.getMethod(propertyTag.getClass(), setStringMethod, String.class, String.class).invoke(propertyTag, tagName, value.toString());
                         if (tagList == null) {
                             tagValues.put(identifier, value.toString());
                         } else {

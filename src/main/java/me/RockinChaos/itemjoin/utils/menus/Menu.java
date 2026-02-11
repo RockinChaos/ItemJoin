@@ -460,7 +460,7 @@ public class Menu {
      * @param k          - The Page Directory.
      */
     private static void setButton(final Player player, final ItemMap itemMap, final Interface modifyPane, final ItemMap contents, final ItemMap refMap, final int k) {
-        final ItemStack item = itemMap.getTempItem().clone();
+        final ItemStack item = itemMap.getItemStack(player);
         if (item.getType() == Material.AIR) {
             item.setType(fillerPaneItem.getType());
         }
@@ -761,16 +761,22 @@ public class Menu {
             Object tag = null;
             final ItemStack itemCopy = item.clone();
             final Class<?> itemClass = ReflectionUtils.getMinecraftClass("ItemStack");
-            final Object nms = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, itemCopy);
+            final ReflectionUtils.MethodInvoker asNMSCopy = ReflectionUtils.getMethod(ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack"), "asNMSCopy", ItemStack.class);
+            final Object nms = asNMSCopy.invoke(null, itemCopy);
             if (ServerUtils.hasPreciseUpdate("1_20_5")) {
-                final Object componentMap = ReflectionUtils.getMethod(itemClass, MinecraftMethod.getComponents.getMethod()).invoke(nms);
-                final Object customDataType = ReflectionUtils.getField(ReflectionUtils.getMinecraftClass("DataComponents"), ReflectionUtils.MinecraftField.CustomData.getField()).get(null);
-                final Object customDataOptional = ReflectionUtils.getMethod(ReflectionUtils.getMinecraftClass(ServerUtils.hasPreciseUpdate("1_21_5") ? "DataComponentGetter" : "DataComponentMap"), MinecraftMethod.get.getMethod(), ReflectionUtils.getMinecraftClass("DataComponentType")).invoke(componentMap, customDataType);
+                final ReflectionUtils.MethodInvoker getComponents = ReflectionUtils.getMethod(itemClass, MinecraftMethod.getComponents.getMethod());
+                final Object componentMap = getComponents.invoke(nms);
+                final ReflectionUtils.FieldAccessor<Object> customDataField = ReflectionUtils.getField(ReflectionUtils.getMinecraftClass("DataComponents"), ReflectionUtils.MinecraftField.CustomData.getField());
+                final Object customDataType = customDataField.get(null);
+                final ReflectionUtils.MethodInvoker getMethod = ReflectionUtils.getMethod(ReflectionUtils.getMinecraftClass(ServerUtils.hasPreciseUpdate("1_21_5") ? "DataComponentGetter" : "DataComponentMap"), MinecraftMethod.get.getMethod(), ReflectionUtils.getMinecraftClass("DataComponentType"));
+                final Object customDataOptional = getMethod.invoke(componentMap, customDataType);
                 if (customDataOptional != null) {
-                    tag = ReflectionUtils.getMethod(customDataOptional.getClass(), MinecraftMethod.copyTag.getMethod()).invoke(customDataOptional);
+                    final ReflectionUtils.MethodInvoker copyTag = ReflectionUtils.getMethod(customDataOptional.getClass(), MinecraftMethod.copyTag.getMethod());
+                    tag = copyTag.invoke(customDataOptional);
                 }
             } else {
-                tag = itemClass.getMethod(MinecraftMethod.getTag.getMethod()).invoke(nms);
+                final ReflectionUtils.MethodInvoker getTag = ReflectionUtils.getMethod(itemClass, MinecraftMethod.getTag.getMethod());
+                tag = getTag.invoke(nms);
             }
             if (tag == null) {
                 return null;
@@ -795,12 +801,13 @@ public class Menu {
      */
     @SuppressWarnings("unchecked")
     private static void extractNBTData(final Object tag, final String parentKey, final Map<Object, Object> nbtData) throws Exception {
-        for (final String key : (Set<String>) tag.getClass().getMethod(MinecraftMethod.getKeys.getMethod()).invoke(tag)) {
+        final Class<?> tagClass = tag.getClass();
+        for (final String key : (Set<String>) ReflectionUtils.getMethod(tagClass, MinecraftMethod.getKeys.getMethod()).invoke(tag)) {
             if (isVanillaTag(key)) {
                 continue;
             }
-            final Object nbtBase = tag.getClass().getMethod(MinecraftMethod.getBase.getMethod(), String.class).invoke(tag, key);
-            final byte typeId = (byte) nbtBase.getClass().getMethod(MinecraftMethod.getTypeId.getMethod()).invoke(nbtBase);
+            final Object nbtBase = ReflectionUtils.getMethod(tagClass, MinecraftMethod.getBase.getMethod(), String.class).invoke(tag, key);
+            final byte typeId = (byte) ReflectionUtils.getMethod(nbtBase.getClass(), MinecraftMethod.getTypeId.getMethod()).invoke(nbtBase);
             final String fullKey = parentKey.isEmpty() ? key : parentKey + "." + key;
             if (typeId == 10) {
                 extractNBTData(nbtBase, fullKey, nbtData);
@@ -4322,7 +4329,7 @@ public class Menu {
                             itemMap.getAnimationHandler().get(player).setMenu(true, 1);
                         }
                     }
-                    swapPane.addButton(new Button(ItemHandler.addLore(item.getTempItem(), "&7", "&6---------------------------", "&7*Click to set as a swap-item.", "&9&lNode: &a" + item.getConfigName(), "&7"), event -> {
+                    swapPane.addButton(new Button(ItemHandler.addLore(item.getItemStack(player), "&7", "&6---------------------------", "&7*Click to set as a swap-item.", "&9&lNode: &a" + item.getConfigName(), "&7"), event -> {
                         modifyCommands(itemMap, ItemCommand.fromString("swap-item: " + item.getConfigName(), action, itemMap, 0L, null), true);
                         commandListPane(player, itemMap, action);
                     }));
@@ -9852,8 +9859,7 @@ public class Menu {
                             }
                             ((SkullMeta) itemMeta).setOwnerProfile(playerProfile);
                         } else {
-                            Field declaredField = itemMeta.getClass().getDeclaredField("profile");
-                            declaredField.setAccessible(true);
+                            final Field declaredField = ReflectionUtils.getDeclaredField(itemMeta.getClass(), "profile");
                             declaredField.set(itemMeta, CompatUtils.newGameProfile(UUID.randomUUID(), skullTexture));
                         }
                     }

@@ -59,7 +59,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionType;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.Map.Entry;
@@ -1956,9 +1955,7 @@ public class ItemMap implements Cloneable {
             for (String command : (toggleSingle != null ? this.nodeLocation.getStringList(".toggle") : this.toggleCommands)) {
                 PluginCommand cmd = null;
                 try {
-                    Constructor<PluginCommand> pluginCommand = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
-                    pluginCommand.setAccessible(true);
-                    cmd = pluginCommand.newInstance((command.contains(" ") ? command.split(" ")[0] : command), ItemJoin.getCore().getPlugin());
+                    cmd = (PluginCommand) ReflectionUtils.getConstructor(PluginCommand.class, String.class, Plugin.class).invoke((command.contains(" ") ? command.split(" ")[0] : command), ItemJoin.getCore().getPlugin());
                 } catch (Exception e) {
                     ServerUtils.sendDebugTrace(e);
                 }
@@ -1973,9 +1970,7 @@ public class ItemMap implements Cloneable {
         } else if (toggleSingle != null && !toggleSingle.isEmpty() && !toggleSingle.equalsIgnoreCase(" ")) {
             PluginCommand cmd = null;
             try {
-                Constructor<PluginCommand> pluginCommand = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
-                pluginCommand.setAccessible(true);
-                cmd = pluginCommand.newInstance((toggleSingle.contains(" ") ? toggleSingle.split(" ")[0] : toggleSingle), ItemJoin.getCore().getPlugin());
+                cmd = (PluginCommand) ReflectionUtils.getConstructor(PluginCommand.class, String.class, Plugin.class).invoke((toggleSingle.contains(" ") ? toggleSingle.split(" ")[0] : toggleSingle), ItemJoin.getCore().getPlugin());
             } catch (Exception e) {
                 ServerUtils.sendDebugTrace(e);
             }
@@ -4474,15 +4469,15 @@ public class ItemMap implements Cloneable {
         if (!ServerUtils.hasPreciseUpdate("1_20_5") && (this.isUnbreakable() || this.hideDurability)) {
             try {
                 Class<?> craftItemStack = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack");
-                Object nms = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
+                Object nms = ReflectionUtils.getMethod(craftItemStack, "asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
                 Class<?> itemClass = ReflectionUtils.getMinecraftClass("ItemStack");
-                Object tag = itemClass.getMethod(MinecraftMethod.getTag.getMethod()).invoke(nms);
+                Object tag = ReflectionUtils.getMethod(itemClass, MinecraftMethod.getTag.getMethod()).invoke(nms);
                 if (tag == null) {
-                    tag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
+                    tag = ReflectionUtils.getConstructor(ReflectionUtils.getMinecraftClass("NBTTagCompound")).invoke();
                 }
-                tag.getClass().getMethod(MinecraftMethod.setInt.getMethod(), String.class, int.class).invoke(tag, "Unbreakable", 1);
-                nms.getClass().getMethod(MinecraftMethod.setTag.getMethod(), tag.getClass()).invoke(nms, tag);
-                final ItemStack item = (ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms);
+                ReflectionUtils.getMethod(tag.getClass(), MinecraftMethod.setInt.getMethod(), String.class, int.class).invoke(tag, "Unbreakable", 1);
+                ReflectionUtils.getMethod(nms.getClass(), MinecraftMethod.setTag.getMethod(), tag.getClass()).invoke(nms, tag);
+                final ItemStack item = (ItemStack) ReflectionUtils.getMethod(craftItemStack, "asCraftMirror", nms.getClass()).invoke(null, nms);
                 this.tempItem = item != null ? item : this.tempItem.clone();
             } catch (Exception e) {
                 ServerUtils.sendDebugTrace(e);
@@ -4617,9 +4612,9 @@ public class ItemMap implements Cloneable {
         for (String textComponent : pages) {
             try {
                 textComponent = StringUtils.translateLayout(textComponent, player);
-                Object TagString = ReflectionUtils.getMinecraftClass("NBTTagString").getConstructor(String.class).newInstance(textComponent);
+                Object TagString = ReflectionUtils.getConstructor(ReflectionUtils.getMinecraftClass("NBTTagString"), String.class).invoke(textComponent);
                 Class<?> baseClass = ReflectionUtils.getMinecraftClass("NBTBase");
-                localePages.getClass().getMethod(MinecraftMethod.add.getMethod(), baseClass).invoke(localePages, TagString);
+                ReflectionUtils.getMethod(localePages.getClass(), MinecraftMethod.add.getMethod(), baseClass).invoke(localePages, TagString);
             } catch (Exception e) {
                 ServerUtils.sendDebugTrace(e);
             }
@@ -4647,9 +4642,9 @@ public class ItemMap implements Cloneable {
             String textComponent = pages.get(i);
             try {
                 textComponent = StringUtils.translateLayout(textComponent, player);
-                Object TagString = ReflectionUtils.getMinecraftClass("NBTTagString").getConstructor(String.class).newInstance(textComponent);
+                Object TagString = ReflectionUtils.getConstructor(ReflectionUtils.getMinecraftClass("NBTTagString"), String.class).invoke(textComponent);
                 Class<?> baseClass = ReflectionUtils.getMinecraftClass("NBTBase");
-                localePages.getClass().getMethod(MinecraftMethod.add.getMethod(), int.class, baseClass).invoke(localePages, 0, TagString);
+                ReflectionUtils.getMethod(localePages.getClass(), MinecraftMethod.add.getMethod(), int.class, baseClass).invoke(localePages, 0, TagString);
             } catch (Exception e) {
                 ServerUtils.sendDebugTrace(e);
             }
@@ -4679,8 +4674,8 @@ public class ItemMap implements Cloneable {
                 textComponent = StringUtils.translateLayout(textComponent, player);
                 Class<?> stringClass = ReflectionUtils.getMinecraftClass("NBTTagString");
                 Class<?> baseClass = ReflectionUtils.getMinecraftClass("NBTBase");
-                Object TagString = stringClass.getMethod(MinecraftMethod.getPage.getMethod(), String.class).invoke(null, textComponent);
-                localePages.getClass().getMethod(MinecraftMethod.add.getMethod(), int.class, baseClass).invoke(localePages, 0, TagString);
+                Object TagString = ReflectionUtils.getMethod(stringClass, MinecraftMethod.getPage.getMethod(), String.class).invoke(null, textComponent);
+                ReflectionUtils.getMethod(localePages.getClass(), MinecraftMethod.add.getMethod(), int.class, baseClass).invoke(localePages, 0, TagString);
             } catch (Exception e) {
                 ServerUtils.sendDebugTrace(e);
             }
@@ -4728,17 +4723,17 @@ public class ItemMap implements Cloneable {
      * @throws Exception An exception.
      */
     private ItemStack invokePages(final ItemStack item, final Object pages) throws Exception {
-        Class<?> craftItemStack = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack");
-        Class<?> itemClass = ReflectionUtils.getMinecraftClass("ItemStack");
-        Class<?> baseClass = ReflectionUtils.getMinecraftClass("NBTBase");
-        Object nms = craftItemStack.getMethod("asNMSCopy", ItemStack.class).invoke(null, item);
-        Object tag = itemClass.getMethod(MinecraftMethod.getTag.getMethod()).invoke(nms);
+        final Class<?> craftItemStack = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack");
+        final Class<?> itemClass = ReflectionUtils.getMinecraftClass("ItemStack");
+        final Class<?> baseClass = ReflectionUtils.getMinecraftClass("NBTBase");
+        final Object nms = ReflectionUtils.getMethod(craftItemStack, "asNMSCopy", ItemStack.class).invoke(null, item);
+        Object tag = ReflectionUtils.getMethod(itemClass, MinecraftMethod.getTag.getMethod()).invoke(nms);
         if (tag == null) {
-            tag = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
+            tag = ReflectionUtils.getConstructor(ReflectionUtils.getMinecraftClass("NBTTagCompound")).invoke();
         }
-        tag.getClass().getMethod(MinecraftMethod.set.getMethod(), String.class, baseClass).invoke(tag, "pages", pages);
-        nms.getClass().getMethod(MinecraftMethod.setTag.getMethod(), tag.getClass()).invoke(nms, tag);
-        return ((ItemStack) craftItemStack.getMethod("asCraftMirror", nms.getClass()).invoke(null, nms));
+        ReflectionUtils.getMethod(tag.getClass(), MinecraftMethod.set.getMethod(), String.class, baseClass).invoke(tag, "pages", pages);
+        ReflectionUtils.getMethod(nms.getClass(), MinecraftMethod.setTag.getMethod(), tag.getClass()).invoke(nms, tag);
+        return ((ItemStack) ReflectionUtils.getMethod(craftItemStack, "asCraftMirror", nms.getClass()).invoke(null, nms));
     }
 
     /**
@@ -4748,15 +4743,15 @@ public class ItemMap implements Cloneable {
         if (ItemJoin.getCore().getData().dataTagsEnabled() && !this.isVanilla() && !this.isVanillaControl() && !this.isVanillaStatus()) {
             try {
                 final Class<?> itemClass = ReflectionUtils.getMinecraftClass("ItemStack");
-                final Object nms = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack").getMethod("asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
-                Object tagInstance = ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
+                final Object nms = ReflectionUtils.getMethod(ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack"), "asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
+                Object tagInstance = ReflectionUtils.getConstructor(ReflectionUtils.getMinecraftClass("NBTTagCompound")).invoke();
                 if (!ServerUtils.hasPreciseUpdate("1_20_5")) {
-                    final Object cacheTag = itemClass.getMethod(MinecraftMethod.getTag.getMethod()).invoke(nms);
+                    final Object cacheTag = ReflectionUtils.getMethod(itemClass, MinecraftMethod.getTag.getMethod()).invoke(nms);
                     if (cacheTag != null) {
                         tagInstance = cacheTag;
                     }
                 }
-                tagInstance.getClass().getMethod(MinecraftMethod.setString.getMethod(), String.class, String.class).invoke(tagInstance, "ItemJoin Name", this.getConfigName());
+                ReflectionUtils.getMethod(tagInstance.getClass(), MinecraftMethod.setString.getMethod(), String.class, String.class).invoke(tagInstance, "ItemJoin Name", this.getConfigName());
                 final Map<String, Object> packages = new HashMap<>();
                 if (this.nbtProperty != null && !this.nbtProperty.isEmpty()) {
                     for (Object tag : this.nbtProperty.keySet()) {
@@ -4771,31 +4766,31 @@ public class ItemMap implements Cloneable {
                         }
                         try {
                             if (packageName != null) {
-                                Object customPackage = packages.get(packageName) != null ? packages.get(packageName) : ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
+                                Object customPackage = packages.get(packageName) != null ? packages.get(packageName) : ReflectionUtils.getConstructor(ReflectionUtils.getMinecraftClass("NBTTagCompound")).invoke();
                                 if (property instanceof String) {
                                     final String castProperty = (String) property;
-                                    customPackage.getClass().getMethod(MinecraftMethod.setString.getMethod(), String.class, String.class).invoke(customPackage, tagName, castProperty);
+                                    ReflectionUtils.getMethod(customPackage.getClass(), MinecraftMethod.setString.getMethod(), String.class, String.class).invoke(customPackage, tagName, castProperty);
                                 } else {
-                                    customPackage.getClass().getMethod(MinecraftMethod.put.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(customPackage, tagName, property);
+                                    ReflectionUtils.getMethod(customPackage.getClass(), MinecraftMethod.put.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(customPackage, tagName, property);
                                 }
                                 packages.put(packageName, customPackage);
-                                tagInstance.getClass().getMethod(MinecraftMethod.setCompound.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagInstance, packageName, customPackage);
+                                ReflectionUtils.getMethod(tagInstance.getClass(), MinecraftMethod.setCompound.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagInstance, packageName, customPackage);
                             } else {
                                 if (property instanceof String) {
                                     final String castProperty = (String) property;
-                                    tagInstance.getClass().getMethod(MinecraftMethod.setString.getMethod(), String.class, String.class).invoke(tagInstance, tagName, castProperty);
+                                    ReflectionUtils.getMethod(tagInstance.getClass(), MinecraftMethod.setString.getMethod(), String.class, String.class).invoke(tagInstance, tagName, castProperty);
                                 } else {
-                                    tagInstance.getClass().getMethod(MinecraftMethod.put.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagInstance, tagName, property);
+                                    ReflectionUtils.getMethod(tagInstance.getClass(), MinecraftMethod.put.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagInstance, tagName, property);
                                 }
                             }
                         } catch (Exception e) {
                             if (packageName != null) {
-                                Object customPackage = packages.get(packageName) != null ? packages.get(packageName) : ReflectionUtils.getMinecraftClass("NBTTagCompound").getConstructor().newInstance();
-                                customPackage.getClass().getMethod(MinecraftMethod.set.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(customPackage, tagName, property);
+                                Object customPackage = packages.get(packageName) != null ? packages.get(packageName) : ReflectionUtils.getConstructor(ReflectionUtils.getMinecraftClass("NBTTagCompound")).invoke();
+                                ReflectionUtils.getMethod(customPackage.getClass(), MinecraftMethod.set.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(customPackage, tagName, property);
                                 packages.put(packageName, customPackage);
-                                tagInstance.getClass().getMethod(MinecraftMethod.setCompound.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagInstance, packageName, customPackage);
+                                ReflectionUtils.getMethod(tagInstance.getClass(), MinecraftMethod.setCompound.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagInstance, packageName, customPackage);
                             } else {
-                                tagInstance.getClass().getMethod(MinecraftMethod.set.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagInstance, tagName, property);
+                                ReflectionUtils.getMethod(tagInstance.getClass(), MinecraftMethod.set.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagInstance, tagName, property);
                             }
                         }
                     }
@@ -6748,9 +6743,8 @@ public class ItemMap implements Cloneable {
      */
     public ItemMap clone() {
         try {
-            ItemMap clone = (ItemMap) super.clone();
-            for (Field field : this.getClass().getDeclaredFields()) {
-                field.setAccessible(true);
+            final ItemMap clone = (ItemMap) super.clone();
+            for (final Field field : ReflectionUtils.getDeclaredFields(this.getClass())) {
                 field.set(clone, field.get(this));
             }
             return clone;
