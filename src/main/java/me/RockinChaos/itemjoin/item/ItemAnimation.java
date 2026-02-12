@@ -30,24 +30,30 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ItemAnimation {
 
     private final ItemMap itemMap;
-    private List<String> dynamicNames = null;
-    private List<List<String>> dynamicLores = null;
-    private List<String> dynamicMaterials = null;
-    private List<String> dynamicOwners = null;
-    private List<String> dynamicTextures = null;
-    private List<String> dynamicPages = null;
-    private boolean stopAnimations = false;
-    private boolean menu = false;
+    private final List<String> dynamicNames;
+    private final List<List<String>> dynamicLores;
+    private final List<String> dynamicMaterials;
+    private final List<String> dynamicOwners;
+    private final List<String> dynamicTextures;
+    private final List<String> dynamicPages;
+
+    private static final Map<String, AtomicBoolean> GLOBAL_ANIMATION_FLAGS = new ConcurrentHashMap<>();
+    private final List<Integer> scheduledTaskIds = new ArrayList<>();
+
+    private volatile boolean menu = false;
     private List<List<String>> menuLores = null;
 
     /**
@@ -57,23 +63,12 @@ public class ItemAnimation {
      */
     public ItemAnimation(final ItemMap item) {
         this.itemMap = item;
-        if (item.getDynamicNames() != null && !item.getDynamicNames().isEmpty()) {
-            this.dynamicNames = item.getDynamicNames();
-        }
-        if (item.getDynamicLores() != null && !item.getDynamicLores().isEmpty()) {
-            this.dynamicLores = item.getDynamicLores();
-        }
-        if (item.getDynamicMaterials() != null && !item.getDynamicMaterials().isEmpty()) {
-            this.dynamicMaterials = item.getDynamicMaterials();
-        }
-        if (this.itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") && item.getPages() != null && !item.getPages().isEmpty()) {
-            this.dynamicPages = item.getPages();
-        }
-        if (item.getDynamicOwners() != null && !item.getDynamicOwners().isEmpty()) {
-            this.dynamicOwners = item.getDynamicOwners();
-        } else if (item.getDynamicTextures() != null && !item.getDynamicTextures().isEmpty()) {
-            this.dynamicTextures = item.getDynamicTextures();
-        }
+        this.dynamicNames = item.getDynamicNames() != null && !item.getDynamicNames().isEmpty() ? new ArrayList<>(item.getDynamicNames()) : null;
+        this.dynamicLores = item.getDynamicLores() != null && !item.getDynamicLores().isEmpty() ? new ArrayList<>(item.getDynamicLores()) : null;
+        this.dynamicMaterials = item.getDynamicMaterials() != null && !item.getDynamicMaterials().isEmpty() ? new ArrayList<>(item.getDynamicMaterials()) : null;
+        this.dynamicPages = (this.itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK") && item.getPages() != null && !item.getPages().isEmpty()) ? new ArrayList<>(item.getPages()) : null;
+        this.dynamicOwners = item.getDynamicOwners() != null && !item.getDynamicOwners().isEmpty() ? new ArrayList<>(item.getDynamicOwners()) : null;
+        this.dynamicTextures = (this.dynamicOwners == null && item.getDynamicTextures() != null && !item.getDynamicTextures().isEmpty()) ? new ArrayList<>(item.getDynamicTextures()) : null;
     }
 
     /**
@@ -82,26 +77,32 @@ public class ItemAnimation {
      * @param player - The player which will have animations started.
      */
     public void openAnimation(final Player player) {
+        final AtomicBoolean newFlag = new AtomicBoolean(true);
+        if (!canAnimate(player, newFlag)) return;
+        AtomicBoolean existingFlag = GLOBAL_ANIMATION_FLAGS.get(this.getPlayerAnimationKey(player));
+        if (existingFlag != null) existingFlag.set(false);
+        GLOBAL_ANIMATION_FLAGS.put(this.getPlayerAnimationKey(player), newFlag);
         SchedulerUtils.runAsync(() -> {
-            if (!stopAnimations && player.isOnline() && !player.isDead()) {
+            if (canAnimate(player, newFlag)) {
                 if (this.dynamicNames != null) {
-                    this.nameTasks(player);
+                    this.nameTasks(player, newFlag);
                 }
                 if (this.dynamicLores != null) {
-                    this.loreTasks(player);
+                    this.loreTasks(player, newFlag);
                 }
                 if (this.dynamicMaterials != null) {
-                    this.materialTasks(player);
+                    this.materialTasks(player, newFlag);
                 }
                 if (this.dynamicPages != null) {
-                    this.pagesTasks(player);
+                    this.pagesTasks(player, newFlag);
                 }
                 if (this.dynamicOwners != null) {
-                    this.ownerTasks(player);
+                    this.ownerTasks(player, newFlag);
                 } else if (this.dynamicTextures != null) {
-                    this.textureTasks(player);
+                    this.textureTasks(player, newFlag);
                 }
             }
+            ServerUtils.logDebug("{Animation} Successfully STARTED all animations for the item " + this.itemMap.getConfigName() + " with the instanced player " + player.getName() + ".");
         });
     }
 
@@ -111,238 +112,303 @@ public class ItemAnimation {
      * @param player - The player which will have animations stopped.
      */
     public void closeAnimation(final Player player) {
-        this.stopAnimations = true;
-        ServerUtils.logDebug("{Animation} Successfully closed all animations for the item " + this.itemMap.getConfigName() + " with the instanced player " + player.getName() + ".");
+        AtomicBoolean flag = GLOBAL_ANIMATION_FLAGS.get(this.getPlayerAnimationKey(player));
+        if (flag != null) flag.set(false);
+        synchronized (scheduledTaskIds) {
+            for (Integer taskId : scheduledTaskIds) {
+                if (taskId != null && taskId != 0) {
+                    SchedulerUtils.cancelTask(taskId);
+                }
+            }
+            scheduledTaskIds.clear();
+        }
+        GLOBAL_ANIMATION_FLAGS.remove(this.getPlayerAnimationKey(player));
+        ServerUtils.logDebug("{Animation} Successfully CLOSED all animations for the item " + this.itemMap.getConfigName() + " with the instanced player " + player.getName() + ".");
     }
 
     /**
      * Handles animations for the display name of a custom item.
      *
      * @param player - The player which will have animations handled.
+     * @param flag - The flag to check if animation should continue.
      */
-    private void nameTasks(final Player player) {
-        long ticks = 0;
-        final Iterator<String> it = this.dynamicNames.iterator();
-        while (it.hasNext()) {
-            final String name = it.next();
+    private void nameTasks(final Player player, final AtomicBoolean flag) {
+        if (this.dynamicNames == null || this.dynamicNames.isEmpty()) return;
+        long cumulativeTicks = 0;
+        final List<AnimationFrame> frames = new ArrayList<>();
+        for (String name : this.dynamicNames) {
             final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(name));
-            ticks = ticks + (delay != null ? delay : 180);
-            this.AnimateTask(player, it.hasNext(), name, null, null, null, null, null, ticks, 0);
+            cumulativeTicks += (delay != null ? delay : 180);
+            frames.add(new AnimationFrame(name, cumulativeTicks));
         }
+        scheduleAnimationCycle(player, frames, AnimationType.NAME, flag);
     }
 
     /**
      * Handles animations for the displayed lore of a custom item.
      *
      * @param player - The player which will have animations handled.
+     * @param flag - The flag to check if animation should continue.
      */
-    private void loreTasks(final Player player) {
-        long ticks = 0;
-        int position = 0;
-        final Iterator<List<String>> it = this.dynamicLores.iterator();
-        while (it.hasNext()) {
-            final List<String> lore = it.next();
+    private void loreTasks(final Player player, final AtomicBoolean flag) {
+        if (this.dynamicLores == null || this.dynamicLores.isEmpty()) return;
+        long cumulativeTicks = 0;
+        final List<AnimationFrame> frames = new ArrayList<>();
+        for (int position = 0; position < this.dynamicLores.size(); position++) {
+            final List<String> lore = this.dynamicLores.get(position);
             final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(lore.get(0)));
-            ticks = ticks + (delay != null ? delay : 180);
-            this.AnimateTask(player, it.hasNext(), null, lore, null, null, null, null, ticks, position);
-            position++;
+            cumulativeTicks += (delay != null ? delay : 180);
+            frames.add(new AnimationFrame(lore, cumulativeTicks, position));
         }
+        scheduleAnimationCycle(player, frames, AnimationType.LORE, flag);
     }
 
     /**
      * Handles animations for the material of a custom item.
      *
      * @param player - The player which will have animations handled.
+     * @param flag - The flag to check if animation should continue.
      */
-    private void materialTasks(final Player player) {
-        long ticks = 0;
-        final Iterator<String> it = this.dynamicMaterials.iterator();
-        while (it.hasNext()) {
-            final String mat = it.next();
+    private void materialTasks(final Player player, final AtomicBoolean flag) {
+        if (this.dynamicMaterials == null || this.dynamicMaterials.isEmpty()) return;
+        long cumulativeTicks = 0;
+        final List<AnimationFrame> frames = new ArrayList<>();
+        for (String mat : this.dynamicMaterials) {
             final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(mat));
-            ticks = ticks + (delay != null ? delay : 180);
-            this.AnimateTask(player, it.hasNext(), null, null, mat, null, null, null, ticks, 0);
+            cumulativeTicks += (delay != null ? delay : 180);
+            frames.add(new AnimationFrame(mat, cumulativeTicks));
         }
+        scheduleAnimationCycle(player, frames, AnimationType.MATERIAL, flag);
     }
 
     /**
      * Handles animations for the book pages of a custom book item.
      *
      * @param player - The player which will have animations handled.
+     * @param flag - The flag to check if animation should continue.
      */
-    private void pagesTasks(final Player player) {
-        long ticks = 0;
+    private void pagesTasks(final Player player, final AtomicBoolean flag) {
+        if (this.dynamicPages == null || this.dynamicPages.isEmpty()) return;
         final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(this.dynamicPages.get(0)));
-        ticks = ticks + (delay != null ? delay : 180);
-        this.AnimateTask(player, false, null, null, null, null, null, this.dynamicPages, ticks, 0);
+        long cumulativeTicks = (delay != null ? delay : 180);
+        final List<AnimationFrame> frames = new ArrayList<>();
+        frames.add(new AnimationFrame(this.dynamicPages, cumulativeTicks));
+        scheduleAnimationCycle(player, frames, AnimationType.PAGES, flag);
     }
 
     /**
      * Handles animations for the skull owner of a custom item.
      *
      * @param player - The player which will have animations handled.
+     * @param flag - The flag to check if animation should continue.
      */
-    private void ownerTasks(final Player player) {
-        long ticks = 0;
-        final Iterator<String> it = this.dynamicOwners.iterator();
-        while (it.hasNext()) {
-            final String owner = it.next();
+    private void ownerTasks(final Player player, final AtomicBoolean flag) {
+        if (this.dynamicOwners == null || this.dynamicOwners.isEmpty()) return;
+        long cumulativeTicks = 0;
+        final List<AnimationFrame> frames = new ArrayList<>();
+        for (String owner : this.dynamicOwners) {
             final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(owner));
-            ticks = ticks + (delay != null ? delay : 180);
-            this.AnimateTask(player, it.hasNext(), null, null, null, owner, null, null, ticks, 0);
+            cumulativeTicks += (delay != null ? delay : 180);
+            frames.add(new AnimationFrame(owner, cumulativeTicks));
         }
+        scheduleAnimationCycle(player, frames, AnimationType.OWNER, flag);
     }
 
     /**
      * Handles animations for the skull texture of a custom item.
      *
      * @param player - The player which will have animations handled.
+     * @param flag - The flag to check if animation should continue.
      */
-    private void textureTasks(final Player player) {
-        long ticks = 0;
-        final Iterator<String> it = this.dynamicTextures.iterator();
-        while (it.hasNext()) {
-            final String texture = it.next();
+    private void textureTasks(final Player player, final AtomicBoolean flag) {
+        if (this.dynamicTextures == null || this.dynamicTextures.isEmpty()) return;
+        long cumulativeTicks = 0;
+        final List<AnimationFrame> frames = new ArrayList<>();
+        for (String texture : this.dynamicTextures) {
             final Integer delay = StringUtils.returnInteger(ItemHandler.getDelayFormat(this.dynamicTextures.get(0)));
-            ticks = ticks + (delay != null ? delay : 180);
-            this.AnimateTask(player, it.hasNext(), null, null, null, null, texture, null, ticks, 0);
+            cumulativeTicks += (delay != null ? delay : 180);
+            frames.add(new AnimationFrame(texture, cumulativeTicks));
+        }
+        scheduleAnimationCycle(player, frames, AnimationType.TEXTURE, flag);
+    }
+
+    /**
+     * Schedules an animation cycle for the given frames.
+     *
+     * @param player - The player for the animation.
+     * @param frames - The list of animation frames.
+     * @param type - The type of animation.
+     * @param animateFlag - The flag that controls this animation session.
+     */
+    private void scheduleAnimationCycle(final Player player, final List<AnimationFrame> frames, final AnimationType type, final AtomicBoolean animateFlag) {
+        final List<Integer> cycleTaskIds = new ArrayList<>();
+        for (int i = 0; i < frames.size(); i++) {
+            final AnimationFrame frame = frames.get(i);
+            final boolean isLastFrame = (i == frames.size() - 1);
+            final int taskId = SchedulerUtils.runAsyncLater(frame.delay, () -> {
+                if (!animateFlag.get()) {
+                    synchronized (scheduledTaskIds) {
+                        scheduledTaskIds.removeAll(cycleTaskIds);
+                    }
+                    return;
+                }
+                if (!canAnimate(player, animateFlag)) {
+                    synchronized (scheduledTaskIds) {
+                        scheduledTaskIds.removeAll(cycleTaskIds);
+                    }
+                    return;
+                }
+                applyAnimationFrame(player, frame, type, animateFlag);
+                if (isLastFrame) {
+                    synchronized (scheduledTaskIds) {
+                        scheduledTaskIds.removeAll(cycleTaskIds);
+                    }
+                    if (animateFlag.get() && canAnimate(player, animateFlag)) {
+                        scheduleAnimationCycle(player, frames, type, animateFlag);
+                    }
+                }
+            });
+            if (taskId != 0) {
+                cycleTaskIds.add(taskId);
+                synchronized (scheduledTaskIds) {
+                    scheduledTaskIds.add(taskId);
+                }
+            }
         }
     }
 
     /**
-     * Runs the animation task of a custom item.
+     * Applies a single animation frame to all relevant items.
      *
-     * @param player         - The player which will have animations handled.
-     * @param hasNext        - The AnimationTask has another iteration.
-     * @param nameString     - The display name to be set to the custom item.
-     * @param loreString     - The displayed lore to be set to the custom item.
-     * @param materialString - The material to be set to the custom item.
-     * @param ownerString    - The skull owner to be set to the custom item.
-     * @param textureString  - The skull texture to be set to the custom item.
-     * @param pagesString    - The book pages to be set to the custom item.
-     * @param UpdateDelay    - The delay to wait before starting the single animation.
-     * @param position       - The position in only the lore iteration.
+     * @param player - The player whose items to animate.
+     * @param frame - The animation frame to apply.
+     * @param type - The type of animation.
+     * @param animateFlag - The flag that controls this animation session.
      */
-    private void AnimateTask(final Player player, final boolean hasNext, final String nameString, final List<String> loreString, final String materialString, final String ownerString, final String textureString, final List<String> pagesString, final long UpdateDelay, final int position) {
-        final ItemMap itemMap = this.itemMap;
-        SchedulerUtils.runAsyncLater(UpdateDelay, () -> {
-            if (!stopAnimations) {
-                // ============== Animate Within the Player Inventory ============== //
-                for (ItemStack inPlayerInventory : player.getInventory().getContents()) {
-                    boolean heldAnimations = ItemJoin.getCore().getConfig("config.yml").getBoolean("Settings.HeldItem-Animations");
-                    if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isReal(inPlayerInventory) && (heldAnimations || !itemMap.isReal(PlayerHandler.getHandItem(player)))) {
-                        SchedulerUtils.run(() -> {
-                            if (!stopAnimations && player.isOnline() && !player.isDead()) {
-                                if (nameString != null) {
-                                    setNameData(player, inPlayerInventory, nameString);
-                                } else if (loreString != null) {
-                                    setLoreData(player, inPlayerInventory, loreString);
-                                } else if (materialString != null) {
-                                    setMaterialData(inPlayerInventory, materialString);
-                                } else if (pagesString != null) {
-                                    setPagesData(player, inPlayerInventory, pagesString);
-                                } else if (ownerString != null || textureString != null) {
-                                    setSkull(player, inPlayerInventory, ownerString, textureString);
-                                }
-                            }
-                        });
-                    }
+    private void applyAnimationFrame(final Player player, final AnimationFrame frame, final AnimationType type, final AtomicBoolean animateFlag) {
+        if (!animateFlag.get() || !canAnimate(player, animateFlag)) return;
+        final ItemStack heldItem = ItemJoin.getCore().getConfig("config.yml").getBoolean("Settings.HeldItem-Animations") ? null : PlayerHandler.getHandItem(player);
+        final int heldItemSlot = heldItem != null && heldItem.getType() != Material.AIR ? player.getInventory().getHeldItemSlot() : -1;
+
+        // Animate inventory items
+        SchedulerUtils.run(() -> {
+            if (!animateFlag.get() || !canAnimate(player, animateFlag)) return;
+            final PlayerInventory inventory = player.getInventory();
+            for (int slot = 0; slot < inventory.getSize(); slot++) {
+                final ItemStack item = inventory.getItem(slot);
+                if (isAnimateTarget(item, (slot == heldItemSlot) ? heldItem : null)) {
+                    applyFrameToItem(player, item, frame, type);
                 }
-                // =============== Animate Within the Player's Armor =============== //
-                for (ItemStack inPlayerInventory : player.getInventory().getArmorContents()) {
-                    if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isReal(inPlayerInventory)) {
-                        SchedulerUtils.run(() -> {
-                            if (!stopAnimations && player.isOnline() && !player.isDead()) {
-                                if (nameString != null) {
-                                    setNameData(player, inPlayerInventory, nameString);
-                                } else if (loreString != null) {
-                                    setLoreData(player, inPlayerInventory, loreString);
-                                } else if (materialString != null) {
-                                    setMaterialData(inPlayerInventory, materialString);
-                                } else if (pagesString != null) {
-                                    setPagesData(player, inPlayerInventory, pagesString);
-                                } else if (ownerString != null || textureString != null) {
-                                    setSkull(player, inPlayerInventory, ownerString, textureString);
-                                }
-                            }
-                        });
-                    }
+            }
+        });
+
+        // Animate armor items
+        SchedulerUtils.run(() -> {
+            if (!animateFlag.get() || !canAnimate(player, animateFlag)) return;
+            for (ItemStack item : player.getInventory().getArmorContents()) {
+                if (isAnimateTarget(item, null)) {
+                    applyFrameToItem(player, item, frame, type);
                 }
-                // ========== Animate Within the Player Crafting/Chests ============ //
-                for (ItemStack inPlayerInventory : CompatUtils.getTopInventory(player).getContents()) {
-                    if (inPlayerInventory != null && itemMap.getTempItem() != null && itemMap.isReal(inPlayerInventory)) {
-                        SchedulerUtils.run(() -> {
-                            if (!stopAnimations && player.isOnline() && !player.isDead()) {
-                                if (nameString != null) {
-                                    setNameData(player, inPlayerInventory, nameString);
-                                } else if (loreString != null) {
-                                    if (menu) {
-                                        setLoreData(player, inPlayerInventory, menuLores.get(position));
-                                    } else {
-                                        setLoreData(player, inPlayerInventory, loreString);
-                                    }
-                                } else if (materialString != null) {
-                                    setMaterialData(inPlayerInventory, materialString);
-                                } else if (pagesString != null) {
-                                    setPagesData(player, inPlayerInventory, pagesString);
-                                } else if (ownerString != null || textureString != null) {
-                                    setSkull(player, inPlayerInventory, ownerString, textureString);
-                                }
-                            }
-                        });
-                    }
-                }
-                // ============== Animate Within the Player's Cursor =============== //
-                if (player.getItemOnCursor().getType() != Material.AIR && itemMap.getTempItem() != null && itemMap.isReal(player.getItemOnCursor())) {
-                    SchedulerUtils.run(() -> {
-                        if (!stopAnimations && player.isOnline() && !player.isDead()) {
-                            ItemStack item = new ItemStack(player.getItemOnCursor());
-                            if (Clicking.getCursor(PlayerHandler.getPlayerID(player)) != null && itemMap.isReal(Clicking.getCursor(PlayerHandler.getPlayerID(player)))) {
-                                item = new ItemStack(Clicking.getCursor(PlayerHandler.getPlayerID(player)));
-                            }
-                            if (nameString != null) {
-                                setNameData(player, player.getItemOnCursor(), nameString);
-                            } else if (loreString != null) {
-                                setLoreData(player, player.getItemOnCursor(), loreString);
-                            } else if (materialString != null) {
-                                setMaterialData(player.getItemOnCursor(), materialString);
-                            } else if (pagesString != null) {
-                                setPagesData(player, player.getItemOnCursor(), pagesString);
-                            } else if (ownerString != null || textureString != null) {
-                                setSkull(player, player.getItemOnCursor(), ownerString, textureString);
-                            }
-                            Clicking.putCursor(PlayerHandler.getPlayerID(player), item);
-                        }
-                    });
-                }
-                if (StringUtils.getSlotConversion(itemMap.getSlot()) != -1 && !ServerUtils.hasSpecificUpdate("1_13")) {
-                    LegacyAPI.updateInventory(player);
-                } else {
-                    synchronized ("IJ_ANIMATE") {
-                        final ItemStack updatedItem = itemMap.getItemStack(player);
-                        if (updatedItem != null) {
-                            PlayerHandler.updateInventory(player, updatedItem.clone(), 1L);
-                        }
-                    }
-                }
-                // ============== This has Concluded all Animations.. ============== //
-                if (!hasNext) {
-                    if (nameString != null) {
-                        nameTasks(player);
-                    } else if (loreString != null) {
-                        loreTasks(player);
-                    } else if (materialString != null) {
-                        materialTasks(player);
-                    } else if (pagesString != null) {
-                        pagesTasks(player);
-                    } else if (ownerString != null) {
-                        ownerTasks(player);
-                    } else if (textureString != null) {
-                        textureTasks(player);
+            }
+        });
+
+        // Animate items in open inventory (top inventory)
+        SchedulerUtils.run(() -> {
+            if (!animateFlag.get() || !canAnimate(player, animateFlag)) return;
+            final org.bukkit.inventory.Inventory topInventory = CompatUtils.getTopInventory(player);
+            // Check if this player is the first viewer (to prevent animation conflicts between multiple viewers)
+            if (!topInventory.getViewers().isEmpty() && topInventory.getViewers().get(0).equals(player)) {
+                for (ItemStack item : topInventory.getContents()) {
+                    if (isAnimateTarget(item, null)) {
+                        applyFrameToItem(player, item, frame, type);
                     }
                 }
             }
         });
+
+        // Animate cursor item
+        SchedulerUtils.run(() -> {
+            if (!animateFlag.get() || !canAnimate(player, animateFlag)) return;
+            ItemStack cursorItem = player.getItemOnCursor();
+            if (cursorItem.getType() != Material.AIR && itemMap.isReal(cursorItem)) {
+                ItemStack item = new ItemStack(cursorItem);
+                ItemStack clickingCursor = Clicking.getCursor(PlayerHandler.getPlayerID(player));
+                if (clickingCursor != null && itemMap.isReal(clickingCursor)) {
+                    item = new ItemStack(clickingCursor);
+                }
+                applyFrameToItem(player, cursorItem, frame, type);
+                Clicking.putCursor(PlayerHandler.getPlayerID(player), item);
+            }
+        });
+
+        // Update inventory
+        SchedulerUtils.run(() -> {
+            if (!animateFlag.get() || !canAnimate(player, animateFlag)) return;
+            if (StringUtils.getSlotConversion(itemMap.getSlot()) != -1 && !ServerUtils.hasSpecificUpdate("1_13")) {
+                LegacyAPI.updateInventory(player);
+            } else {
+                synchronized ("IJ_ANIMATE") {
+                    final ItemStack updatedItem = itemMap.getItemStack(player);
+                    if (updatedItem != null) {
+                        PlayerHandler.updateInventory(player, updatedItem.clone(), 1L);
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * Checks if an item is a valid target for animation.
+     *
+     * @param item - The item to check.
+     * @param heldItem - The held item to compare against (null to skip check).
+     * @return true if the item should be animated.
+     */
+    private boolean isAnimateTarget(final ItemStack item, final ItemStack heldItem) {
+        if (item == null || item.getType() == Material.AIR) {
+            return false;
+        }
+        if (itemMap.getTempItem() == null || !itemMap.isReal(item)) {
+            return false;
+        }
+        return heldItem == null || !itemMap.isReal(heldItem);
+    }
+
+    /**
+     * Applies an animation frame to a specific item.
+     *
+     * @param player - The player context.
+     * @param item - The item to modify.
+     * @param frame - The animation frame.
+     * @param type - The animation type.
+     */
+    @SuppressWarnings("unchecked")
+    private void applyFrameToItem(final Player player, final ItemStack item, final AnimationFrame frame, final AnimationType type) {
+        switch (type) {
+            case NAME:
+                setNameData(player, item, (String) frame.data);
+                break;
+            case LORE:
+                List<String> loreData = (List<String>) frame.data;
+                if (menu && menuLores != null && frame.position < menuLores.size()) {
+                    setLoreData(player, item, menuLores.get(frame.position));
+                } else {
+                    setLoreData(player, item, loreData);
+                }
+                break;
+            case MATERIAL:
+                setMaterialData(item, (String) frame.data);
+                break;
+            case PAGES:
+                setPagesData(player, item, (List<String>) frame.data);
+                break;
+            case OWNER:
+                setSkull(player, item, (String) frame.data, null);
+                break;
+            case TEXTURE:
+                setSkull(player, item, null, (String) frame.data);
+                break;
+        }
     }
 
     /**
@@ -472,6 +538,53 @@ public class ItemAnimation {
             }
             reviseItem.setItemMeta(tempMeta);
         }
+    }
+
+    /**
+     * Checks if animations can continue.
+     *
+     * @param player - The player to check.
+     * @param flag - The flag to check.
+     * @return true if animations can continue, false otherwise.
+     */
+    private boolean canAnimate(final Player player, final AtomicBoolean flag) {
+        return flag.get() && player != null && player.isOnline() && !player.isDead();
+    }
+
+    /**
+     * Gets the unique key for a player-item animation.
+     *
+     * @param player - The player.
+     * @return The unique key.
+     */
+    private String getPlayerAnimationKey(final Player player) {
+        return PlayerHandler.getPlayerID(player) + ":" + this.itemMap.getConfigName();
+    }
+
+    /**
+     * Represents a single frame in an animation sequence.
+     */
+    private static class AnimationFrame {
+        final Object data;
+        final long delay;
+        final int position;
+
+        AnimationFrame(Object data, long delay) {
+            this(data, delay, 0);
+        }
+
+        AnimationFrame(Object data, long delay, int position) {
+            this.data = data;
+            this.delay = delay;
+            this.position = position;
+        }
+    }
+
+    /**
+     * Enumeration of animation types.
+     */
+    private enum AnimationType {
+        NAME, LORE, MATERIAL, PAGES, OWNER, TEXTURE
     }
 
     /**

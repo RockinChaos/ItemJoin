@@ -5159,12 +5159,6 @@ public class ItemMap implements Cloneable {
         final ItemStack[] craftingContents = topInventory.getContents();
         this.updateItem(player);
         if (amount[0] == 0) {
-            if (this.isAnimated() && this.getAnimationHandler().get(player) != null
-                    || this.isDynamic() && this.getAnimationHandler().get(player) != null) {
-                this.localeAnimations.get(player).closeAnimation(player);
-                this.localeAnimations.remove(player);
-            }
-
             for (int k = 0; k < contents.length; k++) {
                 if (this.isSimilar(player, contents[k])) {
                     inv.setItem(k, new ItemStack(Material.AIR));
