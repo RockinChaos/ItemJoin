@@ -42,7 +42,6 @@ import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -168,22 +167,20 @@ public class Commands implements Listener {
     private void onJoin(PlayerJoinEvent event) {
         final Player player = event.getPlayer();
         if (ItemJoin.getCore().getDependencies().authMeEnabled()) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    try {
-                        if (ItemJoin.getCore().getDependencies().isAuthenticated(player)) {
-                            handleJoin(player);
-                            this.cancel();
-                        } else if (!player.isOnline()) {
-                            this.cancel();
-                        }
-                    } catch (NoClassDefFoundError e) {
-                        ServerUtils.logSevere("{Commands} You are using an outdated version of AuthMe, ON_JOIN commands will not be executed.");
-                        this.cancel();
+            final int[] taskId = new int[1];
+            taskId[0] = SchedulerUtils.runAtInterval(0, 20, () -> {
+                try {
+                    if (ItemJoin.getCore().getDependencies().isAuthenticated(player)) {
+                        handleJoin(player);
+                        SchedulerUtils.cancelTask(taskId[0]);
+                    } else if (!player.isOnline()) {
+                        SchedulerUtils.cancelTask(taskId[0]);
                     }
+                } catch (NoClassDefFoundError e) {
+                    ServerUtils.logSevere("{Commands} You are using an outdated version of AuthMe, ON_JOIN commands will not be executed.");
+                    SchedulerUtils.cancelTask(taskId[0]);
                 }
-            }.runTaskTimer(ItemJoin.getCore().getPlugin(), 0, 20);
+            });
         } else {
             this.handleJoin(player);
         }

@@ -33,7 +33,6 @@ import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -212,22 +211,20 @@ public class ItemUtilities {
      */
     public void setAuthenticating(final Player player, final World world, TriggerType type, final GameMode newMode, final String targetRegion, final List<String> regions) {
         if (ItemJoin.getCore().getDependencies().authMeEnabled()) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    try {
-                        if (ItemJoin.getCore().getDependencies().isAuthenticated(player)) {
-                            setItems(player, world, type, newMode, targetRegion, regions);
-                            this.cancel();
-                        } else if (!player.isOnline()) {
-                            this.cancel();
-                        }
-                    } catch (NoClassDefFoundError e) {
-                        ServerUtils.logSevere("{ItemMap} You are using an outdated version of AuthMe, custom items will not be given after login.");
-                        this.cancel();
+            final int[] taskId = new int[1];
+            taskId[0] = SchedulerUtils.runAtInterval(0, 20, () -> {
+                try {
+                    if (ItemJoin.getCore().getDependencies().isAuthenticated(player)) {
+                        setItems(player, world, type, newMode, targetRegion, regions);
+                        SchedulerUtils.cancelTask(taskId[0]);
+                    } else if (!player.isOnline()) {
+                        SchedulerUtils.cancelTask(taskId[0]);
                     }
+                } catch (NoClassDefFoundError e) {
+                    ServerUtils.logSevere("{ItemMap} You are using an outdated version of AuthMe, custom items will not be given after login.");
+                    SchedulerUtils.cancelTask(taskId[0]);
                 }
-            }.runTaskTimer(ItemJoin.getCore().getPlugin(), 0, 20);
+            });
         } else {
             this.setItems(player, world, type, newMode, targetRegion, regions);
         }
