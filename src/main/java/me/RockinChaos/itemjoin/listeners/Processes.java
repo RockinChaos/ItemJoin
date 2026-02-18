@@ -20,6 +20,8 @@ package me.RockinChaos.itemjoin.listeners;
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
+import me.RockinChaos.core.utils.StringUtils;
+import me.RockinChaos.core.utils.TimerUtils;
 import me.RockinChaos.core.utils.types.Clear;
 import me.RockinChaos.core.utils.types.Hats;
 import me.RockinChaos.core.utils.types.PlaceHolder;
@@ -35,6 +37,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class Processes implements Listener {
 
@@ -53,9 +56,14 @@ public class Processes implements Listener {
             if (itemMap != null && itemMap.isNotHat()) {
                 event.setMessage("itemjoin_blocked");
                 event.setCancelled(true);
-                ServerUtils.logDebug("{Processes} " + player.getName() + " tried to perform the command " + command + " on the item " + itemMap.getConfigName() + " but was blocked by the itemflag no-hat.");
+                ServerUtils.logDebug("{Processes} " + player.getName() + " tried to perform the command " + command + " on the item " + itemMap.getConfigName() + " but was blocked by the itemflag not-hat.");
                 final PlaceHolder placeHolders = new PlaceHolder().with(Holder.TARGET_PLAYER, player.getName()).with(Holder.ITEM, itemMap.getConfigName()).with(Holder.COMMAND, command);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.item.badCommand", player, placeHolders);
+                final String flagMessage = itemMap.getFlagMessages().get("not-hat");
+                if (flagMessage != null && TimerUtils.isExpired("not-hat-message", player.getUniqueId())) {
+                    player.sendMessage(StringUtils.translateLayout(flagMessage, player));
+                    TimerUtils.setExpiry("not-hat-message", player.getUniqueId(), 200, TimeUnit.MILLISECONDS);
+                }
             }
         }
     }

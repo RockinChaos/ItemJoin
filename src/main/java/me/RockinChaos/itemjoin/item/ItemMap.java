@@ -499,6 +499,7 @@ public class ItemMap implements Cloneable {
             this.autoRemove = StringUtils.splitIgnoreCase(this.itemflags, "auto-remove", ",");
             this.stackable = StringUtils.splitIgnoreCase(this.itemflags, "stackable", ",");
             this.notHat = StringUtils.splitIgnoreCase(this.itemflags, "not-hat", ",");
+            if (this.nodeLocation.getString(".not-hat-message") != null) this.flagMessages.put("not-hat", this.nodeLocation.getString(".not-hat-message"));
             this.noClear = StringUtils.splitIgnoreCase(this.itemflags, "no-clear", ",");
             this.selectable = StringUtils.splitIgnoreCase(this.itemflags, "selectable", ",");
             this.selectableDelay = this.nodeLocation.getString(".selectable-delay") != null ? this.nodeLocation.getInt(".selectable-delay") : 0;
@@ -519,6 +520,7 @@ public class ItemMap implements Cloneable {
             this.noRepairing = StringUtils.splitIgnoreCase(this.itemflags, "item-repairable", ",");
             if (this.nodeLocation.getString(".item-repairable-message") != null) this.flagMessages.put("item-repairable", this.nodeLocation.getString(".item-repairable-message"));
             this.cancelEvents = StringUtils.splitIgnoreCase(this.itemflags, "cancel-events", ",");
+            if (this.nodeLocation.getString(".cancel-events-message") != null) this.flagMessages.put("cancel-events", this.nodeLocation.getString(".cancel-events-message"));
             this.countLock = StringUtils.splitIgnoreCase(this.itemflags, "count-lock", ",");
             this.teleportArrow = StringUtils.splitIgnoreCase(this.itemflags, "teleport", ",");
             this.overwritable = StringUtils.splitIgnoreCase(this.itemflags, "overwrite", ",");
