@@ -58,7 +58,7 @@ public class Interact implements Listener {
         final ItemStack item = event.getItem();
         final Player player = event.getPlayer();
         if ((!PlayerHandler.isMenuClick(player, event.getAction()) && (event.hasItem() && event.getAction() != Action.PHYSICAL && !ItemUtilities.getUtilities().isAllowed(player, item, "cancel-events")
-                || (event.getAction() != Action.PHYSICAL && event.getAction() != Action.LEFT_CLICK_AIR && ServerUtils.hasSpecificUpdate("1_9") && event.getHand() != null
+                || (event.getAction() != Action.PHYSICAL && event.getAction() != Action.LEFT_CLICK_AIR && ServerUtils.hasUpdate("1_9") && event.getHand() != null
                 && event.getHand().toString().equalsIgnoreCase("OFF_HAND") && !ItemUtilities.getUtilities().isAllowed(player, PlayerHandler.getMainHandItem(event.getPlayer()), "cancel-events"))))) {
             if ((item != null && ItemHandler.isBookQuill(item)) || ItemHandler.isBookQuill(PlayerHandler.getMainHandItem(event.getPlayer()))) {
                 player.closeInventory();
@@ -127,7 +127,7 @@ public class Interact implements Listener {
     @EventHandler(ignoreCancelled = true)
     public void onBlockPlaceCooldown(final BlockPlaceEvent event) {
         final Player player = event.getPlayer();
-        this.handleUseCooldown(player, PlayerHandler.getPerfectHandItem(player, ServerUtils.hasSpecificUpdate("1_9") ? event.getHand().name() : ""), event);
+        this.handleUseCooldown(player, PlayerHandler.getPerfectHandItem(player, ServerUtils.hasUpdate("1_9") ? event.getHand().name() : ""), event);
     }
 
     /**

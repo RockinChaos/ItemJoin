@@ -120,7 +120,7 @@ public class Storable implements Listener {
         try {
             if (event.getRightClicked().getType().name().equalsIgnoreCase("ITEM_FRAME") || event.getRightClicked().getType().name().equalsIgnoreCase("FOX") || event.getRightClicked().getType().name().equalsIgnoreCase("ALLAY")) {
                 ItemStack item;
-                if (ServerUtils.hasSpecificUpdate("1_9")) {
+                if (ServerUtils.hasUpdate("1_9")) {
                     item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
                 } else {
                     item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");
@@ -162,7 +162,7 @@ public class Storable implements Listener {
         try {
             if (event.getRightClicked().getType().name().equalsIgnoreCase("ARMOR_STAND") || event.getRightClicked().getType().name().equalsIgnoreCase("FOX") || event.getRightClicked().getType().name().equalsIgnoreCase("ALLAY")) {
                 ItemStack item;
-                if (ServerUtils.hasSpecificUpdate("1_9")) {
+                if (ServerUtils.hasUpdate("1_9")) {
                     item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
                 } else {
                     item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");

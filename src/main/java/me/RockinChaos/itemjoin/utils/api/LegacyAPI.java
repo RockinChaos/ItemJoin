@@ -44,7 +44,7 @@ public class LegacyAPI {
      * Only called when the Server version is below 1.12.
      */
     public static void registerStackable() {
-        if (!ServerUtils.hasSpecificUpdate("1_12") && StringUtils.isRegistered(me.RockinChaos.itemjoin.listeners.legacy.Legacy_Stackable.class.getSimpleName())) {
+        if (!ServerUtils.hasUpdate("1_12") && StringUtils.isRegistered(me.RockinChaos.itemjoin.listeners.legacy.Legacy_Stackable.class.getSimpleName())) {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new me.RockinChaos.itemjoin.listeners.legacy.Legacy_Stackable(), ItemJoin.getCore().getPlugin());
         }
     }
@@ -54,7 +54,7 @@ public class LegacyAPI {
      * Only called when the Server version is below 1.11.
      */
     public static void registerConsumes() {
-        if (!ServerUtils.hasSpecificUpdate("1_11") && StringUtils.isRegistered(me.RockinChaos.itemjoin.listeners.legacy.Legacy_Consumes.class.getSimpleName())) {
+        if (!ServerUtils.hasUpdate("1_11") && StringUtils.isRegistered(me.RockinChaos.itemjoin.listeners.legacy.Legacy_Consumes.class.getSimpleName())) {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new me.RockinChaos.itemjoin.listeners.legacy.Legacy_Consumes(), ItemJoin.getCore().getPlugin());
         }
     }

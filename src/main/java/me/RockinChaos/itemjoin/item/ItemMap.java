@@ -329,9 +329,7 @@ public class ItemMap implements Cloneable {
         final String itemSlot = this.nodeLocation.getString(".slot");
         if (itemSlot != null && itemSlot.contains(",")) {
             String[] slots = itemSlot.replace(" ", "").split(",");
-            for (String slot : slots) {
-                this.AllSlots.add(slot);
-            }
+            this.AllSlots.addAll(Arrays.asList(slots));
         }
     }
 
@@ -386,7 +384,7 @@ public class ItemMap implements Cloneable {
                 }
             }
         } catch (Exception e) {
-            ServerUtils.logSevere("{ItemMap} Your server is running MC " + ReflectionUtils.getServerVersion() + " and this version of Minecraft does not have the defined command-sound " + this.nodeLocation.getString(".commands-sound") + ".");
+            ServerUtils.logSevere("{ItemMap} Your server is running MC " + ServerUtils.getVersion() + " and this version of Minecraft does not have the defined command-sound " + this.nodeLocation.getString(".commands-sound") + ".");
             ServerUtils.sendDebugTrace(e);
         }
     }
@@ -890,7 +888,7 @@ public class ItemMap implements Cloneable {
      */
     private void setCustomName(final Player player) {
         if (this.customName != null && !this.customName.equalsIgnoreCase(ItemHandler.getMaterialName(this.tempItem))) {
-            if (this.legacySecret != null && !ServerUtils.hasSpecificUpdate("1_14")) {
+            if (this.legacySecret != null && !ServerUtils.hasUpdate("1_14")) {
                 final String itemData = this.tempMeta.getDisplayName();
                 this.tempMeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(this.customName), player) + ChatColor.COLOR_CHAR + "r" + itemData);
             } else {
@@ -1196,7 +1194,7 @@ public class ItemMap implements Cloneable {
      * Sets the item contents for the storage box.
      */
     private void setContents(final Player player) {
-        if (this.contents != null && !this.contents.isEmpty() && ServerUtils.hasSpecificUpdate("1_11")) {
+        if (this.contents != null && !this.contents.isEmpty() && ServerUtils.hasUpdate("1_11")) {
             ShulkerBox box = (ShulkerBox) ((BlockStateMeta) this.tempMeta).getBlockState();
             box.getInventory().clear();
             for (String node : this.contents) {
@@ -1545,13 +1543,13 @@ public class ItemMap implements Cloneable {
             if (StringUtils.isInt(this.modelData)) {
                 final int modelData = Integer.parseInt(StringUtils.translateLayout(this.modelData, player));
                 if (modelData != 0) {
-                    if (ServerUtils.hasSpecificUpdate("1_14")) {
+                    if (ServerUtils.hasUpdate("1_14")) {
                         this.tempMeta.setCustomModelData(modelData);
                     } else {
                         ServerUtils.logWarn("{ItemMap} The item " + this.getConfigName() + " is using Custom Model Data which is not supported until Minecraft 1.14+.");
                     }
                 }
-            } else if (ServerUtils.hasPreciseUpdate("1_21_3")) {
+            } else if (ServerUtils.hasUpdate("1_21_3")) {
                 this.tempMeta.setItemModel(NamespacedKey.fromString(StringUtils.translateLayout(this.modelData, player)));
             } else {
                 ServerUtils.logWarn("{ItemMap} The item " + this.getConfigName() + " is using Custom Model Data that is not an integer, item model names are not supported until Minecraft 1.21.4+.");
@@ -1567,7 +1565,7 @@ public class ItemMap implements Cloneable {
      * @param player - The Player to be used for placeholders.
      */
     private void setModelComponents(final Player player) {
-        if (this.modelComponents != null && ServerUtils.hasPreciseUpdate("1_21_4")) {
+        if (this.modelComponents != null && ServerUtils.hasUpdate("1_21_4")) {
             final CustomModelDataComponent component = this.tempMeta.getCustomModelDataComponent();
             if (this.modelComponents.get(0) != null){
                 final List<String> strings = new ArrayList<>();
@@ -4180,7 +4178,7 @@ public class ItemMap implements Cloneable {
         return item != null && item.getType() != Material.AIR
                 && (this.vanillaControl || this.vanillaStatus
                 || (ItemJoin.getCore().getData().dataTagsEnabled() && nbtData != null && nbtData.equalsIgnoreCase(this.getConfigName()))
-                || (this.legacySecret != null && item.hasItemMeta() && (ServerUtils.hasSpecificUpdate("1_14") || (!ServerUtils.hasSpecificUpdate("1_14") && Objects.requireNonNull(item.getItemMeta()).hasDisplayName()))
+                || (this.legacySecret != null && item.hasItemMeta() && (ServerUtils.hasUpdate("1_14") || (!ServerUtils.hasUpdate("1_14") && Objects.requireNonNull(item.getItemMeta()).hasDisplayName()))
                 && Objects.requireNonNull(StringUtils.colorDecode(item)).contains(this.legacySecret)));
     }
 
@@ -4194,7 +4192,7 @@ public class ItemMap implements Cloneable {
     public boolean isSimilar(final Player player, final ItemStack item) {
         if ((item != null && item.getType() != Material.AIR && item.getType() == this.material) || (this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item))) {
             if (this.vanillaControl || this.vanillaStatus || (ItemJoin.getCore().getData().dataTagsEnabled() && ItemHandler.getNBTData(item, PluginData.getInfo().getNBTList()) != null && Objects.requireNonNull(ItemHandler.getNBTData(item, PluginData.getInfo().getNBTList())).equalsIgnoreCase(this.getConfigName()))
-                    || (this.legacySecret != null && item.hasItemMeta() && (ServerUtils.hasSpecificUpdate("1_14") || (!ServerUtils.hasSpecificUpdate("1_14") && Objects.requireNonNull(item.getItemMeta()).hasDisplayName()))
+                    || (this.legacySecret != null && item.hasItemMeta() && (ServerUtils.hasUpdate("1_14") || (!ServerUtils.hasUpdate("1_14") && Objects.requireNonNull(item.getItemMeta()).hasDisplayName()))
                     && Objects.requireNonNull(StringUtils.colorDecode(item)).contains(this.legacySecret))) {
                 if (this.isEnchantSimilar(player, item) || !Objects.requireNonNull(item.getItemMeta()).hasEnchants() && this.enchants.isEmpty() || this.isItemChangeable()) {
                     if (this.material.toString().toUpperCase().contains("BOOK")
@@ -4364,7 +4362,7 @@ public class ItemMap implements Cloneable {
                 return true;
             }
         }
-        if (ServerUtils.hasSpecificUpdate("1_9")
+        if (ServerUtils.hasUpdate("1_9")
                 && this.isSimilar(player, player.getInventory().getItemInOffHand())
                 && (ignoreCount || this.isCountSimilar(player, player.getInventory().getItemInOffHand()))) {
             return true;
@@ -4468,7 +4466,7 @@ public class ItemMap implements Cloneable {
      * Sets the ItemStack as Unbreakable.
      */
     private void setUnbreaking() {
-        if (!ServerUtils.hasPreciseUpdate("1_20_5") && (this.isUnbreakable() || this.hideDurability)) {
+        if (!ServerUtils.hasUpdate("1_20_5") && (this.isUnbreakable() || this.hideDurability)) {
             try {
                 Class<?> craftItemStack = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack");
                 Object nms = ReflectionUtils.getMethod(craftItemStack, "asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
@@ -4491,7 +4489,7 @@ public class ItemMap implements Cloneable {
      * Sets the ItemStack as Unbreakable.
      */
     private void setUnbreakable() {
-        if (ServerUtils.hasPreciseUpdate("1_20_5") && (this.isUnbreakable() || this.hideDurability)) {
+        if (ServerUtils.hasUpdate("1_20_5") && (this.isUnbreakable() || this.hideDurability)) {
             this.tempMeta.setUnbreakable(true);
         }
     }
@@ -4500,13 +4498,13 @@ public class ItemMap implements Cloneable {
      * Sets the armor value to the items attributes.
      */
     private void setAttributes() {
-        if (ServerUtils.hasSpecificUpdate("1_13") && this.attributes != null && !this.attributes.isEmpty()) {
+        if (ServerUtils.hasUpdate("1_13") && this.attributes != null && !this.attributes.isEmpty()) {
             try {
                 for (String attrib : this.attributes.keySet()) {
                     Attribute attribute = (Attribute) CompatUtils.valueOf(Attribute.class, attrib.toUpperCase());
                     if (attribute == null) {
-                        ServerUtils.logSevere("{ItemMap} Your server is running MC " + ReflectionUtils.getServerVersion() + " and this version of Minecraft does not have the defined attribute " + attrib + ".");
-                        if (ServerUtils.hasPreciseUpdate("1_21_3")) {
+                        ServerUtils.logSevere("{ItemMap} Your server is running MC " + ServerUtils.getVersion() + " and this version of Minecraft does not have the defined attribute " + attrib + ".");
+                        if (ServerUtils.hasUpdate("1_21_3")) {
                             ServerUtils.logSevere("{ItemMap} See the Minecraft Wiki for a list of attributes https://minecraft.fandom.com/wiki/Attribute");
                         }
                         return;
@@ -4536,7 +4534,7 @@ public class ItemMap implements Cloneable {
      */
     private void setMapImage() {
         if (this.customMapImage != null || this.mapId != -1) {
-            if (ServerUtils.hasSpecificUpdate("1_13")) {
+            if (ServerUtils.hasUpdate("1_13")) {
                 final MapMeta mapmeta = (MapMeta) this.tempItem.getItemMeta();
                 try {
                     if (mapmeta != null && this.mapView != null) {
@@ -4582,16 +4580,18 @@ public class ItemMap implements Cloneable {
             List<String> copyPages = new ArrayList<>(pages);
             copyPages.set(0, ItemHandler.cutDelay(copyPages.get(0)));
             Object localePages = null;
-            try {
-                localePages = ReflectionUtils.getMinecraftClass("NBTTagList").getConstructor().newInstance();
-            } catch (Exception e) {
-                ServerUtils.sendDebugTrace(e);
+            if (!ServerUtils.hasUpdate("1_20_5")) {
+                try {
+                    localePages = ReflectionUtils.getMinecraftClass("NBTTagList").getConstructor().newInstance();
+                } catch (Exception e) {
+                    ServerUtils.sendDebugTrace(e);
+                }
             }
-            if (ServerUtils.hasPreciseUpdate("1_20_5")) {
+            if (ServerUtils.hasUpdate("1_20_5")) {
                 return this.set1_20_5JSONPages(player, item, copyPages);
-            } else if (ServerUtils.hasSpecificUpdate("1_15")) {
+            } else if (ServerUtils.hasUpdate("1_15")) {
                 return this.set1_15JSONPages(player, item, localePages, copyPages);
-            } else if (ServerUtils.hasSpecificUpdate("1_14")) {
+            } else if (ServerUtils.hasUpdate("1_14")) {
                 return this.set1_14JSONPages(player, item, localePages, copyPages);
             } else {
                 return this.set1_13JSONPages(player, item, localePages, copyPages);
@@ -4722,9 +4722,8 @@ public class ItemMap implements Cloneable {
      * @param item  - The ItemStack to be updated.
      * @param pages - The book pages to be set.
      * @return The updated ItemStack.
-     * @throws Exception An exception.
      */
-    private ItemStack invokePages(final ItemStack item, final Object pages) throws Exception {
+    private ItemStack invokePages(final ItemStack item, final Object pages) {
         final Class<?> craftItemStack = ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack");
         final Class<?> itemClass = ReflectionUtils.getMinecraftClass("ItemStack");
         final Class<?> baseClass = ReflectionUtils.getMinecraftClass("NBTBase");
@@ -4747,7 +4746,7 @@ public class ItemMap implements Cloneable {
                 final Class<?> itemClass = ReflectionUtils.getMinecraftClass("ItemStack");
                 final Object nms = ReflectionUtils.getMethod(ReflectionUtils.getCraftBukkitClass("inventory.CraftItemStack"), "asNMSCopy", ItemStack.class).invoke(null, this.tempItem);
                 Object tagInstance = ReflectionUtils.getConstructor(ReflectionUtils.getMinecraftClass("NBTTagCompound")).invoke();
-                if (!ServerUtils.hasPreciseUpdate("1_20_5")) {
+                if (!ServerUtils.hasUpdate("1_20_5")) {
                     final Object cacheTag = ReflectionUtils.getMethod(itemClass, MinecraftMethod.getTag.getMethod()).invoke(nms);
                     if (cacheTag != null) {
                         tagInstance = cacheTag;
@@ -4756,19 +4755,19 @@ public class ItemMap implements Cloneable {
                 ReflectionUtils.getMethod(tagInstance.getClass(), MinecraftMethod.setString.getMethod(), String.class, String.class).invoke(tagInstance, "ItemJoin Name", this.getConfigName());
                 final Map<String, Object> packages = new HashMap<>();
                 if (this.nbtProperty != null && !this.nbtProperty.isEmpty()) {
-                    for (Object tag : this.nbtProperty.keySet()) {
+                    for (final Object tag : this.nbtProperty.keySet()) {
                         final String castTag = (String) tag;
                         final Object property = this.nbtProperty.get(tag);
                         String packageName = null;
                         String tagName = castTag;
                         if (castTag.contains(".")) {
-                            String [] packageParts = castTag.split("\\.");
+                            final String[] packageParts = castTag.split("\\.");
                             packageName = packageParts[0];
                             tagName = packageParts[1];
                         }
                         try {
                             if (packageName != null) {
-                                Object customPackage = packages.get(packageName) != null ? packages.get(packageName) : ReflectionUtils.getConstructor(ReflectionUtils.getMinecraftClass("NBTTagCompound")).invoke();
+                                final Object customPackage = packages.get(packageName) != null ? packages.get(packageName) : ReflectionUtils.getConstructor(ReflectionUtils.getMinecraftClass("NBTTagCompound")).invoke();
                                 if (property instanceof String) {
                                     final String castProperty = (String) property;
                                     ReflectionUtils.getMethod(customPackage.getClass(), MinecraftMethod.setString.getMethod(), String.class, String.class).invoke(customPackage, tagName, castProperty);
@@ -4787,7 +4786,7 @@ public class ItemMap implements Cloneable {
                             }
                         } catch (Exception e) {
                             if (packageName != null) {
-                                Object customPackage = packages.get(packageName) != null ? packages.get(packageName) : ReflectionUtils.getConstructor(ReflectionUtils.getMinecraftClass("NBTTagCompound")).invoke();
+                                final Object customPackage = packages.get(packageName) != null ? packages.get(packageName) : ReflectionUtils.getConstructor(ReflectionUtils.getMinecraftClass("NBTTagCompound")).invoke();
                                 ReflectionUtils.getMethod(customPackage.getClass(), MinecraftMethod.set.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(customPackage, tagName, property);
                                 packages.put(packageName, customPackage);
                                 ReflectionUtils.getMethod(tagInstance.getClass(), MinecraftMethod.setCompound.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagInstance, packageName, customPackage);
@@ -4813,7 +4812,7 @@ public class ItemMap implements Cloneable {
      */
     private void setDurability() {
         if (this.durability != null && (this.data == null || this.data == 0)) {
-            if (ServerUtils.hasSpecificUpdate("1_13")) {
+            if (ServerUtils.hasUpdate("1_13")) {
                 ((org.bukkit.inventory.meta.Damageable) this.tempMeta).setDamage(this.durability);
             } else {
                 LegacyAPI.setDurability(this.tempItem, this.durability);
@@ -4826,7 +4825,7 @@ public class ItemMap implements Cloneable {
      */
     private void setData() {
         if (this.data != null && this.data > 0) {
-            if (ServerUtils.hasSpecificUpdate("1_13")) {
+            if (ServerUtils.hasUpdate("1_13")) {
                 ((org.bukkit.inventory.meta.Damageable) this.tempMeta).setDamage(this.data);
             } else {
                 LegacyAPI.setDurability(this.tempItem, Short.parseShort(this.data + ""));
@@ -4840,17 +4839,17 @@ public class ItemMap implements Cloneable {
     private void setPotionEffects() {
         if (this.effect != null && !this.effect.isEmpty() && !this.customConsumable) {
             for (PotionEffect potion : this.effect) {
-                if (ServerUtils.hasPreciseUpdate("1_20_3")) {
+                if (ServerUtils.hasUpdate("1_20_3")) {
                     ((PotionMeta) tempMeta).setBasePotionType(PotionType.WATER);
-                } else if (ServerUtils.hasSpecificUpdate("1_9")) {
+                } else if (ServerUtils.hasUpdate("1_9")) {
                     LegacyAPI.setPotionData(((PotionMeta) tempMeta), PotionType.WATER);
                 }
                 ((PotionMeta) this.tempMeta).addCustomEffect(potion, true);
             }
-        } else if (ServerUtils.hasSpecificUpdate("1_9") && (this.getMaterial().toString().equalsIgnoreCase("POTION") || this.getMaterial().toString().equalsIgnoreCase("SPLASH_POTION") || this.getMaterial().toString().equalsIgnoreCase("LINGERING_POTION"))) {
-            if (ServerUtils.hasPreciseUpdate("1_20_3")) {
+        } else if (ServerUtils.hasUpdate("1_9") && (this.getMaterial().toString().equalsIgnoreCase("POTION") || this.getMaterial().toString().equalsIgnoreCase("SPLASH_POTION") || this.getMaterial().toString().equalsIgnoreCase("LINGERING_POTION"))) {
+            if (ServerUtils.hasUpdate("1_20_3")) {
                 ((PotionMeta) tempMeta).setBasePotionType(PotionType.WATER);
-            } else if (ServerUtils.hasSpecificUpdate("1_9")) {
+            } else if (ServerUtils.hasUpdate("1_9")) {
                 LegacyAPI.setPotionData(((PotionMeta) tempMeta), PotionType.WATER);
             }
         }
@@ -4948,7 +4947,7 @@ public class ItemMap implements Cloneable {
             ((BookMeta) this.tempMeta).setTitle(this.title);
         }
 
-        if (this.generation != null && ServerUtils.hasSpecificUpdate("1_10")) {
+        if (this.generation != null && ServerUtils.hasUpdate("1_10")) {
             ((BookMeta) this.tempMeta).setGeneration((BookMeta.Generation) this.generation);
         }
     }
@@ -4987,15 +4986,15 @@ public class ItemMap implements Cloneable {
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_DESTROYS);
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_PLACED_ON);
             this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_UNBREAKABLE);
-            if (!ServerUtils.hasPreciseUpdate("1_20_5")) {
+            if (!ServerUtils.hasUpdate("1_20_5")) {
                 tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.valueOf("HIDE_POTION_EFFECTS"));
             } else {
                 tempMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
             }
-            if (ServerUtils.hasSpecificUpdate("1_20")) {
+            if (ServerUtils.hasUpdate("1_20")) {
                 this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_ARMOR_TRIM);
             }
-            if (ServerUtils.hasSpecificUpdate("1_17")) {
+            if (ServerUtils.hasUpdate("1_17")) {
                 this.tempMeta.addItemFlags(org.bukkit.inventory.ItemFlag.HIDE_DYE);
             }
         }
@@ -5181,7 +5180,7 @@ public class ItemMap implements Cloneable {
             if (this.isSimilar(player, player.getItemOnCursor())) {
                 player.setItemOnCursor(new ItemStack(Material.AIR));
             }
-            if (ServerUtils.hasSpecificUpdate("1_9") && this.isSimilar(player, PlayerHandler.getOffHandItem(player))) {
+            if (ServerUtils.hasUpdate("1_9") && this.isSimilar(player, PlayerHandler.getOffHandItem(player))) {
                 PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR));
             }
 
@@ -5209,7 +5208,7 @@ public class ItemMap implements Cloneable {
                 inv.setBoots(ItemHandler.modifyItem(inv.getBoots(), false, amount[0]));
             } else if (this.isSimilar(player, player.getItemOnCursor())) {
                 player.setItemOnCursor(ItemHandler.modifyItem(player.getItemOnCursor(), false, amount[0]));
-            } else if (ServerUtils.hasSpecificUpdate("1_9") && this.isSimilar(player, PlayerHandler.getOffHandItem(player))) {
+            } else if (ServerUtils.hasUpdate("1_9") && this.isSimilar(player, PlayerHandler.getOffHandItem(player))) {
                 PlayerHandler.setOffHandItem(player, ItemHandler.modifyItem(PlayerHandler.getOffHandItem(player), false, amount[0]));
             } else if (PlayerHandler.isCraftingInv(player)) {
                 for (int k = 0; k < craftingContents.length; k++) {
@@ -5235,7 +5234,7 @@ public class ItemMap implements Cloneable {
         ItemUtilities.getUtilities().setStatistics(player);
         if (this.CustomSlot != null && !this.CustomSlot.contains("%")) {
             final int customAmount = amount[0];
-            if (!ServerUtils.hasSpecificUpdate("1_10")) {
+            if (!ServerUtils.hasUpdate("1_10")) {
                 /*
                     A fix to prevent Arbitrary and addItem's from being accidentally overwritten by dedicated slots.
                     This issue only occurs in 1.8 - 1.9.4.
@@ -5280,7 +5279,7 @@ public class ItemMap implements Cloneable {
             final ItemStack item = topInventory.getItem(actualSlot);
             if (item != null && this.isSimilar(player, item)) {
                 final ItemMeta itemMeta = item.getItemMeta();
-                if (ServerUtils.hasSpecificUpdate("1_13") && itemMeta != null) {
+                if (ServerUtils.hasUpdate("1_13") && itemMeta != null) {
                     int newDamage = ((org.bukkit.inventory.meta.Damageable) itemMeta).getDamage() + damage;
                     if (item.getType().getMaxDurability() > newDamage) {
                         ((org.bukkit.inventory.meta.Damageable) itemMeta).setDamage(newDamage);
@@ -5302,7 +5301,7 @@ public class ItemMap implements Cloneable {
             final ItemStack item = slot.equalsIgnoreCase("OFFHAND") ? PlayerHandler.getOffHandItem(player) : player.getInventory().getItem(Integer.parseInt(slot));
             if (item != null && this.isSimilar(player, item)) {
                 final ItemMeta itemMeta = item.getItemMeta();
-                if (ServerUtils.hasSpecificUpdate("1_13") && itemMeta != null) {
+                if (ServerUtils.hasUpdate("1_13") && itemMeta != null) {
                     int newDamage = ((org.bukkit.inventory.meta.Damageable) itemMeta).getDamage() + damage;
                     if (item.getType().getMaxDurability() > newDamage) {
                         ((org.bukkit.inventory.meta.Damageable) itemMeta).setDamage(newDamage);
@@ -5647,7 +5646,7 @@ public class ItemMap implements Cloneable {
                     }
                 }
             }
-            if (ServerUtils.hasSpecificUpdate("1_9")) {
+            if (ServerUtils.hasUpdate("1_9")) {
                 if (player.getInventory().getItemInOffHand().getType() == mat) {
                     if (player.getInventory().getItemInOffHand().getAmount() >= commandCost) {
                         return true;
@@ -5661,7 +5660,7 @@ public class ItemMap implements Cloneable {
             }
             if (PlayerHandler.isCraftingInv(player)) {
                 for (ItemStack craftInventory : CompatUtils.getTopInventory(player)) {
-                    if (craftInventory != null && craftInventory.getType() == mat && craftInventory.getAmount() >= commandCost) {
+                    if (craftInventory != null && craftInventory.getType() == mat) {
                         if (craftInventory.getAmount() >= commandCost) {
                             return true;
                         } else {
@@ -5706,7 +5705,7 @@ public class ItemMap implements Cloneable {
                 }
             }
         }
-        if (ServerUtils.hasSpecificUpdate("1_9")) {
+        if (ServerUtils.hasUpdate("1_9")) {
             final ItemStack item = player.getInventory().getItemInOffHand();
             if (item.getType() == costMaterial) {
                 if (item.getAmount() < removeAmount) {
@@ -5785,8 +5784,8 @@ public class ItemMap implements Cloneable {
                         try {
                             player.playSound(player.getLocation(), this.commandSound.toUpperCase(), (float) ((double) this.commandSoundVolume), (float) ((double) this.commandSoundPitch));
                         } catch (Exception e4) {
-                            ServerUtils.logSevere("{ItemMap} The defined commands-sound " + this.commandSound + " for the item " + this.configName + " is not valid in Minecraft" + ReflectionUtils.getServerVersion() + ". NOTE: Custom sounds are case-sensitive!");
-                            if (ServerUtils.hasPreciseUpdate("1_21_3")) {
+                            ServerUtils.logSevere("{ItemMap} The defined commands-sound " + this.commandSound + " for the item " + this.configName + " is not valid in Minecraft" + ServerUtils.getVersion() + ". NOTE: Custom sounds are case-sensitive!");
+                            if (ServerUtils.hasUpdate("1_21_3")) {
                                 ServerUtils.logSevere("{ItemMap} See the Minecraft Wiki for a list of command sounds https://minecraft.fandom.com/wiki/Sounds.json/Java_Edition_values");
                             }
                         }
@@ -5819,7 +5818,7 @@ public class ItemMap implements Cloneable {
             if (!allItems) {
                 this.setSubjectRemoval(true);
             }
-            SchedulerUtils.runLater(1L, () -> {
+            SchedulerUtils.runPlayerLater(player, 1L, () -> {
                 if (PlayerHandler.isCreativeMode(player)) {
                     player.closeInventory();
                 }
@@ -5881,9 +5880,9 @@ public class ItemMap implements Cloneable {
         if (this.playersOnInteractCooldown.containsKey(PlayerHandler.getPlayerID(player) + ".items." + this.configName)) {
             playersCooldownList = this.playersOnInteractCooldown.get(PlayerHandler.getPlayerID(player) + ".items." + this.configName);
         }
-        if (System.currentTimeMillis() - playersCooldownList >= this.interactCooldown * 1000) {
+        if (System.currentTimeMillis() - playersCooldownList >= this.interactCooldown * 1000L) {
             this.playersOnInteractCooldown.put(PlayerHandler.getPlayerID(player) + ".items." + this.configName, System.currentTimeMillis());
-            if (ServerUtils.hasPreciseUpdate("1_21_3")) {
+            if (ServerUtils.hasUpdate("1_21_3")) {
                 final ItemStack cloneStack = item.clone();
                 SchedulerUtils.run(() -> player.setCooldown(cloneStack, this.interactCooldown * 20));
             }
@@ -5932,7 +5931,7 @@ public class ItemMap implements Cloneable {
             playersCooldownList = this.playersOnCooldown.get(PlayerHandler.getPlayerID(player));
         }
         if (this.cooldownSeconds != 0) {
-            if (System.currentTimeMillis() - playersCooldownList >= this.cooldownSeconds * 1000) {
+            if (System.currentTimeMillis() - playersCooldownList >= this.cooldownSeconds * 1000L) {
                 return false;
             } else if (this.onCooldownTick(player)) {
                 String cooldownMsg = this.cooldownMessage != null ? (this.cooldownMessage.replace("%timeleft%", String.valueOf((this.cooldownSeconds - ((System.currentTimeMillis() - playersCooldownList) / 1000)))).replace("%item%", this.customName).replace("%itemraw%", Objects.requireNonNull(ItemHandler.getMaterialName(this.tempItem)))) : null;
@@ -6158,7 +6157,7 @@ public class ItemMap implements Cloneable {
         }
         if (this.customName != null && !this.customName.isEmpty() && (this.dynamicNames == null || this.dynamicNames.isEmpty())) {
             String setName;
-            if (this.legacySecret != null && !ServerUtils.hasSpecificUpdate("1_14")) {
+            if (this.legacySecret != null && !ServerUtils.hasUpdate("1_14")) {
                 final ItemMeta itemMeta = this.tempItem.getItemMeta();
                 if (itemMeta != null) {
                     itemMeta.setDisplayName("");

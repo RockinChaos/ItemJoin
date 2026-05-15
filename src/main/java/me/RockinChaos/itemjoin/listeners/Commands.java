@@ -138,7 +138,7 @@ public class Commands implements Listener {
         if (event.getEntity() instanceof Player) {
             final ItemStack bow = (event.getBow() != null ? event.getBow().clone() : event.getBow());
             this.runCommands((Player) event.getEntity(), null, bow, "ON_FIRE", "FIRE", String.valueOf(((Player) event.getEntity()).getInventory().getHeldItemSlot()));
-            if (ServerUtils.hasSpecificUpdate("1_16")) {
+            if (ServerUtils.hasUpdate("1_16")) {
                 final ItemStack arrow = (event.getConsumable() != null ? event.getConsumable().clone() : event.getConsumable());
                 this.runCommands((Player) event.getEntity(), null, arrow, "ON_FIRE", "FIRE", null);
             }
@@ -349,8 +349,8 @@ public class Commands implements Listener {
     @EventHandler()
     public void onProjectileHit(ProjectileHitEvent event) {
         final Player player = ((event.getEntity().getShooter() instanceof Player) ? (Player) event.getEntity().getShooter() : null);
-        Entity hitEntity = (ServerUtils.hasSpecificUpdate("1_12") ? event.getHitEntity() : null);
-        if (!ServerUtils.hasSpecificUpdate("1_12")) {
+        Entity hitEntity = (ServerUtils.hasUpdate("1_12") ? event.getHitEntity() : null);
+        if (!ServerUtils.hasUpdate("1_12")) {
             for (Entity entity : event.getEntity().getNearbyEntities(2, 2, 2)) {
                 if (entity instanceof Player) {
                     hitEntity = entity;
@@ -379,7 +379,7 @@ public class Commands implements Listener {
         try {
             if (event.getRightClicked() instanceof org.bukkit.entity.ItemFrame) {
                 ItemStack item;
-                if (ServerUtils.hasSpecificUpdate("1_9")) {
+                if (ServerUtils.hasUpdate("1_9")) {
                     item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().name());
                 } else {
                     item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");
@@ -404,7 +404,7 @@ public class Commands implements Listener {
         try {
             if (event.getRightClicked().toString().equalsIgnoreCase("CraftArmorStand")) {
                 ItemStack item;
-                if (ServerUtils.hasSpecificUpdate("1_9")) {
+                if (ServerUtils.hasUpdate("1_9")) {
                     item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().name());
                 } else {
                     item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");
@@ -447,7 +447,7 @@ public class Commands implements Listener {
                 if (!PlayerHandler.isMenuClick(player, event.getAction()) && itemMap != null && itemMap.isSimilar(player, item)) {
                     if (TimerUtils.isExpired("dd_interact", new CompositeKey(player.getUniqueId(), item))) {
                         TimerUtils.setExpiry("dd_interact", new CompositeKey(player.getUniqueId(), item), 30, TimeUnit.MILLISECONDS);
-                        final String slot = ServerUtils.hasSpecificUpdate("1_9") && PlayerHandler.getOffHandItem(player).equals(item) ? "OFFHAND" : String.valueOf(player.getInventory().getHeldItemSlot());
+                        final String slot = ServerUtils.hasUpdate("1_9") && PlayerHandler.getOffHandItem(player).equals(item) ? "OFFHAND" : String.valueOf(player.getInventory().getHeldItemSlot());
                         this.runCommands(player, null, item, action, (action.equals(Action.PHYSICAL.name()) ? "INTERACTED" : action.split("_")[0]), slot);
                     }
                 }

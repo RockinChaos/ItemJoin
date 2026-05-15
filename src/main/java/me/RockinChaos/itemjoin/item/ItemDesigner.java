@@ -140,17 +140,17 @@ public class ItemDesigner {
                 String[] parts = id.split(":");
                 id = parts[0];
                 dataValue = parts[1];
-                if (ServerUtils.hasSpecificUpdate("1_13")) {
+                if (ServerUtils.hasUpdate("1_13")) {
                     ServerUtils.logWarn("{ItemDesigner} The item " + internalName + " is using a Legacy Material which is no longer supported as of Minecraft 1.13.");
                     ServerUtils.logWarn("{ItemDesigner} This will cause issues, please see: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html for a list of material names.");
                 }
             }
-            if (!ServerUtils.hasSpecificUpdate("1_9") && id.equalsIgnoreCase("TIPPED_ARROW") || id.equalsIgnoreCase("440") || id.equalsIgnoreCase("0440")) {
-                ServerUtils.logSevere("{ItemDesigner} Your server is running MC " + ReflectionUtils.getServerVersion() + " and this version of Minecraft does not have the item TIPPED_ARROW.");
+            if (!ServerUtils.hasUpdate("1_9") && id.equalsIgnoreCase("TIPPED_ARROW") || id.equalsIgnoreCase("440") || id.equalsIgnoreCase("0440")) {
+                ServerUtils.logSevere("{ItemDesigner} Your server is running MC " + ServerUtils.getVersion() + " and this version of Minecraft does not have the item TIPPED_ARROW.");
                 ServerUtils.logWarn("{ItemDesigner} You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server.");
                 return false;
-            } else if (!ServerUtils.hasSpecificUpdate("1_9") && id.equalsIgnoreCase("LINGERING_POTION") || id.equalsIgnoreCase("441") || id.equalsIgnoreCase("0441")) {
-                ServerUtils.logSevere("{ItemDesigner} Your server is running MC " + ReflectionUtils.getServerVersion() + " and this version of Minecraft does not have the item LINGERING_POTION.");
+            } else if (!ServerUtils.hasUpdate("1_9") && id.equalsIgnoreCase("LINGERING_POTION") || id.equalsIgnoreCase("441") || id.equalsIgnoreCase("0441")) {
+                ServerUtils.logSevere("{ItemDesigner} Your server is running MC " + ServerUtils.getVersion() + " and this version of Minecraft does not have the item LINGERING_POTION.");
                 ServerUtils.logWarn("{ItemDesigner} You are receiving this notice because the item(s) exists in your items.yml and will not be set, please remove the item(s) or update your server.");
                 return false;
             } else if (ItemHandler.getMaterial(id, dataValue) == Material.AIR) {
@@ -190,8 +190,8 @@ public class ItemDesigner {
                 ServerUtils.logWarn("{ItemDesigner} The Item " + internalName + " will not be set!");
                 return false;
             }
-        } else if (!ServerUtils.hasSpecificUpdate("1_9") && slot.equalsIgnoreCase("Offhand")) {
-            ServerUtils.logWarn("{ItemDesigner} Your server is running MC " + ReflectionUtils.getServerVersion() + " and this version of Minecraft does not have OFFHAND support!");
+        } else if (!ServerUtils.hasUpdate("1_9") && slot.equalsIgnoreCase("Offhand")) {
+            ServerUtils.logWarn("{ItemDesigner} Your server is running MC " + ServerUtils.getVersion() + " and this version of Minecraft does not have OFFHAND support!");
             return false;
         }
         return true;
@@ -443,7 +443,7 @@ public class ItemDesigner {
                 final Class<?> nbtBaseClass = ReflectionUtils.getMinecraftClass("NBTBase");
                 final String setStringMethod = MinecraftMethod.setString.getMethod();
                 final String valueOfMethod = MinecraftMethod.valueOf.getMethod();
-                final String addTagMethod = ServerUtils.hasSpecificUpdate("1_21") ? MinecraftMethod.addTag.getMethod() : MinecraftMethod.add.getMethod();
+                final String addTagMethod = ServerUtils.hasUpdate("1_21") ? MinecraftMethod.addTag.getMethod() : MinecraftMethod.add.getMethod();
                 final Object tag = ReflectionUtils.getConstructor(nbtTagCompoundClass).invoke();
                 ReflectionUtils.getMethod(tag.getClass(), setStringMethod, String.class, String.class).invoke(tag, "ItemJoin Name", itemMap.getConfigName());
                 final String itemProperties = itemMap.getNodeLocation().getString(".properties");
@@ -451,8 +451,8 @@ public class ItemDesigner {
                     final Map<Object, Object> tagValues = new HashMap<>();
                     final String[] properties = itemProperties.split(",");
                     for (final String property : properties) {
-                        String[] propertyParts = property.split(":");
-                        String identifier = (propertyParts[0].startsWith(" ") ? propertyParts[0].substring(1) : propertyParts[0]);
+                        final String[] propertyParts = property.split(":");
+                        final String identifier = (propertyParts[0].startsWith(" ") ? propertyParts[0].substring(1) : propertyParts[0]);
                         String tagName = identifier;
                         if (identifier.contains(".")) {
                             tagName = identifier.split("\\.")[1];
@@ -700,9 +700,9 @@ public class ItemDesigner {
      * @param itemMap - The ItemMap being modified.
      */
     private void setModelData(final ItemMap itemMap) {
-        if (ServerUtils.hasSpecificUpdate("1_14") && itemMap.getNodeLocation().getString(".model-data") != null) {
+        if (ServerUtils.hasUpdate("1_14") && itemMap.getNodeLocation().getString(".model-data") != null) {
             itemMap.setModelData(itemMap.getNodeLocation().getString(".model-data"));
-        } else if (ServerUtils.hasPreciseUpdate("1_21_4") && itemMap.getNodeLocation().getString(".model-components") != null) {
+        } else if (ServerUtils.hasUpdate("1_21_4") && itemMap.getNodeLocation().getString(".model-components") != null) {
             itemMap.setModelComponents(Arrays.asList(itemMap.getNodeLocation().getString(".model-components.strings"), itemMap.getNodeLocation().getString(".model-components.colors"), itemMap.getNodeLocation().getString(".model-components.flags"), itemMap.getNodeLocation().getString(".model-components.floats")));
         }
     }
@@ -815,7 +815,7 @@ public class ItemDesigner {
      * @param itemMap - The ItemMap being modified.
      */
     private void addRecipe(final ItemMap itemMap, final List<String> recipe, final String identifier, final Map<Character, ItemRecipe> ingredientList) {
-        final ShapedRecipe shapedRecipe = (ServerUtils.hasSpecificUpdate("1_12") ? new ShapedRecipe(new NamespacedKey(ItemJoin.getCore().getPlugin(), itemMap.getConfigName() + identifier), itemMap.getItem(null)) : LegacyAPI.newShapedRecipe(itemMap.getItem(null)));
+        final ShapedRecipe shapedRecipe = (ServerUtils.hasUpdate("1_12") ? new ShapedRecipe(new NamespacedKey(ItemJoin.getCore().getPlugin(), itemMap.getConfigName() + identifier), itemMap.getItem(null)) : LegacyAPI.newShapedRecipe(itemMap.getItem(null)));
         String[] shape = itemMap.trimRecipe(recipe);
         shapedRecipe.shape(shape);
         if (itemMap.getNodeLocation().getString(".ingredients") != null) {
@@ -1045,7 +1045,7 @@ public class ItemDesigner {
         String potionEffect = (itemMap.getNodeLocation().getString(".potion-effect") != null ? itemMap.getNodeLocation().getString(".potion-effect") : itemMap.getNodeLocation().getString(".potion-effects"));
         if (potionEffect != null) {
             if (itemMap.getMaterial().toString().equalsIgnoreCase("POTION") || itemMap.getMaterial().toString().equalsIgnoreCase("SPLASH_POTION")
-                    || ServerUtils.hasSpecificUpdate("1_9") && itemMap.getMaterial().toString().equalsIgnoreCase("LINGERING_POTION")) {
+                    || ServerUtils.hasUpdate("1_9") && itemMap.getMaterial().toString().equalsIgnoreCase("LINGERING_POTION")) {
                 String potionList = potionEffect.replace(" ", "");
                 List<PotionEffect> potionEffectList = new ArrayList<>();
                 for (String potion : potionList.split(",")) {
@@ -1086,7 +1086,7 @@ public class ItemDesigner {
     private void setTippedArrows(final ItemMap itemMap) {
         String potionEffect = (itemMap.getNodeLocation().getString(".potion-effect") != null ? itemMap.getNodeLocation().getString(".potion-effect") : itemMap.getNodeLocation().getString(".potion-effects"));
         if (potionEffect != null) {
-            if (ServerUtils.hasSpecificUpdate("1_9") && !ItemJoin.getCore().getPlugin().getServer().getVersion().contains("(MC: 1.9)") && itemMap.getMaterial().toString().equalsIgnoreCase("TIPPED_ARROW")) {
+            if (ServerUtils.hasUpdate("1_9") && !ItemJoin.getCore().getPlugin().getServer().getVersion().contains("(MC: 1.9)") && itemMap.getMaterial().toString().equalsIgnoreCase("TIPPED_ARROW")) {
                 String effectList = potionEffect.replace(" ", "");
                 List<PotionEffect> potionEffectList = new ArrayList<>();
                 for (String effect : effectList.split(",")) {
@@ -1137,7 +1137,7 @@ public class ItemDesigner {
                 PatternType Pattern = null;
                 try {
                     Color = DyeColor.valueOf(bannerSection[0].toUpperCase());
-                    if (ServerUtils.hasPreciseUpdate("1_20_6")) {
+                    if (ServerUtils.hasUpdate("1_20_6")) {
                         final NamespacedKey key = NamespacedKey.minecraft(bannerSection[1].toLowerCase());
                         Pattern = Registry.BANNER_PATTERN.get(key);
                     } else {
@@ -1167,7 +1167,7 @@ public class ItemDesigner {
      */
     private void setTrim(final ItemMap itemMap) {
         final String trimMeta = itemMap.getNodeLocation().getString(".trim-meta");
-        if (trimMeta != null && ServerUtils.hasSpecificUpdate("1_20") && ItemHandler.isArmor(itemMap.getMaterial().toString())) {
+        if (trimMeta != null && ServerUtils.hasUpdate("1_20") && ItemHandler.isArmor(itemMap.getMaterial().toString())) {
             String armorTrim = trimMeta.replace(" ", "");
             String[] armorSection = armorTrim.split(":");
             final org.bukkit.inventory.meta.trim.TrimMaterial Material = ItemHandler.getTrimMaterial(armorSection[0].toUpperCase());
@@ -1259,7 +1259,7 @@ public class ItemDesigner {
     private void setDye(final ItemMap itemMap) {
         String leatherColor = itemMap.getNodeLocation().getString(".leather-color");
         if (leatherColor != null) {
-            if (itemMap.getMaterial().toString().contains("LEATHER_") && (ServerUtils.hasSpecificUpdate("1_14") || !itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_HORSE_ARMOR"))) {
+            if (itemMap.getMaterial().toString().contains("LEATHER_") && (ServerUtils.hasUpdate("1_14") || !itemMap.getMaterial().toString().equalsIgnoreCase("LEATHER_HORSE_ARMOR"))) {
                 boolean isPlaceholder = leatherColor.startsWith("%");
                 leatherColor = leatherColor.replace(" ", "");
                 try {
@@ -1327,7 +1327,7 @@ public class ItemDesigner {
      * @param itemMap - The ItemMap being modified.
      */
     private void setBookGeneration(final ItemMap itemMap) {
-        if (ServerUtils.hasSpecificUpdate("1_10") && itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK")) {
+        if (ServerUtils.hasUpdate("1_10") && itemMap.getMaterial().toString().equalsIgnoreCase("WRITTEN_BOOK")) {
             if (itemMap.getNodeLocation().getString(".generation") != null) {
                 itemMap.setGeneration(org.bukkit.inventory.meta.BookMeta.Generation.valueOf(itemMap.getNodeLocation().getString(".generation")));
             } else {

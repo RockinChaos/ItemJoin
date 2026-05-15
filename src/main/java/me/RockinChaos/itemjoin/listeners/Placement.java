@@ -79,7 +79,7 @@ public class Placement implements Listener {
                     } else {
                         final ItemStack heldItem = PlayerHandler.getHandItem(player);
                         if (heldItem.getAmount() <= 1) {
-                            if (ServerUtils.hasSpecificUpdate("1_9")) {
+                            if (ServerUtils.hasUpdate("1_9")) {
                                 if (Objects.equals(event.getHand(), EquipmentSlot.HAND)) {
                                     if (player.getInventory().getHeldItemSlot() == slot) {
                                         PlayerHandler.setMainHandItem(player, item);
@@ -116,7 +116,7 @@ public class Placement implements Listener {
             if (event.getRightClicked() instanceof ItemFrame) {
                 try {
                     ItemStack item;
-                    if (ServerUtils.hasSpecificUpdate("1_9")) {
+                    if (ServerUtils.hasUpdate("1_9")) {
                         item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
                     } else {
                         item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");
@@ -144,7 +144,7 @@ public class Placement implements Listener {
             if (event.getRightClicked() instanceof ItemFrame) {
                 try {
                     ItemStack item;
-                    if (ServerUtils.hasSpecificUpdate("1_9")) {
+                    if (ServerUtils.hasUpdate("1_9")) {
                         item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
                     } else {
                         item = PlayerHandler.getPerfectHandItem(event.getPlayer(), "");
@@ -156,7 +156,7 @@ public class Placement implements Listener {
                             if (itemMap != null) {
                                 final ItemStack heldItem = PlayerHandler.getHandItem(player);
                                 if (heldItem.getAmount() <= 1) {
-                                    if (ServerUtils.hasSpecificUpdate("1_9")) {
+                                    if (ServerUtils.hasUpdate("1_9")) {
                                         if (event.getHand().equals(EquipmentSlot.HAND)) {
                                             PlayerHandler.setMainHandItem(player, item);
                                         } else if (event.getHand().equals(EquipmentSlot.OFF_HAND)) {

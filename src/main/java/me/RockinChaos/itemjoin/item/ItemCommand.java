@@ -500,7 +500,7 @@ public class ItemCommand {
             }
         };
         if (this.delay <= 0) {
-            runnable.run();
+            SchedulerUtils.run(runnable);
         } else {
             SchedulerUtils.runLater(this.delay, runnable);
         }

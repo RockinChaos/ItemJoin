@@ -125,7 +125,7 @@ public class Legacy_Consumes implements Listener {
             SchedulerUtils.runLater(2L, () -> {
                 final ItemStack handItem = PlayerHandler.getHandItem(player);
                 if (handItem.getAmount() <= 1) {
-                    if (ServerUtils.hasSpecificUpdate("1_9")) {
+                    if (ServerUtils.hasUpdate("1_9")) {
                         final ItemStack mainItem = PlayerHandler.getMainHandItem(player);
                         final ItemStack offItem = PlayerHandler.getOffHandItem(player);
                         if (mainItem.getType() != Material.AIR) {

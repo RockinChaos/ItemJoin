@@ -344,7 +344,7 @@ public class ItemAnimation {
         // Update inventory
         SchedulerUtils.run(() -> {
             if (!animateFlag.get() || !canAnimate(player, animateFlag)) return;
-            if (StringUtils.getSlotConversion(itemMap.getSlot()) != -1 && !ServerUtils.hasSpecificUpdate("1_13")) {
+            if (StringUtils.getSlotConversion(itemMap.getSlot()) != -1 && !ServerUtils.hasUpdate("1_13")) {
                 LegacyAPI.updateInventory(player);
             } else {
                 synchronized ("IJ_ANIMATE") {
@@ -471,7 +471,7 @@ public class ItemAnimation {
             String materialString = ItemHandler.cutDelay(material);
             if (materialString.contains(":") && reviseItem != null && reviseItem.getType() != Material.AIR) {
                 final String[] parts = materialString.split(":");
-                if (ServerUtils.hasSpecificUpdate("1_13")) {
+                if (ServerUtils.hasUpdate("1_13")) {
                     if (!StringUtils.isInt(parts[0])) {
                         parts[0] = "LEGACY_" + parts[0];
                     }

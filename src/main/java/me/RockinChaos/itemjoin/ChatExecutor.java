@@ -338,7 +338,7 @@ public class ChatExecutor implements CommandExecutor {
             ItemJoin.getCore().getLang().dispatchMessage(sender, "");
             final PlaceHolder placeHolders = new PlaceHolder().with(Holder.ITEM, handItem.getType().toString());
             ItemJoin.getCore().getLang().sendLangMessage("commands.info.material", sender, placeHolders);
-            if (!ServerUtils.hasSpecificUpdate("1_13")) {
+            if (!ServerUtils.hasUpdate("1_13")) {
                 placeHolders.with(Holder.ITEM, String.valueOf(LegacyAPI.getDataValue(handItem)));
                 ItemJoin.getCore().getLang().sendLangMessage("commands.info.data", sender, placeHolders);
             }

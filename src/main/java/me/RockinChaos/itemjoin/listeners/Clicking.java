@@ -52,7 +52,6 @@ import java.util.*;
 public class Clicking implements Listener {
 
     private static final HashMap<String, ItemStack> cursorItem = new HashMap<>();
-    private final Map<String, Boolean> droppedItem = new HashMap<>();
     private final Map<String, Boolean> dropClick = new HashMap<>();
 
     /**
@@ -122,7 +121,7 @@ public class Clicking implements Listener {
             if (StringUtils.containsIgnoreCase(event.getAction().name(), "HOTBAR")) {
                 if (CompatUtils.getBottomInventory(event).getSize() >= event.getHotbarButton() && event.getHotbarButton() >= 0) {
                     items.add(CompatUtils.getBottomInventory(event).getItem(event.getHotbarButton()));
-                } else if (ServerUtils.hasSpecificUpdate("1_9")) {
+                } else if (ServerUtils.hasUpdate("1_9")) {
                     items.add(PlayerHandler.getOffHandItem(player));
                 }
             }
@@ -352,25 +351,23 @@ public class Clicking implements Listener {
      * @param player - that is dropping the item.
      */
     private void LegacyDropEvent(final Player player) {
-        if (!ServerUtils.hasSpecificUpdate("1_9")) {
+        if (!ServerUtils.hasUpdate("1_9")) {
             dropClick.put(PlayerHandler.getPlayerID(player), true);
             final ItemStack[] Inv = player.getInventory().getContents().clone();
             final ItemStack[] Armor = player.getInventory().getArmorContents().clone();
             SchedulerUtils.runLater(1L, () -> {
-                if (this.dropClick.get(PlayerHandler.getPlayerID(player)) != null && this.dropClick.get(PlayerHandler.getPlayerID(player))
-                        && this.droppedItem.get(PlayerHandler.getPlayerID(player)) != null && this.droppedItem.get(PlayerHandler.getPlayerID(player))) {
+                if (this.dropClick.get(PlayerHandler.getPlayerID(player)) != null && this.dropClick.get(PlayerHandler.getPlayerID(player))) {
                     player.getInventory().clear();
                     player.getInventory().setHelmet(null);
                     player.getInventory().setChestplate(null);
                     player.getInventory().setLeggings(null);
                     player.getInventory().setBoots(null);
-                    if (ServerUtils.hasSpecificUpdate("1_9")) {
+                    if (ServerUtils.hasUpdate("1_9")) {
                         player.getInventory().setItemInOffHand(null);
                     }
                     player.getInventory().setContents(Inv);
                     player.getInventory().setArmorContents(Armor);
                     PlayerHandler.updateInventory(player, 1L);
-                    this.droppedItem.remove(PlayerHandler.getPlayerID(player));
                 }
                 this.dropClick.remove(PlayerHandler.getPlayerID(player));
             });

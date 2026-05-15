@@ -50,7 +50,7 @@ import java.util.List;
 public class Recipes implements Listener {
 
     public Recipes() {
-        if (ServerUtils.hasSpecificUpdate("1_21") && StringUtils.isRegistered(CrafterRecipes.class.getSimpleName())) {
+        if (ServerUtils.hasUpdate("1_21") && StringUtils.isRegistered(CrafterRecipes.class.getSimpleName())) {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new CrafterRecipes(), ItemJoin.getCore().getPlugin());
         }
     }
@@ -199,7 +199,7 @@ public class Recipes implements Listener {
         } else {
             final boolean isCrafter = event != null && event.getClass().getSimpleName().equalsIgnoreCase("CrafterCraftEvent");
             final ItemStack result = (craftInventory != null && craftInventory.getResult() != null ? craftInventory.getResult().clone() : isCrafter ? ((CrafterCraftEvent) event).getResult() : new ItemStack(Material.AIR));
-            final boolean isLegacy = !ServerUtils.hasSpecificUpdate("1_13");
+            final boolean isLegacy = !ServerUtils.hasUpdate("1_13");
             final Inventory craftedInventory = craftInventory != null ? craftInventory : isCrafter ? ((Crafter) ((CrafterCraftEvent) event).getBlock().getState()).getInventory() : null;
             boolean success = false;
             for (final List<Character> tempRecipe : itemMap.getRecipe()) {

@@ -17,7 +17,6 @@
  */
 package me.RockinChaos.itemjoin.utils.api;
 
-import me.RockinChaos.core.utils.ReflectionUtils;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.core.utils.StringUtils;
@@ -53,7 +52,7 @@ public class EffectAPI {
                 player.getWorld().spawnParticle(particle, player.getLocation(), particleLife);
             } catch (Exception e) {
                 ServerUtils.logSevere("{EffectAPI} There was an issue executing the commands-particle you defined.");
-                ServerUtils.logWarn("{EffectAPI} " + commandParticle + " is not a particle in " + ReflectionUtils.getServerVersion() + ".");
+                ServerUtils.logWarn("{EffectAPI} " + commandParticle + " is not a particle in " + ServerUtils.getVersion() + ".");
                 ServerUtils.sendDebugTrace(e);
             }
         }
@@ -85,7 +84,7 @@ public class EffectAPI {
         }
         FireworkEffect effect = FireworkEffect.builder().withColor(startColor).withFade(endColor).with(effectType).trail(true).flicker(true).build();
         final Firework fw;
-        if (!ServerUtils.hasPreciseUpdate("1_20_5")) {
+        if (!ServerUtils.hasUpdate("1_20_5")) {
             fw = (Firework) player.getWorld().spawnEntity(player.getLocation(), EntityType.valueOf("FIREWORK"));
         } else {
             fw = (Firework) player.getWorld().spawnEntity(player.getLocation(), EntityType.FIREWORK_ROCKET);

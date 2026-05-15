@@ -38,7 +38,7 @@ public class Offhand implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     private void onGlobalHandModify(PlayerSwapHandItemsEvent event) {
-        if (ServerUtils.hasSpecificUpdate("1_9")) {
+        if (ServerUtils.hasUpdate("1_9")) {
             final Player player = event.getPlayer();
             if (PluginData.getInfo().isPreventString(player, "itemMovement")) {
                 if (!(PluginData.getInfo().isPreventBypass(player) && (CompatUtils.getInventoryTitle(player).contains(String.valueOf(ChatColor.COLOR_CHAR)) || CompatUtils.getInventoryTitle(player).contains("&")))) {
@@ -56,7 +56,7 @@ public class Offhand implements Listener {
      */
     @EventHandler(ignoreCancelled = true)
     private void onHandModify(PlayerSwapHandItemsEvent event) {
-        if (ServerUtils.hasSpecificUpdate("1_9")) {
+        if (ServerUtils.hasUpdate("1_9")) {
             ItemStack offhand = event.getOffHandItem();
             ItemStack mainhand = event.getMainHandItem();
             Player player = event.getPlayer();

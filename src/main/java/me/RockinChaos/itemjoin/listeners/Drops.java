@@ -100,7 +100,7 @@ public class Drops implements Listener {
     private void onGlobalDeathDrops(PlayerDeathEvent event) {
         final Player player = event.getEntity();
         if (PluginData.getInfo().isPreventString(player, "Death-Drops")) {
-            if (PluginData.getInfo().isPreventBypass(player) && (ServerUtils.hasPreciseUpdate("1_21_11") ? !Boolean.TRUE.equals(player.getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY)) : !LegacyAPI.hasGameRule(player.getWorld(), "keepInventory"))) {
+            if (PluginData.getInfo().isPreventBypass(player) && (ServerUtils.hasUpdate("1_21_11") ? !Boolean.TRUE.equals(player.getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY)) : !LegacyAPI.hasGameRule(player.getWorld(), "keepInventory"))) {
                 player.getInventory().clear();
                 CompatUtils.getTopInventory(player).clear();
                 event.getDrops().clear();
@@ -194,7 +194,7 @@ public class Drops implements Listener {
         final ItemStack legsItem = player.getInventory().getLeggings();
         final ItemStack bootsItem = player.getInventory().getBoots();
         final ItemStack offHandItem = PlayerHandler.getOffHandItem(player);
-        if ((ServerUtils.hasPreciseUpdate("1_21_11") ? !Boolean.TRUE.equals(player.getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY)) : !LegacyAPI.hasGameRule(player.getWorld(), "keepInventory"))) {
+        if ((ServerUtils.hasUpdate("1_21_11") ? !Boolean.TRUE.equals(player.getWorld().getGameRuleValue(GameRule.KEEP_INVENTORY)) : !LegacyAPI.hasGameRule(player.getWorld(), "keepInventory"))) {
             if (!CompatUtils.isInventoryEmpty(bottomInventory)) {
                 for (int playerInventory = 0; playerInventory < bottomInventory.getSize(); playerInventory++) {
                     this.handleKeepItem(player, bottomInventory.getItem(playerInventory), playerInventory, "bottom_inventory");

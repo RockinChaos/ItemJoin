@@ -40,7 +40,7 @@ public class Respawn implements Listener {
     @EventHandler(ignoreCancelled = true)
     private void setRespawnItems(PlayerRespawnEvent event) {
         final Player player = event.getPlayer();
-        final boolean isProtected = event.isBedSpawn() || (ServerUtils.hasPreciseUpdate("1_16_2") && event.isAnchorSpawn());
+        final boolean isProtected = event.isBedSpawn() || (ServerUtils.hasUpdate("1_16_2") && event.isAnchorSpawn());
         if (PlayerHandler.isPlayer(player)) {
             if (ItemJoin.getCore().getDependencies().getGuard().guardEnabled()) {
                 ItemUtilities.getUtilities().handleRegions(player, player.getWorld(), (isProtected ? TriggerType.RESPAWN_POINT : TriggerType.RESPAWN_WILD), player.getGameMode());

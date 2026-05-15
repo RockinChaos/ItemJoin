@@ -19,7 +19,6 @@ package me.RockinChaos.itemjoin.listeners;
 
 import me.RockinChaos.core.handlers.PlayerHandler;
 import me.RockinChaos.core.utils.CompatUtils;
-import me.RockinChaos.core.utils.ReflectionUtils;
 import me.RockinChaos.core.utils.SchedulerUtils;
 import me.RockinChaos.core.utils.ServerUtils;
 import me.RockinChaos.itemjoin.item.ItemMap;
@@ -53,7 +52,7 @@ public class Projectile implements Listener {
     @EventHandler(ignoreCancelled = true)
     private void onProjectileFire(EntityShootBowEvent event) {
         final LivingEntity entity = event.getEntity();
-        if (ServerUtils.hasSpecificUpdate("1_16") && entity instanceof Player && event.getBow() != null) {
+        if (ServerUtils.hasUpdate("1_16") && entity instanceof Player && event.getBow() != null) {
             final ItemStack consumable = (event.getConsumable() != null ? event.getConsumable().clone() : event.getConsumable());
             final Player player = (Player) event.getEntity();
             this.projectileList.put(event.getProjectile().getEntityId(), consumable);
@@ -141,8 +140,8 @@ public class Projectile implements Listener {
                                 try {
                                     projectile.getWorld().playSound(projectile.getLocation(), teleportSound.toUpperCase(), teleportVolume, teleportPitch);
                                 } catch (Exception e4) {
-                                    ServerUtils.logSevere("{Projectile} The defined teleport-sound " + teleportSound + " for the item " + itemMap.getConfigName() + " is not valid in Minecraft" + ReflectionUtils.getServerVersion() + ". NOTE: Custom sounds are case-sensitive!");
-                                    if (ServerUtils.hasPreciseUpdate("1_21_3")) {
+                                    ServerUtils.logSevere("{Projectile} The defined teleport-sound " + teleportSound + " for the item " + itemMap.getConfigName() + " is not valid in Minecraft" + ServerUtils.getVersion() + ". NOTE: Custom sounds are case-sensitive!");
+                                    if (ServerUtils.hasUpdate("1_21_3")) {
                                         ServerUtils.logSevere("{ItemMap} See the Minecraft Wiki for a list of command sounds https://minecraft.fandom.com/wiki/Sounds.json/Java_Edition_values");
                                     }
                                 }

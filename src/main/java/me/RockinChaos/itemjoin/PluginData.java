@@ -316,7 +316,7 @@ public class PluginData {
     public void saveCooldowns() {
         for (final ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
             for (final String key : itemMap.getPlayersOnCooldown().keySet()) {
-                if (System.currentTimeMillis() - itemMap.getPlayersOnCooldown().get(key) <= itemMap.getCommandCooldown() * 1000) {
+                if (System.currentTimeMillis() - itemMap.getPlayersOnCooldown().get(key) <= itemMap.getCommandCooldown() * 1000L) {
                     ItemJoin.getCore().getSQL().saveData(new DataObject(Table.ON_COOLDOWN, key, "GLOBAL", itemMap.getConfigName(), itemMap.getCommandCooldown().toString(), itemMap.getPlayersOnCooldown().get(key).toString()));
                 }
             }
@@ -482,7 +482,7 @@ public class PluginData {
             if (!silent) {
                 if (StringUtils.containsIgnoreCase(compileVersion, "spigot_version")) {
                     ServerUtils.logInfo("Running a developer version ... skipping NMS check.");
-                } else if (!compileVersion.equalsIgnoreCase(serverVersion) && ServerUtils.hasPreciseUpdate(compileVersion)) {
+                } else if (!compileVersion.equalsIgnoreCase(serverVersion) && ServerUtils.hasUpdate(compileVersion)) {
                     ServerUtils.logSevere("Detected a unsupported version of Minecraft, expected: " + compileVersion.replace("_", ".") + " or older!");
                     ServerUtils.logSevere("Attempting to run in NMS compatibility mode...");
                     ServerUtils.logSevere("Things may not work as expected, please check for plugin updates.");
@@ -562,7 +562,7 @@ public class PluginData {
         }
         if ((!StringUtils.splitIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Prevent." + "Pickups"), "FALSE", ",") && !StringUtils.splitIgnoreCase(ItemJoin.getCore().getConfig("config.yml").getString("Prevent." + "Pickups"), "DISABLED", ","))) {
             //noinspection ConstantValue
-            if (ServerUtils.hasSpecificUpdate("1_12") && ReflectionUtils.getBukkitClass("event.entity.EntityPickupItemEvent") != null && StringUtils.isRegistered(Pickups.class.getSimpleName())) {
+            if (ServerUtils.hasUpdate("1_12") && ReflectionUtils.getBukkitClass("event.entity.EntityPickupItemEvent") != null && StringUtils.isRegistered(Pickups.class.getSimpleName())) {
                 ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Pickups(), ItemJoin.getCore().getPlugin());
             } else {
                 LegacyAPI.registerPickups();
@@ -660,7 +660,7 @@ public class PluginData {
                 }
             }
         }
-        if (ServerUtils.hasSpecificUpdate("1_12") && itemMap.isStackable() && StringUtils.isRegistered(Stackable.class.getSimpleName())) {
+        if (ServerUtils.hasUpdate("1_12") && itemMap.isStackable() && StringUtils.isRegistered(Stackable.class.getSimpleName())) {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Stackable(), ItemJoin.getCore().getPlugin());
         } else if (itemMap.isStackable()) {
             LegacyAPI.registerStackable();
@@ -691,7 +691,7 @@ public class PluginData {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Projectile(), ItemJoin.getCore().getPlugin());
         }
         if (itemMap.isCountLock() || itemMap.isCustomConsumable()) {
-            if (ServerUtils.hasSpecificUpdate("1_11") && StringUtils.isRegistered(Consumes.class.getSimpleName())) {
+            if (ServerUtils.hasUpdate("1_11") && StringUtils.isRegistered(Consumes.class.getSimpleName())) {
                 ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Consumes(), ItemJoin.getCore().getPlugin());
             } else {
                 LegacyAPI.registerConsumes();
@@ -708,7 +708,7 @@ public class PluginData {
                 ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Trade(), ItemJoin.getCore().getPlugin());
             }
         }
-        if (itemMap.isMovement() && ServerUtils.hasSpecificUpdate("1_9") && ReflectionUtils.getBukkitClass("event.player.PlayerSwapHandItemsEvent") != null && StringUtils.isRegistered(Offhand.class.getSimpleName())) {
+        if (itemMap.isMovement() && ServerUtils.hasUpdate("1_9") && ReflectionUtils.getBukkitClass("event.player.PlayerSwapHandItemsEvent") != null && StringUtils.isRegistered(Offhand.class.getSimpleName())) {
             ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Offhand(), ItemJoin.getCore().getPlugin());
         }
     }
@@ -723,7 +723,7 @@ public class PluginData {
         return () -> {
             final File itemsFile = new File(ItemJoin.getCore().getPlugin().getDataFolder(), "items.yml");
             final FileConfiguration itemsData = YamlConfiguration.loadConfiguration(itemsFile);
-            if (ServerUtils.hasPreciseUpdate("1_21_3")) {
+            if (ServerUtils.hasUpdate("1_21_3")) {
                 itemsData.set("items.devine-item.commands-sound", "BLOCK.NOTE_BLOCK.PLING");
                 itemsData.set("items.devine-item.attributes", "{ATTACK_DAMAGE:15.2}, {ATTACK_SPEED:19.0}");
                 itemsData.set("items.map-item.id", "FILLED_MAP");
@@ -750,7 +750,7 @@ public class PluginData {
                 itemsData.set("items.random-pane-1.id", "YELLOW_STAINED_GLASS_PANE");
                 itemsData.set("items.random-pane-2.id", "BLUE_STAINED_GLASS_PANE");
                 itemsData.set("items.random-pane-3.id", "PINK_STAINED_GLASS_PANE");
-            } else if (ServerUtils.hasSpecificUpdate("1_14")) {
+            } else if (ServerUtils.hasUpdate("1_14")) {
                 itemsData.set("items.devine-item.commands-sound", "BLOCK_NOTE_BLOCK_PLING");
                 itemsData.set("items.devine-item.attributes", "{GENERIC_ATTACK_DAMAGE:15.2}, {GENERIC_ATTACK_SPEED:19.0}");
                 itemsData.set("items.map-item.id", "FILLED_MAP");
@@ -777,7 +777,7 @@ public class PluginData {
                 itemsData.set("items.random-pane-1.id", "YELLOW_STAINED_GLASS_PANE");
                 itemsData.set("items.random-pane-2.id", "BLUE_STAINED_GLASS_PANE");
                 itemsData.set("items.random-pane-3.id", "PINK_STAINED_GLASS_PANE");
-            } else if (ServerUtils.hasSpecificUpdate("1_13")) {
+            } else if (ServerUtils.hasUpdate("1_13")) {
                 itemsData.set("items.devine-item.commands-sound", "BLOCK_NOTE_BLOCK_PLING");
                 itemsData.set("items.devine-item.attributes", "{GENERIC_ATTACK_DAMAGE:15.2}, {GENERIC_ATTACK_SPEED:19.0}");
                 itemsData.set("items.map-item.id", "FILLED_MAP");
@@ -804,7 +804,7 @@ public class PluginData {
                 itemsData.set("items.random-pane-1.id", "YELLOW_STAINED_GLASS_PANE");
                 itemsData.set("items.random-pane-2.id", "BLUE_STAINED_GLASS_PANE");
                 itemsData.set("items.random-pane-3.id", "PINK_STAINED_GLASS_PANE");
-            } else if (ServerUtils.hasSpecificUpdate("1_9")) {
+            } else if (ServerUtils.hasUpdate("1_9")) {
                 itemsData.set("items.devine-item.commands-sound", "BLOCK_NOTE_PLING");
                 itemsData.set("items.devine-item.attributes", "{GENERIC_ATTACK_DAMAGE:15.2}, {GENERIC_ATTACK_SPEED:19.0}");
                 itemsData.set("items.map-item.id", "MAP");

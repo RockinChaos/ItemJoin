@@ -468,7 +468,7 @@ public class ItemUtilities {
             if (this.canClear(player.getItemOnCursor(), "Cursor", i, clearType)) {
                 player.setItemOnCursor(new ItemStack(Material.AIR));
             }
-            if (ServerUtils.hasSpecificUpdate("1_9") && this.canClear(inventory.getItemInOffHand(), "OffHand", i, clearType)) {
+            if (ServerUtils.hasUpdate("1_9") && this.canClear(inventory.getItemInOffHand(), "OffHand", i, clearType)) {
                 PlayerHandler.setOffHandItem(player, new ItemStack(Material.AIR));
             }
             if (PlayerHandler.isCraftingInv(player)) {
@@ -648,7 +648,7 @@ public class ItemUtilities {
                 return false;
             } else if (CustomSlot.BOOTS.isSlot(itemMap.getSlot()) && player.getInventory().getBoots() != null && player.getInventory().getBoots().getType() != Material.AIR) {
                 return false;
-            } else if (ServerUtils.hasSpecificUpdate("1_9") && CustomSlot.OFFHAND.isSlot(itemMap.getSlot())) {
+            } else if (ServerUtils.hasUpdate("1_9") && CustomSlot.OFFHAND.isSlot(itemMap.getSlot())) {
                 if (player.getInventory().getItemInOffHand().getType() != Material.AIR) {
                     return false;
                 }
@@ -850,7 +850,7 @@ public class ItemUtilities {
         } else if (CustomSlot.BOOTS.isSlot(itemMap.getSlot()) && (existingItem.getType() == Material.AIR || overWrite)) {
             isGiven = true;
             Objects.requireNonNull(player.getEquipment()).setBoots(item);
-        } else if (ServerUtils.hasSpecificUpdate("1_9") && CustomSlot.OFFHAND.isSlot(itemMap.getSlot()) && (existingItem.getType() == Material.AIR || overWrite)) {
+        } else if (ServerUtils.hasUpdate("1_9") && CustomSlot.OFFHAND.isSlot(itemMap.getSlot()) && (existingItem.getType() == Material.AIR || overWrite)) {
             isGiven = true;
             PlayerHandler.setOffHandItem(player, item);
         } else if (craftSlot != -1 && (existingItem.getType() == Material.AIR || overWrite || craftSlot == 0)) {
@@ -1214,7 +1214,7 @@ public class ItemUtilities {
         if (!this.recipeItems.isEmpty()) {
             final Iterator<Recipe> recipes = Bukkit.getServer().recipeIterator();
             final List<Recipe> recipeList = new ArrayList<>();
-            if (!ServerUtils.hasSpecificUpdate("1_16")) {
+            if (!ServerUtils.hasUpdate("1_16")) {
                 Bukkit.getServer().recipeIterator().forEachRemaining(recipeList::add);
             }
             while (recipes.hasNext()) {
@@ -1222,7 +1222,7 @@ public class ItemUtilities {
                 if (nextRecipe instanceof ShapedRecipe) {
                     final ItemStack result = nextRecipe.getResult();
                     for (final ItemMap itemMap : this.recipeItems) {
-                        if (itemMap.isSimilar(null, result) || (ServerUtils.hasSpecificUpdate("1_12") && ((ShapedRecipe) nextRecipe).getKey().getKey().contains(itemMap.getConfigName()))) {
+                        if (itemMap.isSimilar(null, result) || (ServerUtils.hasUpdate("1_12") && ((ShapedRecipe) nextRecipe).getKey().getKey().contains(itemMap.getConfigName()))) {
                             if (recipeList.isEmpty()) {
                                 Bukkit.getServer().removeRecipe(((ShapedRecipe) nextRecipe).getKey());
                             } else {
