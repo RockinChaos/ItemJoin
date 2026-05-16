@@ -118,7 +118,7 @@ public class Storable implements Listener {
     @EventHandler(ignoreCancelled = true)
     private void onInteractEntity(PlayerInteractEntityEvent event) {
         try {
-            if (event.getRightClicked().getType().name().equalsIgnoreCase("ITEM_FRAME") || event.getRightClicked().getType().name().equalsIgnoreCase("FOX") || event.getRightClicked().getType().name().equalsIgnoreCase("ALLAY")) {
+            if (StringUtils.containsIgnoreCase(event.getRightClicked().getType().name(), "ITEM_FRAME") || event.getRightClicked().getType().name().equalsIgnoreCase("FOX") || event.getRightClicked().getType().name().equalsIgnoreCase("ALLAY")) {
                 ItemStack item;
                 if (ServerUtils.hasUpdate("1_9")) {
                     item = PlayerHandler.getPerfectHandItem(event.getPlayer(), event.getHand().toString());
@@ -146,7 +146,8 @@ public class Storable implements Listener {
         final Block clickedBlock = event.getClickedBlock();
         if ((!PlayerHandler.isMenuClick(player, event.getAction()) && (event.hasItem() && event.getAction() == Action.RIGHT_CLICK_BLOCK && clickedBlock != null &&
                 (clickedBlock.getType().name().equalsIgnoreCase("FLOWER_POT") || clickedBlock.getType().name().equalsIgnoreCase("DECORATED_POT")
-                || StringUtils.containsIgnoreCase(clickedBlock.getType().name(), "POTTED_")) && !ItemUtilities.getUtilities().isAllowed(player, item, "item-store")))) {
+                || StringUtils.containsIgnoreCase(clickedBlock.getType().name(), "POTTED_") || (StringUtils.containsIgnoreCase(clickedBlock.getType().name(), "SHELF")
+                && !StringUtils.containsIgnoreCase(clickedBlock.getType().name(), "BOOKSHELF"))) && !ItemUtilities.getUtilities().isAllowed(player, item, "item-store")))) {
             event.setUseItemInHand(Event.Result.DENY);
             event.setUseInteractedBlock(Event.Result.DENY);
         }
