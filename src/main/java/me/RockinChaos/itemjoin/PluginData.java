@@ -704,7 +704,7 @@ public class PluginData {
             if (StringUtils.isRegistered(Storable.class.getSimpleName())) {
                 ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Storable(), ItemJoin.getCore().getPlugin());
             }
-            if (StringUtils.isRegistered(Trade.class.getSimpleName())) {
+            if (ServerUtils.hasUpdate("1_14") && StringUtils.isRegistered(Trade.class.getSimpleName())) {
                 ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new Trade(), ItemJoin.getCore().getPlugin());
             }
         }
