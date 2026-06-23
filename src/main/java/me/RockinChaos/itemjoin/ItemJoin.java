@@ -57,17 +57,13 @@ public class ItemJoin extends JavaPlugin {
     public void onEnable() {
         if (core.isEnabled()) {
             PluginData.getInfo().registerEvents();
-            {
-                PluginData.getInfo().registerClasses(false);
-                {
-                    SchedulerUtils.runAsync(() -> {
-                        core.getUpdater();
-                        {
-                            ServerUtils.logDebug("has been Enabled.");
-                        }
-                    });
+            PluginData.getInfo().registerClasses(false);
+            SchedulerUtils.runAsync(() -> {
+                if (this.isEnabled()) {
+                    core.getUpdater();
+                    ServerUtils.logDebug("has been Enabled.");
                 }
-            }
+            });
         }
     }
 
