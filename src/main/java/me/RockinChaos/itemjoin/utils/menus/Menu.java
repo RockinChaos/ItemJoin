@@ -9831,6 +9831,13 @@ public class Menu {
                 LegacyAPI.setDurability(item, Short.parseShort(itemMap.getData() + ""));
             }
         }
+        if (StringUtils.containsIgnoreCase(itemMap.getMaterial().toString(), "BANNER") && itemMap.getBannerPatterns() != null && !itemMap.getBannerPatterns().isEmpty()) {
+            ItemMeta itemMeta = item.getItemMeta();
+            if (itemMeta instanceof BannerMeta) {
+                ((BannerMeta) itemMeta).setPatterns(itemMap.getBannerPatterns());
+                item.setItemMeta(itemMeta);
+            }
+        }
         if (ItemHandler.isSkull(itemMap.getMaterial())) {
             ItemMeta itemMeta = item.getItemMeta();
             if (itemMap.getSkull() != null && itemMeta != null) {
