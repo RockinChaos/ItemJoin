@@ -599,10 +599,9 @@ public class ItemUtilities {
      * @return If the debug message can be sent.
      */
     private boolean canSend(final Player player, final TriggerType type, final String region) {
+        if (type != TriggerType.REGION_ENTER && type != TriggerType.REGION_LEAVE) return true;
         if (TimerUtils.isExpired("wg_items", new CompositeKey(player.getUniqueId(), region))) {
-            if (type == TriggerType.REGION_ENTER || type == TriggerType.REGION_LEAVE) {
-                TimerUtils.setExpiry("wg_items", new CompositeKey(player.getUniqueId(), region), 20, TimeUnit.MINUTES);
-            }
+            TimerUtils.setExpiry("wg_items", new CompositeKey(player.getUniqueId(), region), 20, TimeUnit.MINUTES);
             return true;
         }
         return false;
