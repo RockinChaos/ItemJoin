@@ -255,32 +255,35 @@ public class Drops implements Listener {
     private void handleKeepItem(final Player player, final ItemStack item, final int slot, final String itemType) {
         if (item != null && !ItemUtilities.getUtilities().isAllowed(player, item, "death-keep")) {
             final ItemStack keepItem = item.clone();
-            final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(keepItem);
-            switch (itemType) {
-                case "helmet":
-                    player.getInventory().setHelmet(keepItem);
-                    break;
-                case "chest":
-                    player.getInventory().setChestplate(keepItem);
-                    break;
-                case "legs":
-                    player.getInventory().setLeggings(keepItem);
-                    break;
-                case "boots":
-                    player.getInventory().setBoots(keepItem);
-                    break;
-                case "offhand":
-                    player.getInventory().setItemInOffHand(keepItem);
-                    break;
-                case "bottom_inventory":
-                    CompatUtils.getBottomInventory(player).setItem(slot, keepItem);
-                    break;
-                case "top_inventory":
-                    CompatUtils.getTopInventory(player).setItem(slot, keepItem);
-                    break;
-            }
-            itemMap.setAnimations(player);
-            ServerUtils.logDebug("{Drops} " + player.getName() + " has triggered the DEATH-KEEP itemflag for " + itemMap.getConfigName() + ".");
+            SchedulerUtils.run(() -> {
+                final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(keepItem);
+                switch (itemType) {
+                    case "helmet":
+                        player.getInventory().setHelmet(keepItem);
+                        break;
+                    case "chest":
+                        player.getInventory().setChestplate(keepItem);
+                        break;
+                    case "legs":
+                        player.getInventory().setLeggings(keepItem);
+                        break;
+                    case "boots":
+                        player.getInventory().setBoots(keepItem);
+                        break;
+                    case "offhand":
+                        player.getInventory().setItemInOffHand(keepItem);
+                        break;
+                    case "bottom_inventory":
+                        CompatUtils.getBottomInventory(player).setItem(slot, keepItem);
+                        break;
+                    case "top_inventory":
+                        if (slot == 0) SchedulerUtils.run(() -> CompatUtils.getTopInventory(player).setItem(slot, keepItem));
+                        else CompatUtils.getTopInventory(player).setItem(slot, keepItem);
+                        break;
+                }
+                itemMap.setAnimations(player);
+                ServerUtils.logDebug("{Drops} " + player.getName() + " has triggered the DEATH-KEEP itemflag for " + itemMap.getConfigName() + ", with type " + itemType + ", in slot " + slot + ".");
+            });
         }
     }
 
