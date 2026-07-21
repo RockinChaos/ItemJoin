@@ -36,7 +36,7 @@ public class ItemsAdderAPI implements Listener {
      */
     @EventHandler
     private void onItemsAdderLoadData(final ItemsAdderLoadDataEvent event) {
-        ServerUtils.logDebug("{ItemsAdder} Data finished loading, refreshing externally provided items for online players.");
+        ServerUtils.logInfo("{ItemsAdder} Data finished loading (cause: " + event.getCause() + "), refreshing externally provided items for online players.");
         ItemUtilities.getUtilities().refreshExternalItems();
     }
 }

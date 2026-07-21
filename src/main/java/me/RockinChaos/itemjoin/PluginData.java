@@ -505,8 +505,13 @@ public class PluginData {
             ItemJoin.getCore().getSQL().load();
         }
         ItemProviderRegistry.register(new ItemsAdderProvider());
-        if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder") && StringUtils.isRegistered(ItemsAdderAPI.class.getSimpleName())) {
-            ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new ItemsAdderAPI(), ItemJoin.getCore().getPlugin());
+        if (Bukkit.getPluginManager().getPlugin("ItemsAdder") != null) {
+            if (StringUtils.isRegistered(ItemsAdderAPI.class.getSimpleName())) {
+                ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new ItemsAdderAPI(), ItemJoin.getCore().getPlugin());
+                ServerUtils.logInfo("{ItemsAdder} Detected, listening for ItemsAdderLoadDataEvent to refresh externally provided items.");
+            } else {
+                ServerUtils.logWarn("{ItemsAdder} Detected, but the ItemsAdderAPI listener is disabled in the configuration!");
+            }
         }
         new ItemDesigner();
         run(() -> {

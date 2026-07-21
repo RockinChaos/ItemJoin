@@ -35,7 +35,10 @@ public class ItemsAdderProvider implements ItemProvider {
 
     @Override
     public boolean isAvailable() {
-        return Bukkit.getPluginManager().isPluginEnabled("ItemsAdder");
+        // ItemsAdder loads as a POSTWORLD plugin, while ItemJoin loads at STARTUP, so ItemsAdder is
+        // never "enabled" yet when ItemJoin registers its providers. Checking for its mere presence
+        // (loaded, regardless of enable state) is what actually reflects whether it's installed.
+        return Bukkit.getPluginManager().getPlugin("ItemsAdder") != null;
     }
 
     @Override
