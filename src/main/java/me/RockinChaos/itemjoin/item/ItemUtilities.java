@@ -26,6 +26,7 @@ import me.RockinChaos.core.utils.types.PlaceHolder.Holder;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.item.ItemCommand.Executor;
+import me.RockinChaos.itemjoin.utils.MiniMessageUtils;
 import me.RockinChaos.itemjoin.utils.api.GuardAPI;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
 import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
@@ -678,9 +679,9 @@ public class ItemUtilities {
                         TimerUtils.setExpiry("wg_failed", new CompositeKey(player.getUniqueId(), region), 20, TimeUnit.MINUTES);
                     }
                     if ((overWrite != null && StringUtils.containsLocation(player.getWorld().getName(), overWrite.replace(" ", "")))) {
-                        ItemJoin.getCore().getLang().sendLangMessage("general.failedInventory", player, placeHolders);
+                        MiniMessageUtils.sendLangMessage("general.failedInventory", player, placeHolders);
                     } else {
-                        ItemJoin.getCore().getLang().sendLangMessage("general.failedOverwrite", player, placeHolders);
+                        MiniMessageUtils.sendLangMessage("general.failedOverwrite", player, placeHolders);
                     }
                 }
                 this.failCount.remove(session);

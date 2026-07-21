@@ -15,6 +15,7 @@
 
     <properties>
         <chaoscore.version>1.1.6-SNAPSHOT</chaoscore.version>
+        <adventure.version>4.17.0</adventure.version>
         <minecraft.version>26.2</minecraft.version>
 
         <spigot.version>${minecraft.version}-R0.1-SNAPSHOT</spigot.version>
@@ -84,6 +85,10 @@
                                 <relocation>
                                     <pattern>me.RockinChaos.core</pattern>
                                     <shadedPattern>me.RockinChaos.itemjoin.core</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>net.kyori</pattern>
+                                    <shadedPattern>me.RockinChaos.itemjoin.libs.kyori</shadedPattern>
                                 </relocation>
                             </relocations>
                             <filters>
@@ -163,6 +168,25 @@
             <artifactId>spigot-api</artifactId>
             <version>${spigot.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <!--Adventure / MiniMessage-->
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-api</artifactId>
+            <version>${adventure.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-text-minimessage</artifactId>
+            <version>${adventure.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-text-serializer-legacy</artifactId>
+            <version>${adventure.version}</version>
+            <scope>compile</scope>
         </dependency>
         <!--Vault API-->
         <dependency>

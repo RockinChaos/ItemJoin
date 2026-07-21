@@ -26,6 +26,7 @@ import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.listeners.Clicking;
+import me.RockinChaos.itemjoin.utils.MiniMessageUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -429,7 +430,7 @@ public class ItemAnimation {
                     itemData = ChatColor.COLOR_CHAR + "r" + encodeData;
                 }
             }
-            tempMeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(nameString), player) + itemData);
+            tempMeta.setDisplayName(MiniMessageUtils.translateLayout(ItemHandler.cutDelay(nameString), player) + itemData);
             reviseItem.setItemMeta(tempMeta);
             if (this.itemMap.isDynamicCount()) { // Better but still temporary--implementation for a list of animated item count is planned.
                 reviseItem.setAmount(this.itemMap.getCount(player));
@@ -451,7 +452,7 @@ public class ItemAnimation {
             final List<String> loreFormatList = new ArrayList<>();
             for (String s : loreString) {
                 String formatLore = ItemHandler.cutDelay(s);
-                formatLore = StringUtils.translateLayout(formatLore, player);
+                formatLore = MiniMessageUtils.translateLayout(formatLore, player);
                 loreFormatList.add(formatLore);
             }
             tempMeta.setLore(loreFormatList);
