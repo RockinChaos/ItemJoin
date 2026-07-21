@@ -1,4 +1,7 @@
 # --{ =-=-=-=-=-=-=-=-=-= ItemJoin 繁體中文文件, by Honey_Alloy =-=-=-=-=-=-=-=-=-= }--
+# MiniMessage tags (e.g. <gradient:#CC3938:#AA1A2A>, <bold>, <#RRGGBB>) are supported inline
+# alongside classic '&' color codes in this file and in items.yml names/lores.
+# See: https://docs.advntr.dev/minimessage/format.html
 # 如果你不想發送任何消息, 請將下面全部內容刪除清空.
 
 # 修改此項將導致文件損壞並重新生成.

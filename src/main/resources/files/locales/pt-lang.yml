@@ -1,4 +1,7 @@
 # --{ =-=-=-=-=-=-=-=-=-= ItemJoin's Portuguese Language file, by DeskTecc =-=-=-=-=-=-=-=-=-= }--
+# MiniMessage tags (e.g. <gradient:#CC3938:#AA1A2A>, <bold>, <#RRGGBB>) are supported inline
+# alongside classic '&' color codes in this file and in items.yml names/lores.
+# See: https://docs.advntr.dev/minimessage/format.html
 # Se você não deseja que uma mensagem seja enviada, remova-a totalmente de baixo ou deixe-a em branco.
 
 # Modificar isso fará com que o arquivo seja interrompido e regenerado.

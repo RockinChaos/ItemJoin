@@ -24,6 +24,7 @@ import me.RockinChaos.core.utils.types.PlaceHolder;
 import me.RockinChaos.core.utils.types.PlaceHolder.Holder;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.utils.MiniMessageUtils;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
 import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
 import org.bukkit.command.Command;
@@ -66,11 +67,11 @@ public class ChatToggleExecutor implements CommandExecutor {
                             if (toggleMessage != null) {
                                 ServerUtils.messageSender(player, toggleMessage, false);
                             } else {
-                                ItemJoin.getCore().getLang().sendLangMessage("commands.disabled.toggleDisable", player, placeHolders);
+                                MiniMessageUtils.sendLangMessage("commands.disabled.toggleDisable", player, placeHolders);
                             }
                         }
                     } else {
-                        ItemJoin.getCore().getLang().sendLangMessage("commands.disabled.togglePlayerFailed", sender, placeHolders);
+                        MiniMessageUtils.sendLangMessage("commands.disabled.togglePlayerFailed", sender, placeHolders);
                     }
                 } else if ((dataObject != null && Boolean.valueOf(dataObject.getEnabled()).equals(false)) && ((itemMap.getToggleNode() == null || itemMap.getToggleNode().isEmpty()) || (itemMap.getToggleNode() != null && !itemMap.getToggleNode().isEmpty() && sender.hasPermission(itemMap.getToggleNode())))) {
                     if (PluginData.getInfo().isEnabled(player, "ALL")) {
@@ -85,24 +86,24 @@ public class ChatToggleExecutor implements CommandExecutor {
                                 if (toggleMessage != null) {
                                     ServerUtils.messageSender(player, toggleMessage, false);
                                 } else {
-                                    ItemJoin.getCore().getLang().sendLangMessage("commands.enabled.toggleEnable", player, placeHolders);
+                                    MiniMessageUtils.sendLangMessage("commands.enabled.toggleEnable", player, placeHolders);
                                 }
                             }
                         } else {
                             placeHolders.with(Holder.FAIL_COUNT, String.valueOf(1));
-                            ItemJoin.getCore().getLang().sendLangMessage("general.failedOverwrite", player, placeHolders);
+                            MiniMessageUtils.sendLangMessage("general.failedOverwrite", player, placeHolders);
                         }
                     } else {
-                        ItemJoin.getCore().getLang().sendLangMessage("commands.enabled.togglePlayerFailed", sender, placeHolders);
+                        MiniMessageUtils.sendLangMessage("commands.enabled.togglePlayerFailed", sender, placeHolders);
                     }
                 } else if (!(itemMap.getToggleNode() != null && !itemMap.getToggleNode().isEmpty() && sender.hasPermission(itemMap.getToggleNode()))) {
-                    ItemJoin.getCore().getLang().sendLangMessage("commands.default.noPermission", sender);
+                    MiniMessageUtils.sendLangMessage("commands.default.noPermission", sender);
                 }
             } else {
                 sender.sendMessage("Unknown command. Type \"/help\" for help.");
             }
         } else {
-            ItemJoin.getCore().getLang().sendLangMessage("commands.default.noPlayer", sender);
+            MiniMessageUtils.sendLangMessage("commands.default.noPlayer", sender);
         }
         return true;
     }
