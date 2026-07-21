@@ -38,6 +38,7 @@ import me.RockinChaos.itemjoin.item.provider.ItemProviderRegistry;
 import me.RockinChaos.itemjoin.item.provider.providers.ItemsAdderProvider;
 import me.RockinChaos.itemjoin.listeners.*;
 import me.RockinChaos.itemjoin.listeners.plugins.ChestSortAPI;
+import me.RockinChaos.itemjoin.listeners.plugins.ItemsAdderAPI;
 import me.RockinChaos.itemjoin.listeners.plugins.legacy.Legacy_ChestSortAPI;
 import me.RockinChaos.itemjoin.listeners.triggers.*;
 import me.RockinChaos.itemjoin.utils.api.LegacyAPI;
@@ -504,6 +505,9 @@ public class PluginData {
             ItemJoin.getCore().getSQL().load();
         }
         ItemProviderRegistry.register(new ItemsAdderProvider());
+        if (Bukkit.getPluginManager().isPluginEnabled("ItemsAdder") && StringUtils.isRegistered(ItemsAdderAPI.class.getSimpleName())) {
+            ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new ItemsAdderAPI(), ItemJoin.getCore().getPlugin());
+        }
         new ItemDesigner();
         run(() -> {
             forOnlinePlayers(player -> ItemUtilities.getUtilities().setStatistics(player));
