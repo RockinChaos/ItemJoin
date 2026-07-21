@@ -4510,6 +4510,68 @@ public class ItemMap implements Cloneable {
     }
 
     /**
+     * Re-resolves this ItemMap against its external Item Provider (e.g. ItemsAdder) and
+     * replaces any matching ItemStack already held by the Player with the freshly resolved version.
+     * Needed because items handed out before the provider plugin finished loading its registry
+     * (e.g. during server startup) can be missing data such as tooltips, that only becomes
+     * available once the provider is fully initialized.
+     *
+     * @param player - The Player having their held ItemStack(s) refreshed.
+     */
+    public void refreshExternalItem(final Player player) {
+        if (this.externalItemProvider == null || this.externalItemKey == null) {
+            return;
+        }
+        this.updateItem(player);
+        final PlayerInventory inv = player.getInventory();
+        final ItemStack[] contents = inv.getContents();
+        for (int k = 0; k < contents.length; k++) {
+            if (this.isSimilar(player, contents[k])) {
+                inv.setItem(k, this.refreshedCopy(contents[k].getAmount()));
+            }
+        }
+        if (this.isSimilar(player, inv.getHelmet())) {
+            inv.setHelmet(this.refreshedCopy(inv.getHelmet().getAmount()));
+        }
+        if (this.isSimilar(player, inv.getChestplate())) {
+            inv.setChestplate(this.refreshedCopy(inv.getChestplate().getAmount()));
+        }
+        if (this.isSimilar(player, inv.getLeggings())) {
+            inv.setLeggings(this.refreshedCopy(inv.getLeggings().getAmount()));
+        }
+        if (this.isSimilar(player, inv.getBoots())) {
+            inv.setBoots(this.refreshedCopy(inv.getBoots().getAmount()));
+        }
+        if (this.isSimilar(player, player.getItemOnCursor())) {
+            player.setItemOnCursor(this.refreshedCopy(player.getItemOnCursor().getAmount()));
+        }
+        if (ServerUtils.hasUpdate("1_9") && this.isSimilar(player, PlayerHandler.getOffHandItem(player))) {
+            PlayerHandler.setOffHandItem(player, this.refreshedCopy(PlayerHandler.getOffHandItem(player).getAmount()));
+        }
+        if (PlayerHandler.isCraftingInv(player)) {
+            final Inventory topInventory = CompatUtils.getTopInventory(player);
+            final ItemStack[] craftingContents = topInventory.getContents();
+            for (int k = 0; k < craftingContents.length; k++) {
+                if (this.isSimilar(player, craftingContents[k])) {
+                    topInventory.setItem(k, this.refreshedCopy(craftingContents[k].getAmount()));
+                }
+            }
+        }
+    }
+
+    /**
+     * Clones the current temporary ItemStack with the specified stack size.
+     *
+     * @param amount - The stack size to apply to the copy.
+     * @return The cloned ItemStack.
+     */
+    private ItemStack refreshedCopy(final int amount) {
+        final ItemStack copy = this.tempItem.clone();
+        copy.setAmount(amount);
+        return copy;
+    }
+
+    /**
      * Sets the Skull Database Textures.
      */
     private void setSkullDatabase() {

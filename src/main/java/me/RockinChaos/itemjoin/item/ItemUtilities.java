@@ -200,6 +200,29 @@ public class ItemUtilities {
     }
 
     /**
+     * Refreshes any already-held ItemStack that is sourced from an external Item Provider
+     * (e.g. ItemsAdder) for ALL Online Players, replacing stale copies given out before the
+     * provider plugin finished loading its registry.
+     */
+    public void refreshExternalItems() {
+        PlayerHandler.forOnlinePlayers(this::refreshExternalItems);
+    }
+
+    /**
+     * Refreshes any already-held ItemStack that is sourced from an external Item Provider
+     * (e.g. ItemsAdder) for the specified Player.
+     *
+     * @param player - The Player having their held ItemStack(s) refreshed.
+     */
+    private void refreshExternalItems(final Player player) {
+        for (ItemMap item : this.getItems()) {
+            if (item.getExternalItemProvider() != null) {
+                item.refreshExternalItem(player);
+            }
+        }
+    }
+
+    /**
      * Checks if the Player is waiting Authentication from a plugin such as AuthMe.
      * Then sets the item after Authentication is complete.
      *
