@@ -75,6 +75,7 @@ public class ItemDesigner {
                             ItemMap itemMap = new ItemMap(internalName, slot);
 
                             this.setMaterial(itemMap);
+                            this.setExternalItem(itemMap);
                             this.setSkullDatabase(itemMap);
                             this.setUnbreaking(itemMap);
                             this.durabilityBar(itemMap);
@@ -256,6 +257,18 @@ public class ItemDesigner {
             itemMap.setDataValue((short) Integer.parseInt(parts[1]));
         }
         return mat;
+    }
+
+    /**
+     * Sets the external Item Provider and lookup key used to source the real ItemStack for this item (e.g. ItemsAdder).
+     *
+     * @param itemMap - The ItemMap being modified.
+     */
+    private void setExternalItem(final ItemMap itemMap) {
+        if (itemMap.getNodeLocation().getString(".provider") != null && itemMap.getNodeLocation().getString(".provider-key") != null) {
+            itemMap.setExternalItemProvider(itemMap.getNodeLocation().getString(".provider"));
+            itemMap.setExternalItemKey(itemMap.getNodeLocation().getString(".provider-key"));
+        }
     }
 
     /**

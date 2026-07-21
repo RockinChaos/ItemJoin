@@ -32,6 +32,8 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.item.ItemCommand.Action;
 import me.RockinChaos.itemjoin.item.ItemCommand.CommandSequence;
+import me.RockinChaos.itemjoin.item.provider.ItemProvider;
+import me.RockinChaos.itemjoin.item.provider.ItemProviderRegistry;
 import me.RockinChaos.itemjoin.listeners.Interact;
 import me.RockinChaos.itemjoin.utils.api.EffectAPI;
 import me.RockinChaos.itemjoin.utils.menus.Menu;
@@ -111,6 +113,8 @@ public class ItemMap implements Cloneable {
     private String skullOwner = null;
     private String skullTexture = null;
     private boolean headDatabase = false;
+    private String externalItemProvider = null;
+    private String externalItemKey = null;
     private List<PotionEffect> effect = new ArrayList<>();
     private List<Pattern> bannerPatterns = new ArrayList<>();
     private Map<String, String> trimPattern = new HashMap<>();
@@ -2800,6 +2804,42 @@ public class ItemMap implements Cloneable {
     }
 
     /**
+     * Gets the name of the external Item Provider supplying this item, if any.
+     *
+     * @return The Provider name, or null if none is set.
+     */
+    public String getExternalItemProvider() {
+        return this.externalItemProvider;
+    }
+
+    /**
+     * Sets the name of the external Item Provider supplying this item.
+     *
+     * @param provider - The value to be set.
+     */
+    public void setExternalItemProvider(final String provider) {
+        this.externalItemProvider = provider;
+    }
+
+    /**
+     * Gets the lookup key passed to the external Item Provider.
+     *
+     * @return The Provider lookup key, or null if none is set.
+     */
+    public String getExternalItemKey() {
+        return this.externalItemKey;
+    }
+
+    /**
+     * Sets the lookup key passed to the external Item Provider.
+     *
+     * @param key - The value to be set.
+     */
+    public void setExternalItemKey(final String key) {
+        this.externalItemKey = key;
+    }
+
+    /**
      * Checks if you give on join is enabled.
      *
      * @return If it is enabled.
@@ -4193,7 +4233,9 @@ public class ItemMap implements Cloneable {
         if ((item != null && item.getType() != Material.AIR && item.getType() == this.material) || (this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item))) {
             if (this.vanillaControl || this.vanillaStatus || (ItemJoin.getCore().getData().dataTagsEnabled() && ItemHandler.getNBTData(item, PluginData.getInfo().getNBTList()) != null && Objects.requireNonNull(ItemHandler.getNBTData(item, PluginData.getInfo().getNBTList())).equalsIgnoreCase(this.getConfigName()))
                     || (this.legacySecret != null && item.hasItemMeta() && (ServerUtils.hasUpdate("1_14") || (!ServerUtils.hasUpdate("1_14") && Objects.requireNonNull(item.getItemMeta()).hasDisplayName()))
-                    && Objects.requireNonNull(StringUtils.colorDecode(item)).contains(this.legacySecret))) {
+                    && Objects.requireNonNull(StringUtils.colorDecode(item)).contains(this.legacySecret))
+                    || (this.externalItemProvider != null && this.externalItemKey != null && ItemProviderRegistry.get(this.externalItemProvider) != null
+                    && ItemProviderRegistry.get(this.externalItemProvider).matches(item, this.externalItemKey))) {
                 if (this.isEnchantSimilar(player, item) || !Objects.requireNonNull(item.getItemMeta()).hasEnchants() && this.enchants.isEmpty() || this.isItemChangeable()) {
                     if (this.material.toString().toUpperCase().contains("BOOK")
                             && (this.isBookMeta(player, item)
@@ -4397,6 +4439,7 @@ public class ItemMap implements Cloneable {
     public ItemMap updateItem(final Player player, final boolean... caughtError) {
         try {
             if (this.tempItem != null) {
+                this.setExternalItem();
                 this.setSkullDatabase();
                 this.setUnbreaking();
                 this.setEnchantments(player);
@@ -4448,6 +4491,20 @@ public class ItemMap implements Cloneable {
     private void setGlowing() {
         if (this.glowing) {
             ItemHandler.setGlowing(this.tempItem);
+        }
+    }
+
+    /**
+     * Sets the ItemStack to the real, live item sourced from an external Item Provider (e.g. ItemsAdder),
+     * resolved fresh on every update so changes to the source item are reflected without reloading ItemJoin.
+     */
+    private void setExternalItem() {
+        if (this.externalItemProvider != null && this.externalItemKey != null) {
+            final ItemProvider provider = ItemProviderRegistry.get(this.externalItemProvider);
+            if (provider != null) {
+                final ItemStack provided = provider.provide(this.externalItemKey);
+                this.tempItem = (provided != null ? provided : this.tempItem.clone());
+            }
         }
     }
 

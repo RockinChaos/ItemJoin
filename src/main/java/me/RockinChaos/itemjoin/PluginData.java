@@ -34,6 +34,8 @@ import me.RockinChaos.itemjoin.item.ItemDesigner;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
+import me.RockinChaos.itemjoin.item.provider.ItemProviderRegistry;
+import me.RockinChaos.itemjoin.item.provider.providers.ItemsAdderProvider;
 import me.RockinChaos.itemjoin.listeners.*;
 import me.RockinChaos.itemjoin.listeners.plugins.ChestSortAPI;
 import me.RockinChaos.itemjoin.listeners.plugins.legacy.Legacy_ChestSortAPI;
@@ -501,6 +503,7 @@ public class PluginData {
             ItemJoin.getCore().getData().setDatabaseData(this.getDatabaseData());
             ItemJoin.getCore().getSQL().load();
         }
+        ItemProviderRegistry.register(new ItemsAdderProvider());
         new ItemDesigner();
         run(() -> {
             forOnlinePlayers(player -> ItemUtilities.getUtilities().setStatistics(player));
