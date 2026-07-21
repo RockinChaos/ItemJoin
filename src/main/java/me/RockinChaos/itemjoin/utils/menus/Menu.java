@@ -8592,7 +8592,7 @@ public class Menu {
                     ItemMeta meta = stack1.getItemMeta();
                     if (meta != null) {
                         ItemHandler.addLore(stack1, "&9&lDISPLAY: &f" + meta.getDisplayName(), "&7", "&7*Create a recipe that can be used.");
-                        meta.setDisplayName(MiniMessageUtils.translateLayout((itemMap.getRecipe().get(0).size() > i ? "&e&l" + itemMap.getRecipe().get(0).get(i) : "&e&lX"), player));
+                        meta.displayName(MiniMessageUtils.translateLayoutComponent((itemMap.getRecipe().get(0).size() > i ? "&e&l" + itemMap.getRecipe().get(0).get(i) : "&e&lX"), player));
                         stack1.setItemMeta(meta);
 
                         recipePane.addButton(new Button(stack1, event -> {

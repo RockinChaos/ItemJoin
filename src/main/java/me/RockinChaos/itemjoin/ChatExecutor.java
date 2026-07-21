@@ -674,10 +674,9 @@ public class ChatExecutor implements CommandExecutor {
                         }
                         arbitraryMap.put(itemMap.getConfigName(), (arbitrary - count));
                     }
-                    final String customName = StringUtils.translateLayout(itemMap.getCustomName(), argsPlayer);
                     final boolean canGive = (!remove && itemMap.inWorld(argsPlayer.getWorld()) && (itemMap.conditionMet(argsPlayer, "trigger-conditions", true, false) && (amount != 0 || itemMap.isAlwaysGive() || multiSlots.contains(itemMap.getConfigName()) || !itemMap.hasItem(argsPlayer, false))));
-                    placeHolder.with(Holder.ITEM, customName).with(Holder.AMOUNT, Integer.toString((amount == 0 ? 1 : amount)));
-                    placeHolders.with(Holder.ITEM, customName);
+                    placeHolder.with(Holder.ITEM, itemMap.getConfigName()).with(Holder.AMOUNT, Integer.toString((amount == 0 ? 1 : amount)));
+                    placeHolders.with(Holder.ITEM, itemMap.getConfigName());
                     if ((remove && itemMap.hasItem(argsPlayer, true)) || (canGive && ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap))) {
                         if (remove || !itemMap.isCMDPermissionNeeded() || itemMap.hasPermission(argsPlayer, argsPlayer.getWorld())) {
                             if (itemMap.isAlwaysGive() && !StringUtils.isInt(args[args.length - 1])) {
@@ -788,7 +787,7 @@ public class ChatExecutor implements CommandExecutor {
                 }
                 return;
             }
-            placeHolders.with(Holder.ITEM, StringUtils.translateLayout(itemMapExist.getCustomName(), argsPlayer)).with(Holder.TARGET_PLAYER, sender.getName()).with(Holder.AMOUNT, amount == 0 ? "&lAll" : Integer.toString(amount));
+            placeHolders.with(Holder.ITEM, itemMapExist.getConfigName()).with(Holder.TARGET_PLAYER, sender.getName()).with(Holder.AMOUNT, amount == 0 ? "&lAll" : Integer.toString(amount));
             final List<String> multiSlots = new ArrayList<>();
             for (final ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
                 if (itemMap.getConfigName().equalsIgnoreCase(args[1])) {

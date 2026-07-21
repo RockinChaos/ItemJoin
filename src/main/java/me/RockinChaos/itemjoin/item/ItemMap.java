@@ -36,6 +36,7 @@ import me.RockinChaos.itemjoin.item.provider.ItemProvider;
 import me.RockinChaos.itemjoin.item.provider.ItemProviderRegistry;
 import me.RockinChaos.itemjoin.listeners.Interact;
 import me.RockinChaos.itemjoin.utils.MiniMessageUtils;
+import net.kyori.adventure.text.Component;
 import me.RockinChaos.itemjoin.utils.api.EffectAPI;
 import me.RockinChaos.itemjoin.utils.menus.Menu;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
@@ -897,7 +898,7 @@ public class ItemMap implements Cloneable {
                 final String itemData = this.tempMeta.getDisplayName();
                 this.tempMeta.setDisplayName(MiniMessageUtils.translateLayout(ItemHandler.cutDelay(this.customName), player) + ChatColor.COLOR_CHAR + "r" + itemData);
             } else {
-                this.tempMeta.setDisplayName(MiniMessageUtils.translateLayout(ItemHandler.cutDelay(this.customName), player));
+                this.tempMeta.customName(MiniMessageUtils.translateLayoutComponent(ItemHandler.cutDelay(this.customName), player));
             }
         }
     }
@@ -947,13 +948,12 @@ public class ItemMap implements Cloneable {
     private void setCustomLore(final Player player) {
         if (this.customLore != null && !this.customLore.isEmpty()) {
             List<String> loreList = this.customLore;
-            List<String> loreFormatList = new ArrayList<>();
+            List<Component> loreFormatList = new ArrayList<>();
             for (String s : loreList) {
                 String formatLore = ItemHandler.cutDelay(s);
-                formatLore = MiniMessageUtils.translateLayout(formatLore, player);
-                loreFormatList.add(formatLore);
+                loreFormatList.add(MiniMessageUtils.translateLayoutComponent(formatLore, player));
             }
-            this.tempMeta.setLore(loreFormatList);
+            this.tempMeta.lore(loreFormatList);
         }
     }
 
@@ -6012,7 +6012,7 @@ public class ItemMap implements Cloneable {
                 this.storedSpammedPlayers.put(PlayerHandler.getPlayerID(player) + ".items." + this.configName, System.currentTimeMillis());
                 if (this.cooldownMessage != null && !this.cooldownMessage.isEmpty()) {
                     int timeLeft = (int) (this.interactCooldown - ((System.currentTimeMillis() - playersCooldownList) / 1000));
-                    player.sendMessage(StringUtils.translateLayout(this.cooldownMessage.replace("%timeleft%", String.valueOf(timeLeft)).replace("%item%", this.customName), player));
+                    player.sendMessage(StringUtils.translateLayout(this.cooldownMessage.replace("%timeleft%", String.valueOf(timeLeft)).replace("%item%", this.configName), player));
                 }
             }
             return true;
@@ -6054,7 +6054,7 @@ public class ItemMap implements Cloneable {
             if (System.currentTimeMillis() - playersCooldownList >= this.cooldownSeconds * 1000L) {
                 return false;
             } else if (this.onCooldownTick(player)) {
-                String cooldownMsg = this.cooldownMessage != null ? (this.cooldownMessage.replace("%timeleft%", String.valueOf((this.cooldownSeconds - ((System.currentTimeMillis() - playersCooldownList) / 1000)))).replace("%item%", this.customName).replace("%itemraw%", Objects.requireNonNull(ItemHandler.getMaterialName(this.tempItem)))) : null;
+                String cooldownMsg = this.cooldownMessage != null ? (this.cooldownMessage.replace("%timeleft%", String.valueOf((this.cooldownSeconds - ((System.currentTimeMillis() - playersCooldownList) / 1000)))).replace("%item%", this.configName).replace("%itemraw%", Objects.requireNonNull(ItemHandler.getMaterialName(this.tempItem)))) : null;
                 if (cooldownMsg != null && !this.cooldownMessage.isEmpty()) {
                     cooldownMsg = StringUtils.translateLayout(cooldownMsg, player);
                     player.sendMessage(cooldownMsg);
