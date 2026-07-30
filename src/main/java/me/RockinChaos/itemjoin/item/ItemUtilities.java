@@ -816,9 +816,9 @@ public class ItemUtilities {
     public void setCustomSlots(final Player player, final ItemMap itemMap, final int size) {
         boolean isGiven = false;
         final int craftSlot = StringUtils.getSlotConversion(itemMap.getSlot());
-        final ItemStack existingItem = ItemHandler.getItem(player, itemMap.getSlot()).clone();
         final ItemStack item = itemMap.getItem(player).clone();
         this.shiftItem(player, itemMap);
+        final ItemStack existingItem = ItemHandler.getItem(player, itemMap.getSlot()).clone();
         int nextSlot = this.nextItem(player, itemMap);
         boolean overWrite = itemMap.isOverwritable() || ItemJoin.getCore().getConfig("items.yml").getBoolean("items-Overwrite");
         if (size > 1) {
