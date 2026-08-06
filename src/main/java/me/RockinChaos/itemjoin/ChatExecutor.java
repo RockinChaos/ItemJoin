@@ -32,6 +32,7 @@ import me.RockinChaos.core.utils.types.PlaceHolder;
 import me.RockinChaos.core.utils.types.PlaceHolder.Holder;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.utils.MiniMessageUtils;
 import me.RockinChaos.itemjoin.utils.menus.Menu;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
 import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
@@ -69,130 +70,130 @@ public class ChatExecutor implements CommandExecutor {
     public boolean onCommand(@Nonnull final CommandSender sender, @Nonnull final Command command, @Nonnull final String label, @Nonnull final String[] args) {
         final Execute executor = this.matchExecutor(args);
         if (Execute.DEFAULT.accept(sender, args, 0)) {
-            ItemJoin.getCore().getLang().dispatchMessage(sender, ("&aItemJoin v" + ItemJoin.getCore().getPlugin().getDescription().getVersion() + "&e by RockinChaos"), "&bThis should be the version submitted to the developer \n&bwhen submitting a bug or feature request.", "https://github.com/RockinChaos/ItemJoin/issues", ClickAction.OPEN_URL);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&aType &a&l/ItemJoin Help&a for the help menu.", "&eClick to View the Help Menu.", "/itemjoin help", ClickAction.RUN_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, ("&aItemJoin v" + ItemJoin.getCore().getPlugin().getDescription().getVersion() + "&e by RockinChaos"), "&bThis should be the version submitted to the developer \n&bwhen submitting a bug or feature request.", "https://github.com/RockinChaos/ItemJoin/issues", ClickAction.OPEN_URL);
+            MiniMessageUtils.dispatchMessage(sender, "&aType &a&l/ItemJoin Help&a for the help menu.", "&eClick to View the Help Menu.", "/itemjoin help", ClickAction.RUN_COMMAND);
         } else if (Execute.HELP.accept(sender, args, 1)) {
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, ("&aItemJoin v" + ItemJoin.getCore().getPlugin().getDescription().getVersion() + "&e by RockinChaos"), "&bThis should be the version submitted to the developer \n&bwhen submitting a bug or feature request.", "https://github.com/RockinChaos/ItemJoin/issues", ClickAction.OPEN_URL);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Help &7- &eThis help menu.", "&aExecuting this command shows this help menu!", "/itemjoin help", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Dump &7- &eGets a debug link for support.", "&aSends a paste link of their configuration files. \n&cThis should be sent to the plugin developer and NOT SHARED PUBLICLY.", "/itemjoin dump", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Reload &7- &eReloads the .yml files.", "&aFully reloads the plugin, fetching \n&aany changes made to the .yml files. \n\n&aBe sure to save changes made to your .yml files!", "/itemjoin reload", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Updates &7- &eChecks for plugin updates.", "&aChecks to see if there are any updates available for this plugin.", "/itemjoin updates", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Upgrade &7- &eUpdates to latest version.", "&aAttempts to Upgrade this plugin to the latest version. \n&aYou will need to restart the server for this process to complete.", "/itemjoin upgrade", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&aType &a&l/ItemJoin Help 2&a for the next page.", "&eClick to View the Next Page.", "/itemjoin help 2", ClickAction.RUN_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 1/10 &a&l]&a&l&m---------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+            MiniMessageUtils.dispatchMessage(sender, ("&aItemJoin v" + ItemJoin.getCore().getPlugin().getDescription().getVersion() + "&e by RockinChaos"), "&bThis should be the version submitted to the developer \n&bwhen submitting a bug or feature request.", "https://github.com/RockinChaos/ItemJoin/issues", ClickAction.OPEN_URL);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Help &7- &eThis help menu.", "&aExecuting this command shows this help menu!", "/itemjoin help", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Dump &7- &eGets a debug link for support.", "&aSends a paste link of their configuration files. \n&cThis should be sent to the plugin developer and NOT SHARED PUBLICLY.", "/itemjoin dump", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Reload &7- &eReloads the .yml files.", "&aFully reloads the plugin, fetching \n&aany changes made to the .yml files. \n\n&aBe sure to save changes made to your .yml files!", "/itemjoin reload", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Updates &7- &eChecks for plugin updates.", "&aChecks to see if there are any updates available for this plugin.", "/itemjoin updates", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Upgrade &7- &eUpdates to latest version.", "&aAttempts to Upgrade this plugin to the latest version. \n&aYou will need to restart the server for this process to complete.", "/itemjoin upgrade", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&aType &a&l/ItemJoin Help 2&a for the next page.", "&eClick to View the Next Page.", "/itemjoin help 2", ClickAction.RUN_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 1/10 &a&l]&a&l&m---------------[");
+            MiniMessageUtils.dispatchMessage(sender, "");
         } else if (Execute.HELP.accept(sender, args, 2)) {
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin List &7- &eView existing items and their worlds.", "&aView an entire list of the existing \n&acustom items and their respective worlds.", "/itemjoin list", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin World &7- &eCheck what world you are in, debugging.", "&aDisplays the world that your Player is currently in. \n&aUseful for debugging, such as comparing to your enabled-worlds.", "/itemjoin world", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Menu &7- &eOpens the GUI Creator for custom items.", "&aCreate custom items in-game without the need \n&ato manually edit the .yml files.", "/itemjoin menu", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Permissions &7- &eLists your permissions.", "&aLists the Permissions for your Player. \n\n&aGreen&b means you have permission whereas \n&cRed&b means you do not have permission.", "/itemjoin permissions", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Query <Item> &7- &eDisplays the custom item data.", "&aDisplays the important item info for the existing custom item-node.", "/itemjoin query ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Info &7- &eGets data-info of the held item.", "&aDisplays the important item info for the item you are currently holding. \n&aUseful for finding the data-value and id of the item to be used.", "/itemjoin info", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&aType &a&l/ItemJoin Help 3&a for the next page.", "&eClick to View the Next Page.", "/itemjoin help 3", ClickAction.RUN_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 2/10 &a&l]&a&l&m---------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin List &7- &eView existing items and their worlds.", "&aView an entire list of the existing \n&acustom items and their respective worlds.", "/itemjoin list", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin World &7- &eCheck what world you are in, debugging.", "&aDisplays the world that your Player is currently in. \n&aUseful for debugging, such as comparing to your enabled-worlds.", "/itemjoin world", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Menu &7- &eOpens the GUI Creator for custom items.", "&aCreate custom items in-game without the need \n&ato manually edit the .yml files.", "/itemjoin menu", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Permissions &7- &eLists your permissions.", "&aLists the Permissions for your Player. \n\n&aGreen&b means you have permission whereas \n&cRed&b means you do not have permission.", "/itemjoin permissions", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Query <Item> &7- &eDisplays the custom item data.", "&aDisplays the important item info for the existing custom item-node.", "/itemjoin query ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Info &7- &eGets data-info of the held item.", "&aDisplays the important item info for the item you are currently holding. \n&aUseful for finding the data-value and id of the item to be used.", "/itemjoin info", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&aType &a&l/ItemJoin Help 3&a for the next page.", "&eClick to View the Next Page.", "/itemjoin help 3", ClickAction.RUN_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 2/10 &a&l]&a&l&m---------------[");
+            MiniMessageUtils.dispatchMessage(sender, "");
         } else if (Execute.HELP.accept(sender, args, 3)) {
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Get <Item> &7- &eGives that ItemJoin item.", "&aGives you the custom item in its designated slot. \n\n&aThis will not work if you already have the item.", "/itemjoin get ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <Qty> &7- &eGives amount of said item.", "&aGives you the custom item in its designated slot with the specified quantity. \n\n&aThis &cWILL&a work if you already have the item.", "/itemjoin get ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <User> &7- &eGives to said player.", "&aGives the custom item to the specified player name. \n\n&aThis will not work if they already have the item.", "/itemjoin get ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <User> <Qty> &7- &eGives qty to player.", "&aGives the custom item to the specified player name with the specified quantity. \n\n&aThis &cWILL&a work if they already have the item.", "/itemjoin get ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&aType &a&l/ItemJoin Help 4&a for the next page.", "&eClick to View the Next Page.", "/itemjoin help 4", ClickAction.RUN_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 3/10 &a&l]&a&l&m---------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Get <Item> &7- &eGives that ItemJoin item.", "&aGives you the custom item in its designated slot. \n\n&aThis will not work if you already have the item.", "/itemjoin get ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <Qty> &7- &eGives amount of said item.", "&aGives you the custom item in its designated slot with the specified quantity. \n\n&aThis &cWILL&a work if you already have the item.", "/itemjoin get ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <User> &7- &eGives to said player.", "&aGives the custom item to the specified player name. \n\n&aThis will not work if they already have the item.", "/itemjoin get ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Get <Item> <User> <Qty> &7- &eGives qty to player.", "&aGives the custom item to the specified player name with the specified quantity. \n\n&aThis &cWILL&a work if they already have the item.", "/itemjoin get ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&aType &a&l/ItemJoin Help 4&a for the next page.", "&eClick to View the Next Page.", "/itemjoin help 4", ClickAction.RUN_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 3/10 &a&l]&a&l&m---------------[");
+            MiniMessageUtils.dispatchMessage(sender, "");
         } else if (Execute.HELP.accept(sender, args, 4)) {
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> &7- &eRemoves item from inventory.", "&aRemoves the custom item from your inventory. \n\n&aThis will not work if you do not have the item.", "/itemjoin remove ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> <Qty> &7- &eRemoves qty of item.", "&aRemoves the custom item from your inventory with the specified quantity. \n\n&aThis will not work if you do not have the item.", "/itemjoin remove ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> <Qty> &7- &eRemoves qty of item.", "&aRemoves the custom item from the specified player name. \n\n&aThis will not work if they do not have the item.", "/itemjoin remove ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> <User> <Qty> &7- &eRemoves qty.", "&aRemoves the custom item from the specified player name with the specified quantity. \n\n&aThis will not work if they do not have the item.", "/itemjoin remove ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&aType &a&l/ItemJoin Help 5&a for the next page.", "&eClick to View the Next Page.", "/itemjoin help 5", ClickAction.RUN_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 4/10 &a&l]&a&l&m---------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> &7- &eRemoves item from inventory.", "&aRemoves the custom item from your inventory. \n\n&aThis will not work if you do not have the item.", "/itemjoin remove ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> <Qty> &7- &eRemoves qty of item.", "&aRemoves the custom item from your inventory with the specified quantity. \n\n&aThis will not work if you do not have the item.", "/itemjoin remove ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> <Qty> &7- &eRemoves qty of item.", "&aRemoves the custom item from the specified player name. \n\n&aThis will not work if they do not have the item.", "/itemjoin remove ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Remove <Item> <User> <Qty> &7- &eRemoves qty.", "&aRemoves the custom item from the specified player name with the specified quantity. \n\n&aThis will not work if they do not have the item.", "/itemjoin remove ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&aType &a&l/ItemJoin Help 5&a for the next page.", "&eClick to View the Next Page.", "/itemjoin help 5", ClickAction.RUN_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 4/10 &a&l]&a&l&m---------------[");
+            MiniMessageUtils.dispatchMessage(sender, "");
         } else if (Execute.HELP.accept(sender, args, 5)) {
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin GetOnline <Item> &7- &eGives to all online.", "&aGives the custom item to all online players.", "/itemjoin getonline ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin GetOnline <Item> <Qty> &7- &eGives qty to all online.", "&aGives the custom item with the specified quantity to all online players.", "/itemjoin getonline ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin RemoveOnline <Item> &7- &eRemoves from all online.", "&aRemoves the custom item from all online players.", "/itemjoin removeonline ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin RemoveOnline <Item> <Qty> &7- &eRemoves qty.", "&aRemoves the custom item with the specified quantity from all online players.", "/itemjoin removeonline ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&aType &a&l/ItemJoin Help 6&a for the next page.", "&eClick to View the Next Page.", "/itemjoin help 6", ClickAction.RUN_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 5/10 &a&l]&a&l&m---------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin GetOnline <Item> &7- &eGives to all online.", "&aGives the custom item to all online players.", "/itemjoin getonline ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin GetOnline <Item> <Qty> &7- &eGives qty to all online.", "&aGives the custom item with the specified quantity to all online players.", "/itemjoin getonline ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin RemoveOnline <Item> &7- &eRemoves from all online.", "&aRemoves the custom item from all online players.", "/itemjoin removeonline ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin RemoveOnline <Item> <Qty> &7- &eRemoves qty.", "&aRemoves the custom item with the specified quantity from all online players.", "/itemjoin removeonline ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&aType &a&l/ItemJoin Help 6&a for the next page.", "&eClick to View the Next Page.", "/itemjoin help 6", ClickAction.RUN_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 5/10 &a&l]&a&l&m---------------[");
+            MiniMessageUtils.dispatchMessage(sender, "");
         } else if (Execute.HELP.accept(sender, args, 6)) {
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin GetAll &7- &eGives all ItemJoin items.", "&aGives you all the custom items.", "/itemjoin getall", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin GetAll <User> &7- &eGives all items to said player.", "&aGives all custom items to the specified player name.", "/itemjoin getall ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin RemoveAll &7- &eRemoves all ItemJoin items.", "&aRemoves all custom items from your inventory.", "/itemjoin removeall", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin RemoveAll <User> &7- &eRemoves from player.", "&aRemoves all custom items from the specified player name.", "/itemjoin removeall ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&aType &a&l/ItemJoin Help 7&a for the next page.", "&eClick to View the Next Page.", "/itemjoin help 7", ClickAction.RUN_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 6/10 &a&l]&a&l&m---------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin GetAll &7- &eGives all ItemJoin items.", "&aGives you all the custom items.", "/itemjoin getall", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin GetAll <User> &7- &eGives all items to said player.", "&aGives all custom items to the specified player name.", "/itemjoin getall ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin RemoveAll &7- &eRemoves all ItemJoin items.", "&aRemoves all custom items from your inventory.", "/itemjoin removeall", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin RemoveAll <User> &7- &eRemoves from player.", "&aRemoves all custom items from the specified player name.", "/itemjoin removeall ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&aType &a&l/ItemJoin Help 7&a for the next page.", "&eClick to View the Next Page.", "/itemjoin help 7", ClickAction.RUN_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 6/10 &a&l]&a&l&m---------------[");
+            MiniMessageUtils.dispatchMessage(sender, "");
         } else if (Execute.HELP.accept(sender, args, 7)) {
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Enable &7- &eEnables ItemJoin for all players.", "&aEnables ItemJoin for all players. \nPlayers will be able to get custom items.", "/itemjoin enable", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Enable <User> &7- &eEnables ItemJoin for player.", "&aEnables ItemJoin for the specified player name. \nThis player will be able to get custom items.", "/itemjoin enable ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Enable <User> <World> &7- &eFor player/world.", "&aEnables ItemJoin for the specified player name in the specified world. \nThis player will be able to get custom items in this world.", "/itemjoin enable ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&aType &a&l/ItemJoin Help 8&a for the next page.", "&eClick to View the Next Page.", "/itemjoin help 8", ClickAction.RUN_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 7/10 &a&l]&a&l&m---------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Enable &7- &eEnables ItemJoin for all players.", "&aEnables ItemJoin for all players. \nPlayers will be able to get custom items.", "/itemjoin enable", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Enable <User> &7- &eEnables ItemJoin for player.", "&aEnables ItemJoin for the specified player name. \nThis player will be able to get custom items.", "/itemjoin enable ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Enable <User> <World> &7- &eFor player/world.", "&aEnables ItemJoin for the specified player name in the specified world. \nThis player will be able to get custom items in this world.", "/itemjoin enable ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&aType &a&l/ItemJoin Help 8&a for the next page.", "&eClick to View the Next Page.", "/itemjoin help 8", ClickAction.RUN_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 7/10 &a&l]&a&l&m---------------[");
+            MiniMessageUtils.dispatchMessage(sender, "");
         } else if (Execute.HELP.accept(sender, args, 8)) {
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Disable &7- &eDisables ItemJoin for all players.", "&aDisables ItemJoin for all players. \nPlayers will NOT be able to get custom items.", "/itemjoin disable", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Disable <User> &7- &eDisables ItemJoin for player.", "&aDisables ItemJoin for the specified player name. \nThis player will NOT be able to get custom items.", "/itemjoin disable ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Disable <User> <World> &7- &eFor player/world.", "&aDisables ItemJoin for the specified player name in the specified world. \nThis player will NOT be able to get custom items in this world.", "/itemjoin disable ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&aType &a&l/ItemJoin Help 9&a for the next page.", "&eClick to View the Next Page.", "/itemjoin help 9", ClickAction.RUN_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 8/10 &a&l]&a&l&m---------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Disable &7- &eDisables ItemJoin for all players.", "&aDisables ItemJoin for all players. \nPlayers will NOT be able to get custom items.", "/itemjoin disable", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Disable <User> &7- &eDisables ItemJoin for player.", "&aDisables ItemJoin for the specified player name. \nThis player will NOT be able to get custom items.", "/itemjoin disable ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Disable <User> <World> &7- &eFor player/world.", "&aDisables ItemJoin for the specified player name in the specified world. \nThis player will NOT be able to get custom items in this world.", "/itemjoin disable ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&aType &a&l/ItemJoin Help 9&a for the next page.", "&eClick to View the Next Page.", "/itemjoin help 9", ClickAction.RUN_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 8/10 &a&l]&a&l&m---------------[");
+            MiniMessageUtils.dispatchMessage(sender, "");
         } else if (Execute.HELP.accept(sender, args, 9)) {
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Purge &7- &eDeletes the database file.", "&c&l[DANGER] &eThe Following Destroys Data &nPermanently!&e&c&l [DANGER] \n\n&aPurges ALL Player Data from the Database file! \n\n&c&n&lTHIS CANNOT BE UNDONE.", "/itemjoin purge", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Purge map-id <Image> &7- &eMap-Images data.", "&c&l[DANGER] &eThe Following Destroys Data &nPermanently!&e&c&l [DANGER] \n\n&aPurges the map-id data for the custom-image from the Database file! \n\n&c&n&lTHIS CANNOT BE UNDONE.", "/itemjoin purge map-id ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Purge first-join <User> &7- &eFirst-Join data.", "&c&l[DANGER] &eThe Following Destroys Data &nPermanently!&e&c&l [DANGER] \n\n&aPurges the first-join data for the player name from the Database file! \n\n&c&n&lTHIS CANNOT BE UNDONE.", "/itemjoin purge first-join ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Purge first-world <User> &7- &eFirst-World data.", "&c&l[DANGER] &eThe Following Destroys Data &nPermanently!&e&c&l [DANGER] \n\n&aPurges the first-world data for the player name from the Database file! \n\n&c&n&lTHIS CANNOT BE UNDONE.", "/itemjoin purge first-world ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Purge ip-limits <User> &7- &eIp-Limits data.", "&c&l[DANGER] &eThe Following Destroys Data &nPermanently!&e&c&l [DANGER] \n\n&aPurges the ip-limits data for the player name from the Database file! \n\n&c&n&lTHIS CANNOT BE UNDONE.", "/itemjoin purge ip-limits ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&aType &a&l/ItemJoin Help 10&a for the next page.", "&eClick to View the Next Page.", "/itemjoin help 10", ClickAction.RUN_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]--------------&a&l[&e Help Menu 9/10 &a&l]&a&l&m---------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Purge &7- &eDeletes the database file.", "&c&l[DANGER] &eThe Following Destroys Data &nPermanently!&e&c&l [DANGER] \n\n&aPurges ALL Player Data from the Database file! \n\n&c&n&lTHIS CANNOT BE UNDONE.", "/itemjoin purge", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Purge map-id <Image> &7- &eMap-Images data.", "&c&l[DANGER] &eThe Following Destroys Data &nPermanently!&e&c&l [DANGER] \n\n&aPurges the map-id data for the custom-image from the Database file! \n\n&c&n&lTHIS CANNOT BE UNDONE.", "/itemjoin purge map-id ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Purge first-join <User> &7- &eFirst-Join data.", "&c&l[DANGER] &eThe Following Destroys Data &nPermanently!&e&c&l [DANGER] \n\n&aPurges the first-join data for the player name from the Database file! \n\n&c&n&lTHIS CANNOT BE UNDONE.", "/itemjoin purge first-join ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Purge first-world <User> &7- &eFirst-World data.", "&c&l[DANGER] &eThe Following Destroys Data &nPermanently!&e&c&l [DANGER] \n\n&aPurges the first-world data for the player name from the Database file! \n\n&c&n&lTHIS CANNOT BE UNDONE.", "/itemjoin purge first-world ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Purge ip-limits <User> &7- &eIp-Limits data.", "&c&l[DANGER] &eThe Following Destroys Data &nPermanently!&e&c&l [DANGER] \n\n&aPurges the ip-limits data for the player name from the Database file! \n\n&c&n&lTHIS CANNOT BE UNDONE.", "/itemjoin purge ip-limits ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&aType &a&l/ItemJoin Help 10&a for the next page.", "&eClick to View the Next Page.", "/itemjoin help 10", ClickAction.RUN_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]--------------&a&l[&e Help Menu 9/10 &a&l]&a&l&m---------------[");
+            MiniMessageUtils.dispatchMessage(sender, "");
         } else if (Execute.HELP.accept(sender, args, 10)) {
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Purge enabled-players <User> &7- &eThe Data.", "&c&l[DANGER] &eThe Following Destroys Data &nPermanently!&e&c&l [DANGER] \n\n&aPurges the enabled-players data for the player name from the Database file! \n\n&c&n&lTHIS CANNOT BE UNDONE.", "/itemjoin purge enabled-players ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l/ItemJoin Purge first-commands <User> &7- &eThe Data.", "&c&l[DANGER] &eThe Following Destroys Data &nPermanently!&e&c&l [DANGER] \n\n&aPurges the first-commands data for the player name from the Database file! \n\n&c&n&lTHIS CANNOT BE UNDONE.", "/itemjoin purge first-commands ", ClickAction.SUGGEST_COMMAND);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&aFound a bug? Report it @");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&ahttps://github.com/RockinChaos/ItemJoin/issues", "&eClick to Submit a Bug or Feature Request.", "https://github.com/RockinChaos/ItemJoin/issues", ClickAction.OPEN_URL);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 10/10 &a&l]&a&l&m--------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Purge enabled-players <User> &7- &eThe Data.", "&c&l[DANGER] &eThe Following Destroys Data &nPermanently!&e&c&l [DANGER] \n\n&aPurges the enabled-players data for the player name from the Database file! \n\n&c&n&lTHIS CANNOT BE UNDONE.", "/itemjoin purge enabled-players ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l/ItemJoin Purge first-commands <User> &7- &eThe Data.", "&c&l[DANGER] &eThe Following Destroys Data &nPermanently!&e&c&l [DANGER] \n\n&aPurges the first-commands data for the player name from the Database file! \n\n&c&n&lTHIS CANNOT BE UNDONE.", "/itemjoin purge first-commands ", ClickAction.SUGGEST_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&aFound a bug? Report it @");
+            MiniMessageUtils.dispatchMessage(sender, "&ahttps://github.com/RockinChaos/ItemJoin/issues", "&eClick to Submit a Bug or Feature Request.", "https://github.com/RockinChaos/ItemJoin/issues", ClickAction.OPEN_URL);
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]---------------&a&l[&e Help Menu 10/10 &a&l]&a&l&m--------------[");
+            MiniMessageUtils.dispatchMessage(sender, "");
         } else if (Execute.DUMP.accept(sender, args, 0)) {
             this.dump(sender);
         } else if (Execute.RELOAD.accept(sender, args, 0)) {
             PluginData.getInfo().hardReload(false);
-            ItemJoin.getCore().getLang().sendLangMessage("commands.default.configReload", sender);
+            MiniMessageUtils.sendLangMessage("commands.default.configReload", sender);
         } else if (Execute.MENU.accept(sender, args, 0)) {
             Menu.startMenu(sender);
-            ItemJoin.getCore().getLang().sendLangMessage("commands.menu.openMenu", sender);
+            MiniMessageUtils.sendLangMessage("commands.menu.openMenu", sender);
         } else if (Execute.INFO.accept(sender, args, 0)) {
             this.info(sender);
         } else if (Execute.QUERY.accept(sender, args, 0)) {
             this.query(sender, args);
         } else if (Execute.WORLD.accept(sender, args, 0)) {
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+            MiniMessageUtils.dispatchMessage(sender, "");
             final PlaceHolder placeHolders = new PlaceHolder().with(Holder.WORLD, ((Player) sender).getWorld().getName());
-            ItemJoin.getCore().getLang().sendLangMessage("commands.world.worldHeader", sender, placeHolders);
-            ItemJoin.getCore().getLang().sendLangMessage("commands.world.worldRow", sender, placeHolders);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]--------------&a&l[&e Worlds In Menu 1/1 &a&l]&a&l&m-------------[");
+            MiniMessageUtils.sendLangMessage("commands.world.worldHeader", sender, placeHolders);
+            MiniMessageUtils.sendLangMessage("commands.world.worldRow", sender, placeHolders);
+            MiniMessageUtils.dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]--------------&a&l[&e Worlds In Menu 1/1 &a&l]&a&l&m-------------[");
         } else if (Execute.LIST.accept(sender, args, 1)) {
             this.list(sender, 1);
         } else if (Execute.LIST.accept(sender, args, 2)) {
@@ -230,47 +231,47 @@ public class ChatExecutor implements CommandExecutor {
             this.handleAllItems(sender, args, true);
         } else if (Execute.UPDATE.accept(sender, args, 0)) {
             final PlaceHolder placeHolders = new PlaceHolder().with(Holder.PLAYER, sender.getName());
-            ItemJoin.getCore().getLang().sendLangMessage("commands.updates.checkRequest", Bukkit.getServer().getConsoleSender(), placeHolders);
+            MiniMessageUtils.sendLangMessage("commands.updates.checkRequest", Bukkit.getServer().getConsoleSender(), placeHolders);
             SchedulerUtils.runAsync(() -> ItemJoin.getCore().getUpdater().checkUpdates(sender, true));
         } else if (Execute.UPGRADE.accept(sender, args, 0)) {
             final PlaceHolder placeHolders = new PlaceHolder().with(Holder.PLAYER, sender.getName());
-            ItemJoin.getCore().getLang().sendLangMessage("commands.updates.updateRequest", Bukkit.getServer().getConsoleSender(), placeHolders);
+            MiniMessageUtils.sendLangMessage("commands.updates.updateRequest", Bukkit.getServer().getConsoleSender(), placeHolders);
             SchedulerUtils.runAsync(() -> ItemJoin.getCore().getUpdater().forceUpdates(sender));
         } else if (Execute.DEBUG.accept(sender, args, 0)) {
             if (ServerUtils.devListening()) {
-                ItemJoin.getCore().getLang().dispatchMessage(sender, ItemJoin.getCore().getData().getPluginPrefix() + " &aYou are &nnow listening&a for debug messages.");
+                MiniMessageUtils.dispatchMessage(sender, ItemJoin.getCore().getData().getPluginPrefix() + " &aYou are &nnow listening&a for debug messages.");
             } else {
-                ItemJoin.getCore().getLang().dispatchMessage(sender, ItemJoin.getCore().getData().getPluginPrefix() + "&cYou are &nno longer&c listening for debug messages.");
+                MiniMessageUtils.dispatchMessage(sender, ItemJoin.getCore().getData().getPluginPrefix() + "&cYou are &nno longer&c listening for debug messages.");
             }
         } else if (executor == null) {
-            ItemJoin.getCore().getLang().sendLangMessage("commands.default.unknownCommand", sender);
+            MiniMessageUtils.sendLangMessage("commands.default.unknownCommand", sender);
         } else if (!executor.playerRequired(sender, args)) {
-            ItemJoin.getCore().getLang().sendLangMessage("commands.default.noPlayer", sender);
+            MiniMessageUtils.sendLangMessage("commands.default.noPlayer", sender);
             if (executor.equals(Execute.GET)) {
-                ItemJoin.getCore().getLang().sendLangMessage("commands.get.usageSyntax", sender);
+                MiniMessageUtils.sendLangMessage("commands.get.usageSyntax", sender);
             } else if (executor.equals(Execute.GETALL)) {
-                ItemJoin.getCore().getLang().sendLangMessage("commands.get.usageSyntax", sender);
+                MiniMessageUtils.sendLangMessage("commands.get.usageSyntax", sender);
             } else if (executor.equals(Execute.REMOVE)) {
-                ItemJoin.getCore().getLang().sendLangMessage("commands.remove.usageSyntax", sender);
+                MiniMessageUtils.sendLangMessage("commands.remove.usageSyntax", sender);
             } else if (executor.equals(Execute.REMOVEALL)) {
-                ItemJoin.getCore().getLang().sendLangMessage("commands.remove.usageSyntax", sender);
+                MiniMessageUtils.sendLangMessage("commands.remove.usageSyntax", sender);
             }
         } else if (!executor.hasSyntax(args, 0)) {
             if (executor.equals(Execute.GET)) {
-                ItemJoin.getCore().getLang().sendLangMessage("commands.get.badSyntax", sender);
+                MiniMessageUtils.sendLangMessage("commands.get.badSyntax", sender);
             } else if (executor.equals(Execute.GETONLINE)) {
-                ItemJoin.getCore().getLang().sendLangMessage("commands.get.badOnlineSyntax", sender);
+                MiniMessageUtils.sendLangMessage("commands.get.badOnlineSyntax", sender);
             } else if (executor.equals(Execute.REMOVE)) {
-                ItemJoin.getCore().getLang().sendLangMessage("commands.remove.badSyntax", sender);
+                MiniMessageUtils.sendLangMessage("commands.remove.badSyntax", sender);
             } else if (executor.equals(Execute.REMOVEONLINE)) {
-                ItemJoin.getCore().getLang().sendLangMessage("commands.remove.badOnlineSyntax", sender);
+                MiniMessageUtils.sendLangMessage("commands.remove.badOnlineSyntax", sender);
             } else if (executor.equals(Execute.PURGE)) {
-                ItemJoin.getCore().getLang().sendLangMessage("commands.default.unknownCommand", sender);
+                MiniMessageUtils.sendLangMessage("commands.default.unknownCommand", sender);
             } else if (executor.equals(Execute.QUERY)) {
-                ItemJoin.getCore().getLang().sendLangMessage("commands.query.badSyntax", sender);
+                MiniMessageUtils.sendLangMessage("commands.query.badSyntax", sender);
             }
         } else if (!executor.hasPermission(sender, args)) {
-            ItemJoin.getCore().getLang().sendLangMessage("commands.default.noPermission", sender);
+            MiniMessageUtils.sendLangMessage("commands.default.noPermission", sender);
         }
         return true;
     }
@@ -310,11 +311,11 @@ public class ChatExecutor implements CommandExecutor {
                 if (pasteURL != null) {
                     ServerUtils.logInfo(sender.getName() + " has generated a debug paste at " + pasteURL);
                     if (!(sender instanceof ConsoleCommandSender)) {
-                        ItemJoin.getCore().getLang().dispatchMessage(sender, "%prefix% &a" + pasteURL, "&eClick me to copy the url.", pasteURL, ClickAction.OPEN_URL);
+                        MiniMessageUtils.dispatchMessage(sender, "%prefix% &a" + pasteURL, "&eClick me to copy the url.", pasteURL, ClickAction.OPEN_URL);
                     }
                 } else {
                     if (!(sender instanceof ConsoleCommandSender)) {
-                        ItemJoin.getCore().getLang().dispatchMessage(sender, "%prefix% &cFailed to generate the DUMP URL, please try again later.");
+                        MiniMessageUtils.dispatchMessage(sender, "%prefix% &cFailed to generate the DUMP URL, please try again later.");
                     }
                     ServerUtils.logSevere("{ChatExecutor} Failed to generate the DUMP URL, this is not necessarily a bug.");
                 }
@@ -333,20 +334,20 @@ public class ChatExecutor implements CommandExecutor {
     private void info(final CommandSender sender) {
         final ItemStack handItem = PlayerHandler.getHandItem((Player) sender);
         if (handItem.getType() != Material.AIR) {
-            ItemJoin.getCore().getLang().dispatchMessage(sender, " ");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]-----------------&a&l[&e Item Info &a&l]&a&l&m----------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, " ");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]-----------------&a&l[&e Item Info &a&l]&a&l&m----------------[");
+            MiniMessageUtils.dispatchMessage(sender, "");
             final PlaceHolder placeHolders = new PlaceHolder().with(Holder.ITEM, handItem.getType().toString());
-            ItemJoin.getCore().getLang().sendLangMessage("commands.info.material", sender, placeHolders);
+            MiniMessageUtils.sendLangMessage("commands.info.material", sender, placeHolders);
             if (!ServerUtils.hasUpdate("1_13")) {
                 placeHolders.with(Holder.ITEM, String.valueOf(LegacyAPI.getDataValue(handItem)));
-                ItemJoin.getCore().getLang().sendLangMessage("commands.info.data", sender, placeHolders);
+                MiniMessageUtils.sendLangMessage("commands.info.data", sender, placeHolders);
             }
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]-----------------&a&l[&e Item Info &a&l]&a&l&m----------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, " ");
+            MiniMessageUtils.dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]-----------------&a&l[&e Item Info &a&l]&a&l&m----------------[");
+            MiniMessageUtils.dispatchMessage(sender, " ");
         } else {
-            ItemJoin.getCore().getLang().sendLangMessage("commands.item.noItemHeld", sender);
+            MiniMessageUtils.sendLangMessage("commands.item.noItemHeld", sender);
         }
     }
 
@@ -371,18 +372,18 @@ public class ChatExecutor implements CommandExecutor {
             } else {
                 placeHolders.with(Holder.ITEM_PERMISSION, "&a[✔] itemjoin.console" + "." + itemMap.getConfigName());
             }
-            ItemJoin.getCore().getLang().dispatchMessage(sender, " ");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]-----------------&a&l[&e Query Data &a&l]&a&l&m----------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
-            ItemJoin.getCore().getLang().sendLangMessage("commands.query.node", sender, placeHolders);
-            ItemJoin.getCore().getLang().sendLangMessage("commands.query.material", sender, placeHolders);
-            ItemJoin.getCore().getLang().sendLangMessage("commands.query.slot", sender, placeHolders);
-            ItemJoin.getCore().getLang().sendLangMessage("commands.query.permission", sender, placeHolders);
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]-----------------&a&l[&e Query Data &a&l]&a&l&m----------------[");
-            ItemJoin.getCore().getLang().dispatchMessage(sender, " ");
+            MiniMessageUtils.dispatchMessage(sender, " ");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]-----------------&a&l[&e Query Data &a&l]&a&l&m----------------[");
+            MiniMessageUtils.dispatchMessage(sender, "");
+            MiniMessageUtils.sendLangMessage("commands.query.node", sender, placeHolders);
+            MiniMessageUtils.sendLangMessage("commands.query.material", sender, placeHolders);
+            MiniMessageUtils.sendLangMessage("commands.query.slot", sender, placeHolders);
+            MiniMessageUtils.sendLangMessage("commands.query.permission", sender, placeHolders);
+            MiniMessageUtils.dispatchMessage(sender, "");
+            MiniMessageUtils.dispatchMessage(sender, "&a&l&m]-----------------&a&l[&e Query Data &a&l]&a&l&m----------------[");
+            MiniMessageUtils.dispatchMessage(sender, " ");
         } else {
-            ItemJoin.getCore().getLang().sendLangMessage("commands.item.noItem", sender, placeHolders);
+            MiniMessageUtils.sendLangMessage("commands.item.noItem", sender, placeHolders);
         }
     }
 
@@ -392,7 +393,7 @@ public class ChatExecutor implements CommandExecutor {
      * @param sender - Source of the command.
      */
     private void list(final CommandSender sender, final int page) {
-        ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+        MiniMessageUtils.dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
         int maxPage = PluginData.getInfo().getListPages();
         int lineCount = 0;
         boolean worldSent = false;
@@ -401,7 +402,7 @@ public class ChatExecutor implements CommandExecutor {
                 boolean itemFound = false;
                 final PlaceHolder placeHolders = new PlaceHolder().with(Holder.WORLD, world.getName());
                 if (!(lineCount > (page * 15)) && (page == 1 || !(lineCount < ((page - 1) * 15)))) {
-                    ItemJoin.getCore().getLang().sendLangMessage("commands.list.worldHeader", sender, placeHolders);
+                    MiniMessageUtils.sendLangMessage("commands.list.worldHeader", sender, placeHolders);
                     lineCount++;
                     worldSent = true;
                 } else {
@@ -413,29 +414,29 @@ public class ChatExecutor implements CommandExecutor {
                         if (page == 1 && !(lineCount >= page * 15) || page != 1 && !(lineCount > page * 15) && !(lineCount < (page - 1) * 15)) {
                             if (!worldSent) {
                                 if (!(lineCount > (page * 15)) && (page == 1 || !(lineCount < ((page - 1) * 15)))) {
-                                    ItemJoin.getCore().getLang().sendLangMessage("commands.list.worldHeader", sender, placeHolders);
+                                    MiniMessageUtils.sendLangMessage("commands.list.worldHeader", sender, placeHolders);
                                     lineCount++;
                                     worldSent = true;
                                 }
                             }
                             placeHolders.with(Holder.ITEM, itemMap.getConfigName());
                             inputListed.add(itemMap.getConfigName());
-                            ItemJoin.getCore().getLang().sendLangMessage("commands.list.itemRow", sender, placeHolders);
+                            MiniMessageUtils.sendLangMessage("commands.list.itemRow", sender, placeHolders);
                         }
                         lineCount++;
                         itemFound = true;
                     }
                 }
                 if (!itemFound) {
-                    ItemJoin.getCore().getLang().sendLangMessage("commands.list.noItems", sender);
+                    MiniMessageUtils.sendLangMessage("commands.list.noItems", sender);
                     lineCount++;
                 }
             }
         }
         if (page != maxPage) {
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&aType &a&l/ItemJoin List " + (page + 1) + "&a for the next page.", "&eClick to View the Next Page.", "/itemjoin list " + (page + 1), ClickAction.RUN_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&aType &a&l/ItemJoin List " + (page + 1) + "&a for the next page.", "&eClick to View the Next Page.", "/itemjoin list " + (page + 1), ClickAction.RUN_COMMAND);
         }
-        ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]----------------&a&l[&e List Menu " + page + "/" + maxPage + " &a&l]&a&l&m---------------[");
+        MiniMessageUtils.dispatchMessage(sender, "&a&l&m]----------------&a&l[&e List Menu " + page + "/" + maxPage + " &a&l]&a&l&m---------------[");
     }
 
     /**
@@ -445,30 +446,30 @@ public class ChatExecutor implements CommandExecutor {
      * @param page   - The page number to be displayed.
      */
     private void permissions(final CommandSender sender, final int page) {
-        ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
+        MiniMessageUtils.dispatchMessage(sender, "&a&l&m]------------------&a&l[&e ItemJoin &a&l]&a&l&m-----------------[");
         int maxPage = PluginData.getInfo().getPermissionPages();
         final boolean opPermissionRequired = ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items-OP");
         final boolean permissionRequired = ItemJoin.getCore().getConfig("config.yml").getBoolean("Permissions.Obtain-Items");
         if (page == 1) {
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.*") ? "&a[✔] ItemJoin&r&a.*" : "&c[✘] ItemJoin&r&c.*"));
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.all") ? "&a[✔] ItemJoin&r&a.All" : "&c[✘] ItemJoin&r&c.All"));
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.use") ? "&a[✔] ItemJoin&r&a.Use" : "&c[✘] ItemJoin&r&c.Use"));
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.reload") ? "&a[✔] ItemJoin&r&a.Reload" : "&c[✘] ItemJoin&r&c.Reload"));
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.updates") ? "&a[✔] ItemJoin&r&a.Updates" : "&c[✘] ItemJoin&r&c.Updates"));
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.upgrade") ? "&a[✔] ItemJoin&r&a.Upgrade" : "&c[✘] ItemJoin&r&c.Upgrade"));
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.permissions") ? "&a[✔] ItemJoin&r&a.Permissions" : "&c[✘] ItemJoin&r&c.Permissions"));
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.query") ? "&a[✔] ItemJoin&r&a.Query" : "&c[✘] ItemJoin&r&c.Query"));
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.get") ? "&a[✔] ItemJoin&r&a.Get" : "&c[✘] ItemJoin&r&c.Get"));
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.remove") ? "&a[✔] ItemJoin&r&a.Remove" : "&c[✘] ItemJoin&r&c.Remove"));
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.enable") ? "&a[✔] ItemJoin&r&a.Enable" : "&c[✘] ItemJoin&r&c.Enable"));
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.disable") ? "&a[✔] ItemJoin&r&a.Disable" : "&c[✘] ItemJoin&r&c.Disable"));
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.get.others") ? "&a[✔] ItemJoin&r&a.Get&r&a.Others" : "&c[✘] ItemJoin&r&c.Get&r&c.Others"));
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.remove.others") ? "&a[✔] ItemJoin&r&a.Remove&r&a.Others" : "&c[✘] ItemJoin&r&c.Remove&r&c.Others"));
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.enable.others") ? "&a[✔] ItemJoin&r&a.Enable&r&a.Others" : "&c[✘] ItemJoin&r&c.Enable&r&c.Others"));
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.disable.others") ? "&a[✔] ItemJoin&r&a.Disable&r&a.Others" : "&c[✘] ItemJoin&r&c.Disable&r&c.Others"));
-            ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.bypass.inventorymodify") ? "&a[✔] ItemJoin&r&a.Bypass&r&a.InventoryModify" : "&c[✘] ItemJoin&r&c.Bypass&r&c.InventoryModify"));
+            MiniMessageUtils.dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.*") ? "&a[✔] ItemJoin&r&a.*" : "&c[✘] ItemJoin&r&c.*"));
+            MiniMessageUtils.dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.all") ? "&a[✔] ItemJoin&r&a.All" : "&c[✘] ItemJoin&r&c.All"));
+            MiniMessageUtils.dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.use") ? "&a[✔] ItemJoin&r&a.Use" : "&c[✘] ItemJoin&r&c.Use"));
+            MiniMessageUtils.dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.reload") ? "&a[✔] ItemJoin&r&a.Reload" : "&c[✘] ItemJoin&r&c.Reload"));
+            MiniMessageUtils.dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.updates") ? "&a[✔] ItemJoin&r&a.Updates" : "&c[✘] ItemJoin&r&c.Updates"));
+            MiniMessageUtils.dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.upgrade") ? "&a[✔] ItemJoin&r&a.Upgrade" : "&c[✘] ItemJoin&r&c.Upgrade"));
+            MiniMessageUtils.dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.permissions") ? "&a[✔] ItemJoin&r&a.Permissions" : "&c[✘] ItemJoin&r&c.Permissions"));
+            MiniMessageUtils.dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.query") ? "&a[✔] ItemJoin&r&a.Query" : "&c[✘] ItemJoin&r&c.Query"));
+            MiniMessageUtils.dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.get") ? "&a[✔] ItemJoin&r&a.Get" : "&c[✘] ItemJoin&r&c.Get"));
+            MiniMessageUtils.dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.remove") ? "&a[✔] ItemJoin&r&a.Remove" : "&c[✘] ItemJoin&r&c.Remove"));
+            MiniMessageUtils.dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.enable") ? "&a[✔] ItemJoin&r&a.Enable" : "&c[✘] ItemJoin&r&c.Enable"));
+            MiniMessageUtils.dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.disable") ? "&a[✔] ItemJoin&r&a.Disable" : "&c[✘] ItemJoin&r&c.Disable"));
+            MiniMessageUtils.dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.get.others") ? "&a[✔] ItemJoin&r&a.Get&r&a.Others" : "&c[✘] ItemJoin&r&c.Get&r&c.Others"));
+            MiniMessageUtils.dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.remove.others") ? "&a[✔] ItemJoin&r&a.Remove&r&a.Others" : "&c[✘] ItemJoin&r&c.Remove&r&c.Others"));
+            MiniMessageUtils.dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.enable.others") ? "&a[✔] ItemJoin&r&a.Enable&r&a.Others" : "&c[✘] ItemJoin&r&c.Enable&r&c.Others"));
+            MiniMessageUtils.dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.disable.others") ? "&a[✔] ItemJoin&r&a.Disable&r&a.Others" : "&c[✘] ItemJoin&r&c.Disable&r&c.Others"));
+            MiniMessageUtils.dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin.bypass.inventorymodify") ? "&a[✔] ItemJoin&r&a.Bypass&r&a.InventoryModify" : "&c[✘] ItemJoin&r&c.Bypass&r&c.InventoryModify"));
             for (World world : Bukkit.getWorlds()) {
-                ItemJoin.getCore().getLang().dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin." + world.getName() + ".*")
+                MiniMessageUtils.dispatchMessage(sender, (PermissionsHandler.hasPermission(sender, "itemjoin." + world.getName() + ".*")
                         && ((opPermissionRequired && sender.isOp()
                         ? sender.isPermissionSet("itemjoin." + world.getName() + ".*") : !opPermissionRequired)
                         || (permissionRequired && !sender.isOp()
@@ -500,13 +501,13 @@ public class ChatExecutor implements CommandExecutor {
                 }
             }
             for (int i = (page == 2 ? 0 : ((page - 2) * 15) + 1); i <= ((page - 1) * 15 <= inputMessage.size() ? (page - 1) * 15 : (inputMessage.size() - 1)); i++) {
-                ItemJoin.getCore().getLang().dispatchMessage(sender, inputMessage.get(i));
+                MiniMessageUtils.dispatchMessage(sender, inputMessage.get(i));
             }
         }
         if (page != maxPage) {
-            ItemJoin.getCore().getLang().dispatchMessage(sender, "&aType &a&l/ItemJoin Permissions " + (page + 1) + "&a for the next page.", "&eClick to View the Next Page.", "/itemjoin permissions " + (page + 1), ClickAction.RUN_COMMAND);
+            MiniMessageUtils.dispatchMessage(sender, "&aType &a&l/ItemJoin Permissions " + (page + 1) + "&a for the next page.", "&eClick to View the Next Page.", "/itemjoin permissions " + (page + 1), ClickAction.RUN_COMMAND);
         }
-        ItemJoin.getCore().getLang().dispatchMessage(sender, "&a&l&m]------------&a&l[&e Permissions Menu " + page + "/" + maxPage + " &a&l]&a&l&m-----------[");
+        MiniMessageUtils.dispatchMessage(sender, "&a&l&m]------------&a&l[&e Permissions Menu " + page + "/" + maxPage + " &a&l]&a&l&m-----------[");
     }
 
     /**
@@ -525,7 +526,7 @@ public class ChatExecutor implements CommandExecutor {
                 PlayerHandler.forSelectedEntities(sender, !args.equalsIgnoreCase("ALL") && !args.equalsIgnoreCase("All Players") ? args : null, argsPlayer -> {
                     if (!table.equalsIgnoreCase("map-ids") && argsPlayer == null && !args.equalsIgnoreCase("ALL") && !args.equalsIgnoreCase("All Players")) {
                         placeHolders.with(Holder.TARGET_PLAYER, args);
-                        ItemJoin.getCore().getLang().sendLangMessage("commands.default.noTarget", sender, placeHolders);
+                        MiniMessageUtils.sendLangMessage("commands.default.noTarget", sender, placeHolders);
                         hasFailed[0] = true;
                         return;
                     }
@@ -561,16 +562,16 @@ public class ChatExecutor implements CommandExecutor {
                 if (!handledPlayers.isEmpty()) {
                     placeHolders.with(Holder.TARGET_PLAYER, handledPlayers.toString().replace("]", "").replace("[", ""));
                 }
-                ItemJoin.getCore().getLang().sendLangMessage("commands.database.purgeSuccess", sender, placeHolders);
+                MiniMessageUtils.sendLangMessage("commands.database.purgeSuccess", sender, placeHolders);
             }
             this.confirmationRequests.remove(table + sender.getName());
         } else {
             this.confirmationRequests.put(table + sender.getName(), true);
-            ItemJoin.getCore().getLang().sendLangMessage("commands.database.purgeWarn", sender, placeHolders);
-            ItemJoin.getCore().getLang().sendLangMessage("commands.database.purgeConfirm", sender, placeHolders);
+            MiniMessageUtils.sendLangMessage("commands.database.purgeWarn", sender, placeHolders);
+            MiniMessageUtils.sendLangMessage("commands.database.purgeConfirm", sender, placeHolders);
             SchedulerUtils.runLater(100L, () -> {
                 if (this.confirmationRequests.get(table + sender.getName()) != null && this.confirmationRequests.get(table + sender.getName()).equals(true)) {
-                    ItemJoin.getCore().getLang().sendLangMessage("commands.database.purgeTimeOut", sender);
+                    MiniMessageUtils.sendLangMessage("commands.database.purgeTimeOut", sender);
                     this.confirmationRequests.remove(table + sender.getName());
                 }
             });
@@ -592,7 +593,7 @@ public class ChatExecutor implements CommandExecutor {
         PlayerHandler.forSelectedEntities(sender, (args.length >= 2 ? args[1] : "ALL"), argsPlayer -> {
             final PlaceHolder placeHolders = new PlaceHolder().with(Holder.TARGET_PLAYER, sender.getName()).with(Holder.PLAYER, sender.getName()).with(Holder.WORLD, world);
             if (args.length >= 2 && argsPlayer == null) {
-                ItemJoin.getCore().getLang().sendLangMessage("commands.default.noTarget", sender, placeHolders);
+                MiniMessageUtils.sendLangMessage("commands.default.noTarget", sender, placeHolders);
                 return;
             }
             final DataObject dataObject = (DataObject) ItemJoin.getCore().getSQL().getData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, "ALL", String.valueOf(enable)));
@@ -600,17 +601,17 @@ public class ChatExecutor implements CommandExecutor {
                 ItemJoin.getCore().getSQL().removeData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, "ALL", String.valueOf(!enable)));
                 ItemJoin.getCore().getSQL().saveData(new DataObject(Table.ENABLED_PLAYERS, PlayerHandler.getPlayerID(argsPlayer), world, "ALL", String.valueOf(enable)));
                 if (args.length < 2) {
-                    ItemJoin.getCore().getLang().sendLangMessage("commands." + (enable ? "enabled." : "disabled.") + "globalPlayers", sender, placeHolders);
+                    MiniMessageUtils.sendLangMessage("commands." + (enable ? "enabled." : "disabled.") + "globalPlayers", sender, placeHolders);
                 } else if (!handledPlayers.contains(argsPlayer.getName())) {
                     handledPlayers.add(argsPlayer.getName());
                 }
                 if (args.length >= 2 && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
                     placeHolders.with(Holder.TARGET_PLAYER, sender.getName());
-                    ItemJoin.getCore().getLang().sendLangMessage("commands." + (enable ? "enabled." : "disabled.") + (args.length == 3 ? "forTargetWorld" : "forTarget"), argsPlayer, placeHolders);
+                    MiniMessageUtils.sendLangMessage("commands." + (enable ? "enabled." : "disabled.") + (args.length == 3 ? "forTargetWorld" : "forTarget"), argsPlayer, placeHolders);
                 }
             } else {
                 if (args.length < 2) {
-                    ItemJoin.getCore().getLang().sendLangMessage("commands." + (enable ? "enabled." : "disabled.") + "globalPlayersFailed", sender, placeHolders);
+                    MiniMessageUtils.sendLangMessage("commands." + (enable ? "enabled." : "disabled.") + "globalPlayersFailed", sender, placeHolders);
                 } else if (!failedPlayers.contains(argsPlayer.getName())) {
                     failedPlayers.add(argsPlayer.getName());
                 }
@@ -619,11 +620,11 @@ public class ChatExecutor implements CommandExecutor {
         if (!handledPlayers.isEmpty()) {
             final String player = handledPlayers.toString().replace("]", "").replace("[", "");
             placeHolder.with(Holder.TARGET_PLAYER, player).with(Holder.PLAYER, player).with(Holder.PLAYERS, player);
-            ItemJoin.getCore().getLang().sendLangMessage("commands." + (enable ? "enabled." : "disabled.") + (args.length == 3 ? "forPlayerWorld" : "forPlayer"), sender, placeHolder);
+            MiniMessageUtils.sendLangMessage("commands." + (enable ? "enabled." : "disabled.") + (args.length == 3 ? "forPlayerWorld" : "forPlayer"), sender, placeHolder);
         } else if (!failedPlayers.isEmpty()) {
             final String player = failedPlayers.toString().replace("]", "").replace("[", "");
             placeHolder.with(Holder.TARGET_PLAYER, player).with(Holder.PLAYER, player).with(Holder.PLAYERS, player);
-            ItemJoin.getCore().getLang().sendLangMessage("commands." + (enable ? "enabled." : "disabled.") + (args.length == 3 ? "forPlayerWorldFailed" : "forPlayerFailed"), sender, placeHolder);
+            MiniMessageUtils.sendLangMessage("commands." + (enable ? "enabled." : "disabled.") + (args.length == 3 ? "forPlayerWorldFailed" : "forPlayerFailed"), sender, placeHolder);
         }
     }
 
@@ -645,7 +646,7 @@ public class ChatExecutor implements CommandExecutor {
             final PlaceHolder placeHolders = new PlaceHolder().with(Holder.TARGET_PLAYER, (args.length >= 3 && argsPlayer != null ? argsPlayer.getName() : (args.length >= 3 ? args[2] : sender.getName()))).with(Holder.ITEM, args[1]);
             int amount = (((args.length >= 3 && argsPlayer == null) || (args.length > 3)) && StringUtils.isInt(args[args.length - 1]) ? Integer.parseInt(args[args.length - 1]) : 0);
             if (args.length >= 3 && !StringUtils.isInt(args[2]) && argsPlayer == null) {
-                ItemJoin.getCore().getLang().sendLangMessage("commands.default.noTarget", sender, placeHolders);
+                MiniMessageUtils.sendLangMessage("commands.default.noTarget", sender, placeHolders);
                 return;
             } else if (argsPlayer == null && sender instanceof Player) {
                 argsPlayer = (Player) sender;
@@ -654,7 +655,7 @@ public class ChatExecutor implements CommandExecutor {
             final ItemMap itemMapExist = ItemUtilities.getUtilities().getItemMap(args[1]);
             if (itemMapExist == null) {
                 if (!hasFailed[0]) {
-                    ItemJoin.getCore().getLang().sendLangMessage("commands.item.noItem", sender, placeHolders);
+                    MiniMessageUtils.sendLangMessage("commands.item.noItem", sender, placeHolders);
                     hasFailed[0] = true;
                 }
                 return;
@@ -673,10 +674,9 @@ public class ChatExecutor implements CommandExecutor {
                         }
                         arbitraryMap.put(itemMap.getConfigName(), (arbitrary - count));
                     }
-                    final String customName = StringUtils.translateLayout(itemMap.getCustomName(), argsPlayer);
                     final boolean canGive = (!remove && itemMap.inWorld(argsPlayer.getWorld()) && (itemMap.conditionMet(argsPlayer, "trigger-conditions", true, false) && (amount != 0 || itemMap.isAlwaysGive() || multiSlots.contains(itemMap.getConfigName()) || !itemMap.hasItem(argsPlayer, false))));
-                    placeHolder.with(Holder.ITEM, customName).with(Holder.AMOUNT, Integer.toString((amount == 0 ? 1 : amount)));
-                    placeHolders.with(Holder.ITEM, customName);
+                    placeHolder.with(Holder.ITEM, itemMap.getConfigName()).with(Holder.AMOUNT, Integer.toString((amount == 0 ? 1 : amount)));
+                    placeHolders.with(Holder.ITEM, itemMap.getConfigName());
                     if ((remove && itemMap.hasItem(argsPlayer, true)) || (canGive && ItemUtilities.getUtilities().canOverwrite(argsPlayer, itemMap))) {
                         if (remove || !itemMap.isCMDPermissionNeeded() || itemMap.hasPermission(argsPlayer, argsPlayer.getWorld())) {
                             if (itemMap.isAlwaysGive() && !StringUtils.isInt(args[args.length - 1])) {
@@ -704,7 +704,7 @@ public class ChatExecutor implements CommandExecutor {
                                 if (!handledPlayers.contains(argsPlayer.getName()) && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
                                     handledPlayers.add(argsPlayer.getName());
                                 }
-                                ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.removedYou" : "get.givenYou"), argsPlayer, placeHolders);
+                                MiniMessageUtils.sendLangMessage("commands." + (remove ? "remove.removedYou" : "get.givenYou"), argsPlayer, placeHolders);
                             }
                             PlayerHandler.quickCraftSave(argsPlayer);
                         } else if (!messageSent) {
@@ -712,7 +712,7 @@ public class ChatExecutor implements CommandExecutor {
                                 if (!failedPermission.contains(argsPlayer.getName()) && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
                                     failedPermission.add(argsPlayer.getName());
                                 }
-                                ItemJoin.getCore().getLang().sendLangMessage("commands.get.noPermission", argsPlayer, placeHolders);
+                                MiniMessageUtils.sendLangMessage("commands.get.noPermission", argsPlayer, placeHolders);
                             }
                         }
                     } else if (!messageSent && (args.length >= 3 && !StringUtils.isInt(args[2]) && !sender.getName().equalsIgnoreCase(argsPlayer.getName()))) {
@@ -720,15 +720,15 @@ public class ChatExecutor implements CommandExecutor {
                         if (canGive) {
                             placeHolders.with(Holder.FAIL_COUNT, String.valueOf(1));
                             if (argsPlayer.getInventory().firstEmpty() == -1) {
-                                ItemJoin.getCore().getLang().sendLangMessage("general.failedInventory", argsPlayer, placeHolders);
+                                MiniMessageUtils.sendLangMessage("general.failedInventory", argsPlayer, placeHolders);
                             } else {
-                                ItemJoin.getCore().getLang().sendLangMessage("general.failedOverwrite", argsPlayer, placeHolders);
+                                MiniMessageUtils.sendLangMessage("general.failedOverwrite", argsPlayer, placeHolders);
                             }
                             if (!failedPermission.contains(argsPlayer.getName()) && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
                                 failedPermission.add(argsPlayer.getName());
                             }
                         } else {
-                            ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.targetTriedRemoval" : "get.targetTriedGive"), argsPlayer, placeHolders);
+                            MiniMessageUtils.sendLangMessage("commands." + (remove ? "remove.targetTriedRemoval" : "get.targetTriedGive"), argsPlayer, placeHolders);
                             if (!failedPlayers.contains(argsPlayer.getName()) && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
                                 failedPlayers.add(argsPlayer.getName());
                             }
@@ -738,12 +738,12 @@ public class ChatExecutor implements CommandExecutor {
                         if (canGive) {
                             placeHolders.with(Holder.FAIL_COUNT, String.valueOf(1));
                             if (argsPlayer.getInventory().firstEmpty() == -1) {
-                                ItemJoin.getCore().getLang().sendLangMessage("general.failedInventory", argsPlayer, placeHolders);
+                                MiniMessageUtils.sendLangMessage("general.failedInventory", argsPlayer, placeHolders);
                             } else {
-                                ItemJoin.getCore().getLang().sendLangMessage("general.failedOverwrite", argsPlayer, placeHolders);
+                                MiniMessageUtils.sendLangMessage("general.failedOverwrite", argsPlayer, placeHolders);
                             }
                         } else {
-                            ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.failedInventory" : "get.failedInventory"), sender, placeHolders);
+                            MiniMessageUtils.sendLangMessage("commands." + (remove ? "remove.failedInventory" : "get.failedInventory"), sender, placeHolders);
                         }
                     }
                     if (!messageSent) {
@@ -754,13 +754,13 @@ public class ChatExecutor implements CommandExecutor {
         });
         if (!handledPlayers.isEmpty()) {
             placeHolder.with(Holder.TARGET_PLAYER, handledPlayers.toString().replace("]", "").replace("[", ""));
-            ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.removedTarget" : "get.givenTarget"), sender, placeHolder);
+            MiniMessageUtils.sendLangMessage("commands." + (remove ? "remove.removedTarget" : "get.givenTarget"), sender, placeHolder);
         } else if (!failedPlayers.isEmpty()) {
             placeHolder.with(Holder.TARGET_PLAYER, failedPlayers.toString().replace("]", "").replace("[", ""));
-            ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.targetFailedInventory" : "get.targetFailedInventory"), sender, placeHolder);
+            MiniMessageUtils.sendLangMessage("commands." + (remove ? "remove.targetFailedInventory" : "get.targetFailedInventory"), sender, placeHolder);
         } else if (!failedPermission.isEmpty()) {
             placeHolder.with(Holder.TARGET_PLAYER, failedPermission.toString().replace("]", "").replace("[", ""));
-            ItemJoin.getCore().getLang().sendLangMessage("commands.get.targetNoPermission", sender, placeHolder);
+            MiniMessageUtils.sendLangMessage("commands.get.targetNoPermission", sender, placeHolder);
         }
     }
 
@@ -782,12 +782,12 @@ public class ChatExecutor implements CommandExecutor {
             final ItemMap itemMapExist = ItemUtilities.getUtilities().getItemMap(args[1]);
             if (itemMapExist == null) {
                 if (!hasFailed[0]) {
-                    ItemJoin.getCore().getLang().sendLangMessage("commands.item.noItem", sender, placeHolders);
+                    MiniMessageUtils.sendLangMessage("commands.item.noItem", sender, placeHolders);
                     hasFailed[0] = true;
                 }
                 return;
             }
-            placeHolders.with(Holder.ITEM, StringUtils.translateLayout(itemMapExist.getCustomName(), argsPlayer)).with(Holder.TARGET_PLAYER, sender.getName()).with(Holder.AMOUNT, amount == 0 ? "&lAll" : Integer.toString(amount));
+            placeHolders.with(Holder.ITEM, itemMapExist.getConfigName()).with(Holder.TARGET_PLAYER, sender.getName()).with(Holder.AMOUNT, amount == 0 ? "&lAll" : Integer.toString(amount));
             final List<String> multiSlots = new ArrayList<>();
             for (final ItemMap itemMap : ItemUtilities.getUtilities().getItems()) {
                 if (itemMap.getConfigName().equalsIgnoreCase(args[1])) {
@@ -809,7 +809,7 @@ public class ChatExecutor implements CommandExecutor {
                                 }
                             }
                             if (!messageSent && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
-                                ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.removedYou" : "get.givenYou"), argsPlayer, placeHolders);
+                                MiniMessageUtils.sendLangMessage("commands." + (remove ? "remove.removedYou" : "get.givenYou"), argsPlayer, placeHolders);
                             }
                             if (!messageSent && !handledPlayers.contains(argsPlayer.getName())) {
                                 handledPlayers.add(argsPlayer.getName());
@@ -820,12 +820,12 @@ public class ChatExecutor implements CommandExecutor {
                                 if (canGive) {
                                     placeHolders.with(Holder.FAIL_COUNT, String.valueOf(1));
                                     if (argsPlayer.getInventory().firstEmpty() == -1) {
-                                        ItemJoin.getCore().getLang().sendLangMessage("general.failedInventory", argsPlayer, placeHolders);
+                                        MiniMessageUtils.sendLangMessage("general.failedInventory", argsPlayer, placeHolders);
                                     } else {
-                                        ItemJoin.getCore().getLang().sendLangMessage("general.failedOverwrite", argsPlayer, placeHolders);
+                                        MiniMessageUtils.sendLangMessage("general.failedOverwrite", argsPlayer, placeHolders);
                                     }
                                 } else {
-                                    ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.targetTriedRemoval" : "get.targetTriedGive"), argsPlayer, placeHolders);
+                                    MiniMessageUtils.sendLangMessage("commands." + (remove ? "remove.targetTriedRemoval" : "get.targetTriedGive"), argsPlayer, placeHolders);
                                 }
                             }
                             if (!failedPlayers.contains(argsPlayer.getName())) {
@@ -841,9 +841,9 @@ public class ChatExecutor implements CommandExecutor {
         });
         placeHolders.with(Holder.PLAYERS, handledPlayers.toString().replace("]", "").replace("[", ""));
         if (!handledPlayers.isEmpty()) {
-            ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.removedOnline" : "get.givenOnline"), sender, placeHolders);
+            MiniMessageUtils.sendLangMessage("commands." + (remove ? "remove.removedOnline" : "get.givenOnline"), sender, placeHolders);
         } else if (!failedPlayers.isEmpty()) {
-            ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.onlineFailedInventory" : "get.onlineFailedInventory"), sender, placeHolders);
+            MiniMessageUtils.sendLangMessage("commands." + (remove ? "remove.onlineFailedInventory" : "get.onlineFailedInventory"), sender, placeHolders);
         }
     }
 
@@ -863,7 +863,7 @@ public class ChatExecutor implements CommandExecutor {
             final Player argsPlayer = (args.length >= 2 ? player : (Player) sender);
             final PlaceHolder placeHolders = new PlaceHolder().with(Holder.TARGET_PLAYER, (args.length >= 2 ? args[1] : sender.getName()));
             if (argsPlayer == null) {
-                ItemJoin.getCore().getLang().sendLangMessage("commands.default.noTarget", sender, placeHolders);
+                MiniMessageUtils.sendLangMessage("commands.default.noTarget", sender, placeHolders);
                 return;
             }
             boolean itemGiven = false;
@@ -927,27 +927,27 @@ public class ChatExecutor implements CommandExecutor {
             if (itemGiven && failedCount == 0) {
                 failedPermissions = false;
                 placeHolders.with(Holder.TARGET_PLAYER, sender.getName());
-                ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.removedYou_All" : "get.givenYou_All"), argsPlayer, placeHolders);
+                MiniMessageUtils.sendLangMessage("commands." + (remove ? "remove.removedYou_All" : "get.givenYou_All"), argsPlayer, placeHolders);
                 if (!handledPlayers.contains(argsPlayer.getName()) && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
                     handledPlayers.add(argsPlayer.getName());
                 }
             } else if (!failedPermissions && failedCount == 0) {
                 placeHolders.with(Holder.TARGET_PLAYER, argsPlayer.getName());
                 if (sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
-                    ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.failedInventory_All" : "get.failedInventory_All"), sender, placeHolders);
+                    MiniMessageUtils.sendLangMessage("commands." + (remove ? "remove.failedInventory_All" : "get.failedInventory_All"), sender, placeHolders);
                 } else if (!failedPlayers.contains(argsPlayer.getName())) {
                     failedPlayers.add(argsPlayer.getName());
                 }
                 if (!sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
                     placeHolders.with(Holder.TARGET_PLAYER, sender.getName());
-                    ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.targetTriedGive_All" : "get.targetTriedGive_All"), argsPlayer, placeHolders);
+                    MiniMessageUtils.sendLangMessage("commands." + (remove ? "remove.targetTriedGive_All" : "get.targetTriedGive_All"), argsPlayer, placeHolders);
                 }
             } else if (failedCount > 0) {
                 placeHolders.with(Holder.FAIL_COUNT, String.valueOf(failedCount));
                 if (argsPlayer.getInventory().firstEmpty() == -1) {
-                    ItemJoin.getCore().getLang().sendLangMessage("general.failedInventory", argsPlayer, placeHolders);
+                    MiniMessageUtils.sendLangMessage("general.failedInventory", argsPlayer, placeHolders);
                 } else {
-                    ItemJoin.getCore().getLang().sendLangMessage("general.failedOverwrite", argsPlayer, placeHolders);
+                    MiniMessageUtils.sendLangMessage("general.failedOverwrite", argsPlayer, placeHolders);
                 }
                 if (!failedPermission.contains(argsPlayer.getName()) && !sender.getName().equalsIgnoreCase(argsPlayer.getName())) {
                     failedPermission.add(argsPlayer.getName());
@@ -955,18 +955,18 @@ public class ChatExecutor implements CommandExecutor {
             }
             if (failedPermissions) {
                 placeHolders.with(Holder.TARGET_PLAYER, argsPlayer.getName());
-                ItemJoin.getCore().getLang().sendLangMessage("commands.get." + (!sender.getName().equalsIgnoreCase(argsPlayer.getName()) ? "targetNoPermission_All" : "noPermission_All"), sender, placeHolders);
+                MiniMessageUtils.sendLangMessage("commands.get." + (!sender.getName().equalsIgnoreCase(argsPlayer.getName()) ? "targetNoPermission_All" : "noPermission_All"), sender, placeHolders);
             }
         });
         if (!handledPlayers.isEmpty()) {
             placeHolder.with(Holder.TARGET_PLAYER, handledPlayers.toString().replace("]", "").replace("[", ""));
-            ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.removedTarget_All" : "get.givenTarget_All"), sender, placeHolder);
+            MiniMessageUtils.sendLangMessage("commands." + (remove ? "remove.removedTarget_All" : "get.givenTarget_All"), sender, placeHolder);
         } else if (!failedPlayers.isEmpty()) {
             placeHolder.with(Holder.TARGET_PLAYER, failedPlayers.toString().replace("]", "").replace("[", ""));
-            ItemJoin.getCore().getLang().sendLangMessage("commands." + (remove ? "remove.targetFailedInventory_All" : "get.targetFailedInventory_All"), sender, placeHolder);
+            MiniMessageUtils.sendLangMessage("commands." + (remove ? "remove.targetFailedInventory_All" : "get.targetFailedInventory_All"), sender, placeHolder);
         } else if (!failedPermission.isEmpty()) {
             placeHolder.with(Holder.TARGET_PLAYER, failedPermission.toString().replace("]", "").replace("[", ""));
-            ItemJoin.getCore().getLang().sendLangMessage("commands.get.targetNoPermission_All", sender, placeHolder);
+            MiniMessageUtils.sendLangMessage("commands.get.targetNoPermission_All", sender, placeHolder);
         }
     }
 

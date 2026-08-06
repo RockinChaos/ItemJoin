@@ -26,6 +26,8 @@ import me.RockinChaos.core.utils.StringUtils;
 import me.RockinChaos.core.utils.api.LegacyAPI;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.listeners.Clicking;
+import me.RockinChaos.itemjoin.utils.MiniMessageUtils;
+import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -422,14 +424,17 @@ public class ItemAnimation {
         ItemMeta tempMeta = reviseItem.getItemMeta();
         if (tempMeta != null && reviseItem.getType() != Material.AIR) {
             tempMeta = tempMeta.clone();
-            String itemData = "";
-            if (this.itemMap.getLegacySecret() != null && !this.itemMap.getLegacySecret().isEmpty()) {
+            final String formattedName = ItemHandler.cutDelay(nameString);
+            if (this.itemMap.getLegacySecret() != null && !this.itemMap.getLegacySecret().isEmpty() && !ServerUtils.hasUpdate("1_14")) {
+                String itemData = "";
                 final String encodeData = Objects.requireNonNull(StringUtils.colorEncode(new ItemStack(Material.STICK), this.itemMap.getLegacySecret()).getItemMeta()).getDisplayName();
                 if (!encodeData.isEmpty()) {
                     itemData = ChatColor.COLOR_CHAR + "r" + encodeData;
                 }
+                tempMeta.setDisplayName(MiniMessageUtils.translateLayout(formattedName, player) + itemData);
+            } else {
+                tempMeta.customName(MiniMessageUtils.translateLayoutComponent(formattedName, player));
             }
-            tempMeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(nameString), player) + itemData);
             reviseItem.setItemMeta(tempMeta);
             if (this.itemMap.isDynamicCount()) { // Better but still temporary--implementation for a list of animated item count is planned.
                 reviseItem.setAmount(this.itemMap.getCount(player));
@@ -448,13 +453,12 @@ public class ItemAnimation {
         ItemMeta tempMeta = reviseItem.getItemMeta();
         if (tempMeta != null && reviseItem.getType() != Material.AIR) {
             tempMeta = tempMeta.clone();
-            final List<String> loreFormatList = new ArrayList<>();
+            final List<Component> loreFormatList = new ArrayList<>();
             for (String s : loreString) {
-                String formatLore = ItemHandler.cutDelay(s);
-                formatLore = StringUtils.translateLayout(formatLore, player);
-                loreFormatList.add(formatLore);
+                final String formatLore = ItemHandler.cutDelay(s);
+                loreFormatList.add(MiniMessageUtils.translateLayoutComponent(formatLore, player));
             }
-            tempMeta.setLore(loreFormatList);
+            tempMeta.lore(loreFormatList);
             reviseItem.setItemMeta(tempMeta);
         }
     }

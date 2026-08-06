@@ -34,8 +34,11 @@ import me.RockinChaos.itemjoin.item.ItemDesigner;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
 import me.RockinChaos.itemjoin.item.ItemUtilities.TriggerType;
+import me.RockinChaos.itemjoin.item.provider.ItemProviderRegistry;
+import me.RockinChaos.itemjoin.item.provider.providers.ItemsAdderProvider;
 import me.RockinChaos.itemjoin.listeners.*;
 import me.RockinChaos.itemjoin.listeners.plugins.ChestSortAPI;
+import me.RockinChaos.itemjoin.listeners.plugins.ItemsAdderAPI;
 import me.RockinChaos.itemjoin.listeners.plugins.legacy.Legacy_ChestSortAPI;
 import me.RockinChaos.itemjoin.listeners.triggers.*;
 import me.RockinChaos.itemjoin.utils.api.LegacyAPI;
@@ -500,6 +503,15 @@ public class PluginData {
             ItemJoin.getCore().getSQL();
             ItemJoin.getCore().getData().setDatabaseData(this.getDatabaseData());
             ItemJoin.getCore().getSQL().load();
+        }
+        ItemProviderRegistry.register(new ItemsAdderProvider());
+        if (Bukkit.getPluginManager().getPlugin("ItemsAdder") != null) {
+            if (StringUtils.isRegistered(ItemsAdderAPI.class.getSimpleName())) {
+                ItemJoin.getCore().getPlugin().getServer().getPluginManager().registerEvents(new ItemsAdderAPI(), ItemJoin.getCore().getPlugin());
+                ServerUtils.logInfo("{ItemsAdder} Detected, listening for ItemsAdderLoadDataEvent to refresh externally provided items.");
+            } else {
+                ServerUtils.logWarn("{ItemsAdder} Detected, but the ItemsAdderAPI listener is disabled in the configuration!");
+            }
         }
         new ItemDesigner();
         run(() -> {

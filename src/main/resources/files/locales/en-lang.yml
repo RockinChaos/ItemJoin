@@ -1,5 +1,8 @@
 # --{ =-=-=-=-=-=-=-=-=-= ItemJoin's English Language file, by RockinChaos =-=-=-=-=-=-=-=-=-= }--
 # If you don't want a message to be sent, fully remove it from below or make it blank.
+# MiniMessage tags (e.g. <gradient:#CC3938:#AA1A2A>, <bold>, <#RRGGBB>) are supported inline
+# alongside classic '&' color codes in this file and in items.yml names/lores.
+# See: https://docs.advntr.dev/minimessage/format.html
 
 # Modifying this will cause the file to break and regenerate.
 en-Version: 8

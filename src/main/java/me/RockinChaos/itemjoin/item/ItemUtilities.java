@@ -26,6 +26,7 @@ import me.RockinChaos.core.utils.types.PlaceHolder.Holder;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.item.ItemCommand.Executor;
+import me.RockinChaos.itemjoin.utils.MiniMessageUtils;
 import me.RockinChaos.itemjoin.utils.api.GuardAPI;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
 import me.RockinChaos.itemjoin.utils.sql.DataObject.Table;
@@ -195,6 +196,29 @@ public class ItemUtilities {
         for (ItemMap item : this.getItems()) {
             item.updateItem(player);
             item.setAnimations(player);
+        }
+    }
+
+    /**
+     * Refreshes any already-held ItemStack that is sourced from an external Item Provider
+     * (e.g. ItemsAdder) for ALL Online Players, replacing stale copies given out before the
+     * provider plugin finished loading its registry.
+     */
+    public void refreshExternalItems() {
+        PlayerHandler.forOnlinePlayers(this::refreshExternalItems);
+    }
+
+    /**
+     * Refreshes any already-held ItemStack that is sourced from an external Item Provider
+     * (e.g. ItemsAdder) for the specified Player.
+     *
+     * @param player - The Player having their held ItemStack(s) refreshed.
+     */
+    private void refreshExternalItems(final Player player) {
+        for (ItemMap item : this.getItems()) {
+            if (item.getExternalItemProvider() != null) {
+                item.refreshExternalItem(player);
+            }
         }
     }
 
@@ -678,9 +702,9 @@ public class ItemUtilities {
                         TimerUtils.setExpiry("wg_failed", new CompositeKey(player.getUniqueId(), region), 20, TimeUnit.MINUTES);
                     }
                     if ((overWrite != null && StringUtils.containsLocation(player.getWorld().getName(), overWrite.replace(" ", "")))) {
-                        ItemJoin.getCore().getLang().sendLangMessage("general.failedInventory", player, placeHolders);
+                        MiniMessageUtils.sendLangMessage("general.failedInventory", player, placeHolders);
                     } else {
-                        ItemJoin.getCore().getLang().sendLangMessage("general.failedOverwrite", player, placeHolders);
+                        MiniMessageUtils.sendLangMessage("general.failedOverwrite", player, placeHolders);
                     }
                 }
                 this.failCount.remove(session);

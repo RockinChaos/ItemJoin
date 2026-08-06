@@ -17,6 +17,9 @@ items:
   devine-item:
     id: DIAMOND_SWORD
     slot: 0
+    # name/lore support MiniMessage tags alongside classic '&' codes, e.g.
+    # '<gradient:#CC3938:#AA1A2A>Hyper Elytra</gradient>' or '<bold>Hyper</bold>'.
+    # See: https://docs.advntr.dev/minimessage/format.html
     name: '&bBlazefury'
     lore:
       - '&7A devine sword.'

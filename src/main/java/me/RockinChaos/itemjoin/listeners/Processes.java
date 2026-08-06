@@ -29,6 +29,7 @@ import me.RockinChaos.core.utils.types.PlaceHolder.Holder;
 import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.utils.MiniMessageUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -58,7 +59,7 @@ public class Processes implements Listener {
                 event.setCancelled(true);
                 ServerUtils.logDebug("{Processes} " + player.getName() + " tried to perform the command " + command + " on the item " + itemMap.getConfigName() + " but was blocked by the itemflag not-hat.");
                 final PlaceHolder placeHolders = new PlaceHolder().with(Holder.TARGET_PLAYER, player.getName()).with(Holder.ITEM, itemMap.getConfigName()).with(Holder.COMMAND, command);
-                ItemJoin.getCore().getLang().sendLangMessage("commands.item.badCommand", player, placeHolders);
+                MiniMessageUtils.sendLangMessage("commands.item.badCommand", player, placeHolders);
                 final String flagMessage = itemMap.getFlagMessages().get("not-hat");
                 if (flagMessage != null && TimerUtils.isExpired("not-hat-message", player.getUniqueId())) {
                     player.sendMessage(StringUtils.translateLayout(flagMessage, player));

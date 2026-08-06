@@ -1,4 +1,7 @@
 # --{ =-=-=-=-=-=-=-=-=-= ItemJoin's Русская локализация, от Sharper =-=-=-=-=-=-=-=-=-= }--
+# MiniMessage tags (e.g. <gradient:#CC3938:#AA1A2A>, <bold>, <#RRGGBB>) are supported inline
+# alongside classic '&' color codes in this file and in items.yml names/lores.
+# See: https://docs.advntr.dev/minimessage/format.html
 # Если вы не хотите, чтобы сообщение было отправлено, полностью удалите его снизу или оставьте его пустым.
 
 # Изменение этого приведет к поломке и восстановлению файла.

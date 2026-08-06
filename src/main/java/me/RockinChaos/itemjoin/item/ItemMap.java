@@ -32,7 +32,11 @@ import me.RockinChaos.itemjoin.ItemJoin;
 import me.RockinChaos.itemjoin.PluginData;
 import me.RockinChaos.itemjoin.item.ItemCommand.Action;
 import me.RockinChaos.itemjoin.item.ItemCommand.CommandSequence;
+import me.RockinChaos.itemjoin.item.provider.ItemProvider;
+import me.RockinChaos.itemjoin.item.provider.ItemProviderRegistry;
 import me.RockinChaos.itemjoin.listeners.Interact;
+import me.RockinChaos.itemjoin.utils.MiniMessageUtils;
+import net.kyori.adventure.text.Component;
 import me.RockinChaos.itemjoin.utils.api.EffectAPI;
 import me.RockinChaos.itemjoin.utils.menus.Menu;
 import me.RockinChaos.itemjoin.utils.sql.DataObject;
@@ -111,6 +115,8 @@ public class ItemMap implements Cloneable {
     private String skullOwner = null;
     private String skullTexture = null;
     private boolean headDatabase = false;
+    private String externalItemProvider = null;
+    private String externalItemKey = null;
     private List<PotionEffect> effect = new ArrayList<>();
     private List<Pattern> bannerPatterns = new ArrayList<>();
     private Map<String, String> trimPattern = new HashMap<>();
@@ -890,9 +896,9 @@ public class ItemMap implements Cloneable {
         if (this.customName != null && !this.customName.equalsIgnoreCase(ItemHandler.getMaterialName(this.tempItem))) {
             if (this.legacySecret != null && !ServerUtils.hasUpdate("1_14")) {
                 final String itemData = this.tempMeta.getDisplayName();
-                this.tempMeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(this.customName), player) + ChatColor.COLOR_CHAR + "r" + itemData);
+                this.tempMeta.setDisplayName(MiniMessageUtils.translateLayout(ItemHandler.cutDelay(this.customName), player) + ChatColor.COLOR_CHAR + "r" + itemData);
             } else {
-                this.tempMeta.setDisplayName(StringUtils.translateLayout(ItemHandler.cutDelay(this.customName), player));
+                this.tempMeta.customName(MiniMessageUtils.translateLayoutComponent(ItemHandler.cutDelay(this.customName), player));
             }
         }
     }
@@ -942,13 +948,12 @@ public class ItemMap implements Cloneable {
     private void setCustomLore(final Player player) {
         if (this.customLore != null && !this.customLore.isEmpty()) {
             List<String> loreList = this.customLore;
-            List<String> loreFormatList = new ArrayList<>();
+            List<Component> loreFormatList = new ArrayList<>();
             for (String s : loreList) {
                 String formatLore = ItemHandler.cutDelay(s);
-                formatLore = StringUtils.translateLayout(formatLore, player);
-                loreFormatList.add(formatLore);
+                loreFormatList.add(MiniMessageUtils.translateLayoutComponent(formatLore, player));
             }
-            this.tempMeta.setLore(loreFormatList);
+            this.tempMeta.lore(loreFormatList);
         }
     }
 
@@ -2800,6 +2805,42 @@ public class ItemMap implements Cloneable {
     }
 
     /**
+     * Gets the name of the external Item Provider supplying this item, if any.
+     *
+     * @return The Provider name, or null if none is set.
+     */
+    public String getExternalItemProvider() {
+        return this.externalItemProvider;
+    }
+
+    /**
+     * Sets the name of the external Item Provider supplying this item.
+     *
+     * @param provider - The value to be set.
+     */
+    public void setExternalItemProvider(final String provider) {
+        this.externalItemProvider = provider;
+    }
+
+    /**
+     * Gets the lookup key passed to the external Item Provider.
+     *
+     * @return The Provider lookup key, or null if none is set.
+     */
+    public String getExternalItemKey() {
+        return this.externalItemKey;
+    }
+
+    /**
+     * Sets the lookup key passed to the external Item Provider.
+     *
+     * @param key - The value to be set.
+     */
+    public void setExternalItemKey(final String key) {
+        this.externalItemKey = key;
+    }
+
+    /**
      * Checks if you give on join is enabled.
      *
      * @return If it is enabled.
@@ -4193,7 +4234,9 @@ public class ItemMap implements Cloneable {
         if ((item != null && item.getType() != Material.AIR && item.getType() == this.material) || (this.materialAnimated && item != null && item.getType() != Material.AIR && this.isMaterial(item))) {
             if (this.vanillaControl || this.vanillaStatus || (ItemJoin.getCore().getData().dataTagsEnabled() && ItemHandler.getNBTData(item, PluginData.getInfo().getNBTList()) != null && Objects.requireNonNull(ItemHandler.getNBTData(item, PluginData.getInfo().getNBTList())).equalsIgnoreCase(this.getConfigName()))
                     || (this.legacySecret != null && item.hasItemMeta() && (ServerUtils.hasUpdate("1_14") || (!ServerUtils.hasUpdate("1_14") && Objects.requireNonNull(item.getItemMeta()).hasDisplayName()))
-                    && Objects.requireNonNull(StringUtils.colorDecode(item)).contains(this.legacySecret))) {
+                    && Objects.requireNonNull(StringUtils.colorDecode(item)).contains(this.legacySecret))
+                    || (this.externalItemProvider != null && this.externalItemKey != null && ItemProviderRegistry.get(this.externalItemProvider) != null
+                    && ItemProviderRegistry.get(this.externalItemProvider).matches(item, this.externalItemKey))) {
                 if (this.isEnchantSimilar(player, item) || !Objects.requireNonNull(item.getItemMeta()).hasEnchants() && this.enchants.isEmpty() || this.isItemChangeable()) {
                     if (this.material.toString().toUpperCase().contains("BOOK")
                             && (this.isBookMeta(player, item)
@@ -4397,6 +4440,7 @@ public class ItemMap implements Cloneable {
     public ItemMap updateItem(final Player player, final boolean... caughtError) {
         try {
             if (this.tempItem != null) {
+                this.setExternalItem();
                 this.setSkullDatabase();
                 this.setUnbreaking();
                 this.setEnchantments(player);
@@ -4449,6 +4493,82 @@ public class ItemMap implements Cloneable {
         if (this.glowing) {
             ItemHandler.setGlowing(this.tempItem);
         }
+    }
+
+    /**
+     * Sets the ItemStack to the real, live item sourced from an external Item Provider (e.g. ItemsAdder),
+     * resolved fresh on every update so changes to the source item are reflected without reloading ItemJoin.
+     */
+    private void setExternalItem() {
+        if (this.externalItemProvider != null && this.externalItemKey != null) {
+            final ItemProvider provider = ItemProviderRegistry.get(this.externalItemProvider);
+            if (provider != null) {
+                final ItemStack provided = provider.provide(this.externalItemKey);
+                this.tempItem = (provided != null ? provided : this.tempItem.clone());
+            }
+        }
+    }
+
+    /**
+     * Re-resolves this ItemMap against its external Item Provider (e.g. ItemsAdder) and
+     * replaces any matching ItemStack already held by the Player with the freshly resolved version.
+     * Needed because items handed out before the provider plugin finished loading its registry
+     * (e.g. during server startup) can be missing data such as tooltips, that only becomes
+     * available once the provider is fully initialized.
+     *
+     * @param player - The Player having their held ItemStack(s) refreshed.
+     */
+    public void refreshExternalItem(final Player player) {
+        if (this.externalItemProvider == null || this.externalItemKey == null) {
+            return;
+        }
+        this.updateItem(player);
+        final PlayerInventory inv = player.getInventory();
+        final ItemStack[] contents = inv.getContents();
+        for (int k = 0; k < contents.length; k++) {
+            if (this.isSimilar(player, contents[k])) {
+                inv.setItem(k, this.refreshedCopy(contents[k].getAmount()));
+            }
+        }
+        if (this.isSimilar(player, inv.getHelmet())) {
+            inv.setHelmet(this.refreshedCopy(inv.getHelmet().getAmount()));
+        }
+        if (this.isSimilar(player, inv.getChestplate())) {
+            inv.setChestplate(this.refreshedCopy(inv.getChestplate().getAmount()));
+        }
+        if (this.isSimilar(player, inv.getLeggings())) {
+            inv.setLeggings(this.refreshedCopy(inv.getLeggings().getAmount()));
+        }
+        if (this.isSimilar(player, inv.getBoots())) {
+            inv.setBoots(this.refreshedCopy(inv.getBoots().getAmount()));
+        }
+        if (this.isSimilar(player, player.getItemOnCursor())) {
+            player.setItemOnCursor(this.refreshedCopy(player.getItemOnCursor().getAmount()));
+        }
+        if (ServerUtils.hasUpdate("1_9") && this.isSimilar(player, PlayerHandler.getOffHandItem(player))) {
+            PlayerHandler.setOffHandItem(player, this.refreshedCopy(PlayerHandler.getOffHandItem(player).getAmount()));
+        }
+        if (PlayerHandler.isCraftingInv(player)) {
+            final Inventory topInventory = CompatUtils.getTopInventory(player);
+            final ItemStack[] craftingContents = topInventory.getContents();
+            for (int k = 0; k < craftingContents.length; k++) {
+                if (this.isSimilar(player, craftingContents[k])) {
+                    topInventory.setItem(k, this.refreshedCopy(craftingContents[k].getAmount()));
+                }
+            }
+        }
+    }
+
+    /**
+     * Clones the current temporary ItemStack with the specified stack size.
+     *
+     * @param amount - The stack size to apply to the copy.
+     * @return The cloned ItemStack.
+     */
+    private ItemStack refreshedCopy(final int amount) {
+        final ItemStack copy = this.tempItem.clone();
+        copy.setAmount(amount);
+        return copy;
     }
 
     /**
@@ -5406,18 +5526,18 @@ public class ItemMap implements Cloneable {
         if (warmCount != 0) {
             if (itemMap.warmDelay == warmCount) {
                 final PlaceHolder placeHolders = new PlaceHolder().with(Holder.TIME_LEFT, String.valueOf(warmCount)).with(Holder.WORLD, player.getWorld().getName()).with(Holder.ITEM, StringUtils.translateLayout(itemMap.getCustomName(), player));
-                ItemJoin.getCore().getLang().sendLangMessage("general.warmingUp", player, placeHolders);
+                MiniMessageUtils.sendLangMessage("general.warmingUp", player, placeHolders);
                 itemMap.addWarmPending(player);
             }
             SchedulerUtils.runLater(20L, () -> {
                 if (itemMap.warmLocation(player, location, action)) {
                     final PlaceHolder placeHolders = new PlaceHolder().with(Holder.TIME_LEFT, String.valueOf(warmCount)).with(Holder.WORLD, player.getWorld().getName()).with(Holder.ITEM, StringUtils.translateLayout(itemMap.getCustomName(), player));
-                    ItemJoin.getCore().getLang().sendLangMessage("general.warmingTime", player, placeHolders);
+                    MiniMessageUtils.sendLangMessage("general.warmingTime", player, placeHolders);
                     itemMap.warmCycle(player, altPlayer, itemMap, (warmCount - 1), location, itemCopy, action, clickType, slot);
                 } else {
                     itemMap.delWarmPending(player);
                     final PlaceHolder placeHolders = new PlaceHolder().with(Holder.TIME_LEFT, String.valueOf(warmCount)).with(Holder.WORLD, player.getWorld().getName()).with(Holder.ITEM, StringUtils.translateLayout(itemMap.getCustomName(), player));
-                    ItemJoin.getCore().getLang().sendLangMessage("general.warmingHalted", player, placeHolders);
+                    MiniMessageUtils.sendLangMessage("general.warmingHalted", player, placeHolders);
                 }
             });
         } else {
@@ -5440,7 +5560,7 @@ public class ItemMap implements Cloneable {
                     }
                 } else {
                     final PlaceHolder placeHolders = new PlaceHolder().with(Holder.TIME_LEFT, String.valueOf(warmCount)).with(Holder.WORLD, player.getWorld().getName()).with(Holder.ITEM, StringUtils.translateLayout(itemMap.getCustomName(), player));
-                    ItemJoin.getCore().getLang().sendLangMessage("general.warmingHalted", player, placeHolders);
+                    MiniMessageUtils.sendLangMessage("general.warmingHalted", player, placeHolders);
                 }
                 if (itemMap.warmDelay != 0) {
                     itemMap.delWarmPending(player);
@@ -5615,7 +5735,7 @@ public class ItemMap implements Cloneable {
                 return true;
             } else {
                 final PlaceHolder placeHolders = new PlaceHolder().with(Holder.COST, String.valueOf(commandCost)).with(Holder.BALANCE, String.valueOf(balance));
-                ItemJoin.getCore().getLang().sendLangMessage("general.econFailed", player, placeHolders);
+                MiniMessageUtils.sendLangMessage("general.econFailed", player, placeHolders);
                 return false;
             }
         } else if (materialCost) {
@@ -5678,7 +5798,7 @@ public class ItemMap implements Cloneable {
             }
             formatCost = new StringBuilder(formatCost.substring(0, formatCost.length() - 1));
             final PlaceHolder placeHolders = new PlaceHolder().with(Holder.ITEM_TYPE, formatCost.toString()).with(Holder.COST, String.valueOf(commandCost == 0 ? 1 : commandCost)).with(Holder.BALANCE, String.valueOf(foundAmount));
-            ItemJoin.getCore().getLang().sendLangMessage("general.itemFailed", player, placeHolders);
+            MiniMessageUtils.sendLangMessage("general.itemFailed", player, placeHolders);
             return false;
         }
         return true;
@@ -5738,7 +5858,7 @@ public class ItemMap implements Cloneable {
         }
         formatCost = new StringBuilder(formatCost.substring(0, formatCost.length() - 1));
         final PlaceHolder placeHolders = new PlaceHolder().with(Holder.ITEM_TYPE, formatCost.toString()).with(Holder.COST, String.valueOf(commandCost == 0 ? 1 : commandCost));
-        ItemJoin.getCore().getLang().sendLangMessage("general.itemSuccess", player, placeHolders);
+        MiniMessageUtils.sendLangMessage("general.itemSuccess", player, placeHolders);
     }
 
     /**
@@ -5759,7 +5879,7 @@ public class ItemMap implements Cloneable {
                         ServerUtils.sendDebugTrace(e);
                     }
                     final PlaceHolder placeHolders = new PlaceHolder().with(Holder.COST, String.valueOf(commandCost)).with(Holder.BALANCE, String.valueOf(balance));
-                    ItemJoin.getCore().getLang().sendLangMessage("general.econSuccess", player, placeHolders);
+                    MiniMessageUtils.sendLangMessage("general.econSuccess", player, placeHolders);
                 }
             }
         }
@@ -5892,7 +6012,7 @@ public class ItemMap implements Cloneable {
                 this.storedSpammedPlayers.put(PlayerHandler.getPlayerID(player) + ".items." + this.configName, System.currentTimeMillis());
                 if (this.cooldownMessage != null && !this.cooldownMessage.isEmpty()) {
                     int timeLeft = (int) (this.interactCooldown - ((System.currentTimeMillis() - playersCooldownList) / 1000));
-                    player.sendMessage(StringUtils.translateLayout(this.cooldownMessage.replace("%timeleft%", String.valueOf(timeLeft)).replace("%item%", this.customName), player));
+                    player.sendMessage(StringUtils.translateLayout(this.cooldownMessage.replace("%timeleft%", String.valueOf(timeLeft)).replace("%item%", this.configName), player));
                 }
             }
             return true;
@@ -5934,7 +6054,7 @@ public class ItemMap implements Cloneable {
             if (System.currentTimeMillis() - playersCooldownList >= this.cooldownSeconds * 1000L) {
                 return false;
             } else if (this.onCooldownTick(player)) {
-                String cooldownMsg = this.cooldownMessage != null ? (this.cooldownMessage.replace("%timeleft%", String.valueOf((this.cooldownSeconds - ((System.currentTimeMillis() - playersCooldownList) / 1000)))).replace("%item%", this.customName).replace("%itemraw%", Objects.requireNonNull(ItemHandler.getMaterialName(this.tempItem)))) : null;
+                String cooldownMsg = this.cooldownMessage != null ? (this.cooldownMessage.replace("%timeleft%", String.valueOf((this.cooldownSeconds - ((System.currentTimeMillis() - playersCooldownList) / 1000)))).replace("%item%", this.configName).replace("%itemraw%", Objects.requireNonNull(ItemHandler.getMaterialName(this.tempItem)))) : null;
                 if (cooldownMsg != null && !this.cooldownMessage.isEmpty()) {
                     cooldownMsg = StringUtils.translateLayout(cooldownMsg, player);
                     player.sendMessage(cooldownMsg);
