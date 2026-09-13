@@ -35,12 +35,13 @@ import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class ItemUtilities {
     private static ItemUtilities utilities;
-    private final HashMap<Integer, Integer> failCount = new HashMap<>();
-    private final HashMap<String, ItemStatistics> itemStats = new HashMap<>();
+    private final Map<Integer, Integer> failCount = new ConcurrentHashMap<>();
+    private final Map<String, ItemStatistics> itemStats = new ConcurrentHashMap<>();
     private List<ItemMap> items = new ArrayList<>();
     private List<ItemMap> craftingItems = new ArrayList<>();
     private List<ItemMap> recipeItems = new ArrayList<>();
@@ -244,7 +245,7 @@ public class ItemUtilities {
         this.setStatistics(player);
         this.safeSet(player, world, type, targetRegion, regions);
         if (this.getItemDelay() != 0 && type != TriggerType.LIMIT_SWITCH && type != TriggerType.REGION_ENTER && type != TriggerType.REGION_LEAVE) {
-            SchedulerUtils.runLater(this.getItemDelay(), () -> {
+            SchedulerUtils.runPlayerLater(player, this.getItemDelay(), () -> {
                 PluginData.getInfo().restoreCraftItems(player, type);
                 {
                     this.handleItems(player, world, type, player.getGameMode(), targetRegion, regions);
@@ -669,7 +670,7 @@ public class ItemUtilities {
      * @param region  - The region the player is in.
      */
     public void sendFailCount(final Player player, final int session, final TriggerType type, final String region) {
-        SchedulerUtils.runAsync(() -> {
+        SchedulerUtils.runPlayerLater(player, 1L, () -> {
             if (this.failCount.get(session) != null && this.failCount.get(session) != 0) {
                 String overWrite = ItemJoin.getCore().getConfig("items.yml").getString("items-Overwrite");
                 final PlaceHolder placeHolders = new PlaceHolder().with(Holder.FAIL_COUNT, this.failCount.get(session).toString());

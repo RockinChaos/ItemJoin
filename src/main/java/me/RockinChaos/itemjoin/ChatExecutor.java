@@ -1062,7 +1062,7 @@ public class ChatExecutor implements CommandExecutor {
          * @param args   - Passed command arguments.
          */
         public boolean playerRequired(final CommandSender sender, final String[] args) {
-            return (!this.player || (!(sender instanceof ConsoleCommandSender))
+            return (!this.player || sender instanceof Player
                     || ((this.equals(Execute.GETALL) || this.equals(Execute.REMOVEALL)) && args.length >= 2)
                     || ((this.equals(Execute.GET) || this.equals(Execute.REMOVE)) && !(((args.length == 3 && PlayerHandler.getPlayerString(args[2]) == null && StringUtils.isInt(args[2])) || args.length == 2))));
         }

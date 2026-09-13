@@ -39,10 +39,12 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Projectile implements Listener {
 
-    private final HashMap<Integer, ItemStack> projectileList = new HashMap<>();
+    private final Map<Integer, ItemStack> projectileList = new ConcurrentHashMap<>();
 
     /**
      * Refills the players projectile item to its original stack size when consuming the item.
@@ -55,9 +57,9 @@ public class Projectile implements Listener {
         if (ServerUtils.hasUpdate("1_16") && entity instanceof Player && event.getBow() != null) {
             final ItemStack consumable = (event.getConsumable() != null ? event.getConsumable().clone() : event.getConsumable());
             final Player player = (Player) event.getEntity();
-            this.projectileList.put(event.getProjectile().getEntityId(), consumable);
+            this.trackProjectile(event.getProjectile().getEntityId(), consumable);
             if (!event.getBow().getType().name().equalsIgnoreCase("CROSSBOW") && !ItemUtilities.getUtilities().isAllowed(player, consumable, "count-lock")) {
-                SchedulerUtils.runLater(1L, () -> {
+                SchedulerUtils.runPlayerLater(player, 1L, () -> {
                     boolean setConsumable = false;
                     for (final ItemStack item : player.getInventory()) {
                         if (item != null && item.isSimilar(consumable)) {
@@ -86,11 +88,11 @@ public class Projectile implements Listener {
                     map.put(i, cloneStack);
                 }
             }
-            SchedulerUtils.runLater(2L, () -> {
+            SchedulerUtils.runPlayerLater(player, 2L, () -> {
                 for (Integer key : map.keySet()) {
                     final ItemStack item = player.getInventory().getItem(key);
                     if (item == null || item.getAmount() != map.get(key).getAmount()) {
-                        this.projectileList.put(event.getProjectile().getEntityId(), map.get(key));
+                        this.trackProjectile(event.getProjectile().getEntityId(), map.get(key));
                         if (!ItemUtilities.getUtilities().isAllowed(player, map.get(key), "count-lock")) {
                             player.getInventory().setItem(key, map.get(key));
                         }
@@ -102,6 +104,19 @@ public class Projectile implements Listener {
     }
 
     /**
+     * Tracks custom projectiles only for as long as we can retain an arrow.
+     *
+     * @param projectileId - The Entity ID of the projectile.
+     * @param item         - The ItemStack of the projectile.
+     */
+    private void trackProjectile(final int projectileId, final ItemStack item) {
+        if (item != null && ItemUtilities.getUtilities().getItemMap(item) != null) {
+            this.projectileList.put(projectileId, item);
+            SchedulerUtils.runLater(1_200L, () -> this.projectileList.remove(projectileId, item));
+        }
+    }
+
+    /**
      * Teleports the Player to the custom projectile's landed position.
      *
      * @param event - ProjectileHitEvent
@@ -109,48 +124,50 @@ public class Projectile implements Listener {
     @EventHandler(priority = EventPriority.NORMAL)
     public void onProjectileHit(ProjectileHitEvent event) {
         final org.bukkit.entity.Projectile projectile = event.getEntity();
-        if (projectile.getShooter() instanceof Player) {
-            if (this.projectileList.get(projectile.getEntityId()) != null && !ItemUtilities.getUtilities().isAllowed((Player) projectile.getShooter(), this.projectileList.get(projectile.getEntityId()), "teleport")) {
-                final Player player = (Player) projectile.getShooter();
-                final Location location = projectile.getLocation();
-                final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(this.projectileList.get(projectile.getEntityId()));
-                location.setPitch(player.getLocation().getPitch());
-                location.setYaw(player.getLocation().getYaw());
-                player.teleport(location);
-                if (itemMap.getTeleportEffect() != null) {
-                    try {
-                        projectile.getWorld().playEffect(projectile.getLocation(), Effect.valueOf(itemMap.getTeleportEffect()), 15);
-                    } catch (Exception e) {
-                        ServerUtils.logSevere("{Projectile} The defined teleport-effect " + itemMap.getTeleportEffect() + " for the item " + itemMap.getConfigName() + " is not valid!");
-                    }
+        final ItemStack projectileItem = this.projectileList.remove(projectile.getEntityId());
+        if (projectile.getShooter() instanceof Player && projectileItem != null && !ItemUtilities.getUtilities().isAllowed((Player) projectile.getShooter(), projectileItem, "teleport")) {
+            final Player player = (Player) projectile.getShooter();
+            final Location location = projectile.getLocation();
+            final ItemMap itemMap = ItemUtilities.getUtilities().getItemMap(projectileItem);
+            if (itemMap == null) {
+                return;
+            }
+            location.setPitch(player.getLocation().getPitch());
+            location.setYaw(player.getLocation().getYaw());
+            player.teleport(location);
+            if (itemMap.getTeleportEffect() != null) {
+                try {
+                    projectile.getWorld().playEffect(projectile.getLocation(), Effect.valueOf(itemMap.getTeleportEffect()), 15);
+                } catch (Exception e) {
+                    ServerUtils.logSevere("{Projectile} The defined teleport-effect " + itemMap.getTeleportEffect() + " for the item " + itemMap.getConfigName() + " is not valid!");
                 }
-                final String teleportSound = itemMap.getTeleportSound();
-                if (teleportSound != null && !teleportSound.isEmpty()) {
-                    float teleportVolume = (float) ((double) itemMap.getTeleportVolume());
-                    float teleportPitch = (float) ((double) itemMap.getTeleportPitch());
+            }
+            final String teleportSound = itemMap.getTeleportSound();
+            if (teleportSound != null && !teleportSound.isEmpty()) {
+                float teleportVolume = (float) ((double) itemMap.getTeleportVolume());
+                float teleportPitch = (float) ((double) itemMap.getTeleportPitch());
+                try {
+                    projectile.getWorld().playSound(projectile.getLocation(), (Sound) CompatUtils.valueOf(Sound.class, teleportSound), teleportVolume, teleportPitch);
+                } catch (Exception e) {
                     try {
-                        projectile.getWorld().playSound(projectile.getLocation(), (Sound) CompatUtils.valueOf(Sound.class, teleportSound), teleportVolume, teleportPitch);
-                    } catch (Exception e) {
+                        projectile.getWorld().playSound(projectile.getLocation(), teleportSound, teleportVolume, teleportPitch);
+                    } catch (Exception e2) {
                         try {
-                            projectile.getWorld().playSound(projectile.getLocation(), teleportSound, teleportVolume, teleportPitch);
-                        } catch (Exception e2) {
+                            projectile.getWorld().playSound(projectile.getLocation(), teleportSound.toLowerCase(), teleportVolume, teleportPitch);
+                        } catch (Exception e3) {
                             try {
-                                projectile.getWorld().playSound(projectile.getLocation(), teleportSound.toLowerCase(), teleportVolume, teleportPitch);
-                            } catch (Exception e3) {
-                                try {
-                                    projectile.getWorld().playSound(projectile.getLocation(), teleportSound.toUpperCase(), teleportVolume, teleportPitch);
-                                } catch (Exception e4) {
-                                    ServerUtils.logSevere("{Projectile} The defined teleport-sound " + teleportSound + " for the item " + itemMap.getConfigName() + " is not valid in Minecraft" + ServerUtils.getVersion() + ". NOTE: Custom sounds are case-sensitive!");
-                                    if (ServerUtils.hasUpdate("1_21_3")) {
-                                        ServerUtils.logSevere("{ItemMap} See the Minecraft Wiki for a list of command sounds https://minecraft.fandom.com/wiki/Sounds.json/Java_Edition_values");
-                                    }
+                                projectile.getWorld().playSound(projectile.getLocation(), teleportSound.toUpperCase(), teleportVolume, teleportPitch);
+                            } catch (Exception e4) {
+                                ServerUtils.logSevere("{Projectile} The defined teleport-sound " + teleportSound + " for the item " + itemMap.getConfigName() + " is not valid in Minecraft" + ServerUtils.getVersion() + ". NOTE: Custom sounds are case-sensitive!");
+                                if (ServerUtils.hasUpdate("1_21_3")) {
+                                    ServerUtils.logSevere("{ItemMap} See the Minecraft Wiki for a list of command sounds https://minecraft.fandom.com/wiki/Sounds.json/Java_Edition_values");
                                 }
                             }
                         }
                     }
                 }
-                projectile.remove();
             }
+            projectile.remove();
         }
     }
 
@@ -189,7 +206,7 @@ public class Projectile implements Listener {
      */
     public void crossyAction(Player player, HashMap<Integer, ItemStack> map, int tries) {
         if (tries != 0) {
-            SchedulerUtils.runLater(26L, () -> {
+            SchedulerUtils.runPlayerLater(player, 26L, () -> {
                 boolean projectileReturned = false;
                 for (Integer key : map.keySet()) {
                     final ItemStack item = player.getInventory().getItem(key);

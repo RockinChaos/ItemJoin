@@ -30,14 +30,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerGuard implements Listener {
-    private final HashMap<Player, String> fromRegions = new HashMap<>();
-    private final List<Player> movementCooldown = new ArrayList<>();
-    private final List<Player> changeCooldown = new ArrayList<>();
+    private final Map<UUID, String> fromRegions = new ConcurrentHashMap<>();
+    private final Set<UUID> movementCooldown = ConcurrentHashMap.newKeySet();
+    private final Set<UUID> changeCooldown = ConcurrentHashMap.newKeySet();
 
     /**
      * Called on player movement.
@@ -47,14 +49,13 @@ public class PlayerGuard implements Listener {
      * @param event PlayerMoveEvent
      */
     @EventHandler(ignoreCancelled = true)
-    private void setRegionItems(PlayerMoveEvent event) {
+    private void setRegionItems(final PlayerMoveEvent event) {
         final Player player = event.getPlayer();
-        if (event.getTo() != null && event.getFrom().getBlockX() == event.getTo().getBlockX() && event.getFrom().getBlockY() == event.getTo().getBlockY() && event.getFrom().getBlockZ() == event.getTo().getBlockZ() && Objects.equals(event.getFrom().getWorld(), event.getTo().getWorld())) { return; }
-        SchedulerUtils.runAsync(() -> {
-            if (PlayerHandler.isPlayer(player) && !this.onMovementCooldown(player) && PluginData.getInfo().isEnabled(player, "ALL")) {
-                this.handleRegions(player, player.getLocation(), true, event.getFrom());
-            }
-        });
+        if (event.getTo() == null) { return; }
+        if (event.getFrom().getBlockX() == event.getTo().getBlockX() && event.getFrom().getBlockY() == event.getTo().getBlockY() && event.getFrom().getBlockZ() == event.getTo().getBlockZ() && Objects.equals(event.getFrom().getWorld(), event.getTo().getWorld())) { return; }
+        if (PlayerHandler.isPlayer(player) && !this.onMovementCooldown(player) && PluginData.getInfo().isEnabled(player, "ALL")) {
+            this.handleRegions(player, event.getTo(), true, event.getFrom());
+        }
     }
 
     /**
@@ -65,12 +66,25 @@ public class PlayerGuard implements Listener {
      * @param event PlayerTeleportEvent
      */
     @EventHandler(ignoreCancelled = true)
-    private void setRegionItems(PlayerTeleportEvent event) {
+    private void setRegionItems(final PlayerTeleportEvent event) {
         final Player player = event.getPlayer();
         if (PlayerHandler.isPlayer(player) && PluginData.getInfo().isEnabled(player, "ALL")) {
             this.handleRegions(player, event.getTo(), false, event.getFrom());
         }
         ServerUtils.logDebug("{ItemMap} " + player.getName() + " has performed A REGION trigger by teleporting.");
+    }
+
+    /**
+     * Clears cached player state once the player leaves the server.
+     *
+     * @param event PlayerQuitEvent
+     */
+    @EventHandler
+    private void clearPlayerState(final PlayerQuitEvent event) {
+        final UUID playerId = event.getPlayer().getUniqueId();
+        this.fromRegions.remove(playerId);
+        this.movementCooldown.remove(playerId);
+        this.changeCooldown.remove(playerId);
     }
 
     /**
@@ -82,40 +96,37 @@ public class PlayerGuard implements Listener {
     private void handleRegions(final Player player, final Location location, final boolean async, final Location fromLocation) {
         final String regionList = ItemJoin.getCore().getDependencies().getGuard().getRegionAtLocation(location);
         final List<String> regions = Arrays.asList((regionList + ", GLOBAL").replace(" ", "").split(","));
-        List<String> prevRegions = this.fromRegions.get(player) != null ? Arrays.asList(this.fromRegions.get(player).replace(" ", "").split(",")) : Collections.emptyList();
-        if (!regionList.equals(this.fromRegions.get(player) != null ? this.fromRegions.get(player) : "") || !this.onChangedCooldown(player) || !async) {
+        final UUID playerId = player.getUniqueId();
+        final String previousRegionList = this.fromRegions.get(playerId);
+        List<String> prevRegions = previousRegionList != null ? Arrays.asList(previousRegionList.replace(" ", "").split(",")) : Collections.emptyList();
+        if (!regionList.equals(previousRegionList != null ? previousRegionList : "") || !this.onChangedCooldown(player) || !async) {
             if (!prevRegions.isEmpty()) {
                 for (String region : prevRegions) {
                     if (!region.isEmpty()) {
-                        runAuth(async, player, fromLocation.getWorld(), TriggerType.REGION_LEAVE, region, regions);
+                        runAuth(player, fromLocation.getWorld(), TriggerType.REGION_LEAVE, region, regions);
                     }
                 }
             }
             for (String region : regions) {
                 if (!region.isEmpty()) {
-                    runAuth(async, player, location.getWorld(), TriggerType.REGION_ENTER, region, regions);
+                    runAuth(player, location.getWorld(), TriggerType.REGION_ENTER, region, regions);
                 }
             }
-            this.fromRegions.put(player, regionList);
+            this.fromRegions.put(playerId, regionList);
         }
     }
 
     /**
-     * Runs the region authentication logic for the player.
+     * Runs the region authentication logic on the player's current region thread.
      *
-     * @param async True to run on the main thread later, false to run immediately
      * @param player The player to process
      * @param world The world the event occurred in
      * @param type The region trigger type (enter/leave)
      * @param region The region name
      * @param regions All regions currently affecting the player
      */
-    private void runAuth(boolean async, Player player, World world, TriggerType type, String region, List<String> regions) {
-        if (async) {
-            SchedulerUtils.run(() -> ItemUtilities.getUtilities().setAuthenticating(player, world, type, player.getGameMode(), region, regions));
-        } else {
-            ItemUtilities.getUtilities().setAuthenticating(player, world, type, player.getGameMode(), region, regions);
-        }
+    private void runAuth(Player player, World world, TriggerType type, String region, List<String> regions) {
+        ItemUtilities.getUtilities().setAuthenticating(player, world, type, player.getGameMode(), region, regions);
     }
 
     /**
@@ -125,13 +136,12 @@ public class PlayerGuard implements Listener {
      * @return If The player is currently on Movement Cooldown.
      */
     private boolean onMovementCooldown(final Player player) {
-        if (!this.movementCooldown.contains(player)) {
-            this.movementCooldown.add(player);
-            SchedulerUtils.runLater(10L, () -> this.movementCooldown.remove(player));
+        final UUID playerId = player.getUniqueId();
+        if (this.movementCooldown.add(playerId)) {
+            SchedulerUtils.runPlayerLater(player, 10L, () -> this.movementCooldown.remove(playerId));
             return false;
-        } else {
-            return true;
         }
+        return true;
     }
 
     /**
@@ -141,12 +151,11 @@ public class PlayerGuard implements Listener {
      * @return If The player is currently on Changed Cooldown.
      */
     private boolean onChangedCooldown(final Player player) {
-        if (!this.changeCooldown.contains(player)) {
-            this.changeCooldown.add(player);
-            SchedulerUtils.runLater(160L, () -> this.changeCooldown.remove(player));
+        final UUID playerId = player.getUniqueId();
+        if (this.changeCooldown.add(playerId)) {
+            SchedulerUtils.runPlayerLater(player, 160L, () -> this.changeCooldown.remove(playerId));
             return false;
-        } else {
-            return true;
         }
+        return true;
     }
 }
