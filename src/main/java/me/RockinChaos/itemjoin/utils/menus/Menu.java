@@ -35,6 +35,7 @@ import me.RockinChaos.itemjoin.item.ItemCommand.CommandSequence;
 import me.RockinChaos.itemjoin.item.ItemMap;
 import me.RockinChaos.itemjoin.item.ItemRecipe;
 import me.RockinChaos.itemjoin.item.ItemUtilities;
+import me.RockinChaos.itemjoin.item.NBTProperties;
 import me.arcaniax.hdb.api.HeadDatabaseAPI;
 import org.bukkit.*;
 import org.bukkit.FireworkEffect.Type;
@@ -735,6 +736,10 @@ public class Menu {
                 itemMap.setListPages(savePages);
             }
         }
+        final Map<Object, Object> properties = getNBTProperties(item);
+        if (properties != null && !properties.isEmpty()) {
+            itemMap.setNBTProperties(properties);
+        }
         if (slot == null) {
             switchPane(player, itemMap, 0);
         } else {
@@ -742,10 +747,6 @@ public class Menu {
             itemMap.saveToConfig();
             final PlaceHolder placeHolders = new PlaceHolder().with(Holder.ITEM, (item.hasItemMeta() && Objects.requireNonNull(item.getItemMeta()).hasDisplayName() ? item.getItemMeta().getDisplayName() : itemMap.getConfigName()));
             ItemJoin.getCore().getLang().sendLangMessage("commands.menu.itemSaved", player, placeHolders);
-        }
-        final Map<Object, Object> properties = getNBTProperties(item);
-        if (properties != null && !properties.isEmpty()) {
-            itemMap.setNBTProperties(properties);
         }
         itemMap.renderItemStack();
     }
@@ -8651,6 +8652,16 @@ public class Menu {
         ingredientPane.open(player);
     }
 
+    /** Shares property key parsing and scalar inference with the configuration loader. */
+    private static Map<Object, Object> parsePropertyInput(final String input) {
+        if (NBTProperties.isTyped(input)) {
+            return NBTProperties.deserialize(input);
+        }
+        final String[] parts = input.split(":", 2);
+        if (parts.length != 2 || parts[0].isEmpty()) throw new IllegalArgumentException("Missing property key or value");
+        return NBTProperties.scalar(parts[0], parts[1]);
+    }
+
     /**
      * Opens the Pane for the Player.
      * This Pane is for creating NBT Properties.
@@ -8669,9 +8680,12 @@ public class Menu {
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
-                if (ChatColor.stripColor(event.getMessage()).contains(":")) {
-                    String[] propertyParts = ChatColor.stripColor(event.getMessage()).split(":");
-                    properties.put(propertyParts[0], propertyParts[1]);
+                try {
+                    properties.putAll(parsePropertyInput(ChatColor.stripColor(event.getMessage())));
+                } catch (IllegalArgumentException e) {
+                    event.getPlayer().sendMessage(ChatColor.RED + "Invalid NBT property. Quote the key and check the value type.");
+                    nbtPane(event.getPlayer(), itemMap);
+                    return;
                 }
                 itemMap.setNBTProperties(properties);
                 final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "NBT PROPERTY");
@@ -8703,10 +8717,14 @@ public class Menu {
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputType", player, placeHolders);
                 ItemJoin.getCore().getLang().sendLangMessage("commands.menu.inputExample", player, placeHolders);
             }, event -> {
-                if (ChatColor.stripColor(event.getMessage()).contains(":")) {
+                try {
+                    final Map<Object, Object> replacement = parsePropertyInput(ChatColor.stripColor(event.getMessage()));
                     properties.remove(key);
-                    String[] propertyParts = ChatColor.stripColor(event.getMessage()).split(":");
-                    properties.put(propertyParts[0], propertyParts[1]);
+                    properties.putAll(replacement);
+                } catch (IllegalArgumentException e) {
+                    event.getPlayer().sendMessage(ChatColor.RED + "Invalid NBT property. Quote the key and check the value type.");
+                    nbtPane(event.getPlayer(), itemMap);
+                    return;
                 }
                 itemMap.setNBTProperties(properties);
                 final PlaceHolder placeHolders = new PlaceHolder().with(Holder.INPUT, "NBT PROPERTY");

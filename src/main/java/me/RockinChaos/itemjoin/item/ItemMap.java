@@ -4775,7 +4775,7 @@ public class ItemMap implements Cloneable {
                                     ReflectionUtils.getMethod(customPackage.getClass(), MinecraftMethod.put.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(customPackage, tagName, property);
                                 }
                                 packages.put(packageName, customPackage);
-                                ReflectionUtils.getMethod(tagInstance.getClass(), MinecraftMethod.setCompound.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagInstance, packageName, customPackage);
+                                ReflectionUtils.getMethod(tagInstance.getClass(), ServerUtils.hasUpdate("1_18") ? MinecraftMethod.put.getMethod() : MinecraftMethod.set.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagInstance, packageName, customPackage);
                             } else {
                                 if (property instanceof String) {
                                     final String castProperty = (String) property;
@@ -4789,7 +4789,7 @@ public class ItemMap implements Cloneable {
                                 final Object customPackage = packages.get(packageName) != null ? packages.get(packageName) : ReflectionUtils.getConstructor(ReflectionUtils.getMinecraftClass("NBTTagCompound")).invoke();
                                 ReflectionUtils.getMethod(customPackage.getClass(), MinecraftMethod.set.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(customPackage, tagName, property);
                                 packages.put(packageName, customPackage);
-                                ReflectionUtils.getMethod(tagInstance.getClass(), MinecraftMethod.setCompound.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagInstance, packageName, customPackage);
+                                ReflectionUtils.getMethod(tagInstance.getClass(), MinecraftMethod.set.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagInstance, packageName, customPackage);
                             } else {
                                 ReflectionUtils.getMethod(tagInstance.getClass(), MinecraftMethod.set.getMethod(), String.class, ReflectionUtils.getMinecraftClass("NBTBase")).invoke(tagInstance, tagName, property);
                             }
@@ -6613,16 +6613,7 @@ public class ItemMap implements Cloneable {
             itemData.set("items." + this.configName + ".contents", this.contents);
         }
         if (this.nbtProperty != null && !this.nbtProperty.isEmpty()) {
-            StringJoiner propertyList = new StringJoiner(", ");
-            for (Object property : this.nbtProperty.keySet()) {
-                String value = this.nbtProperty.get(property).toString().replace("\"", "");
-                if (value.matches("\\[.*?,.*?\\]")) {
-                    value = value.replace(",", "#").replace("[", "").replace("]", "");
-                    value = "[" + value + "]";
-                }
-                propertyList.add(property + ":" + value);
-            }
-            itemData.set("items." + this.configName + ".properties", propertyList.toString());
+            itemData.set("items." + this.configName + ".properties", NBTProperties.serialize(this.nbtProperty));
         }
         if (this.disposableConditions != null && !this.disposableConditions.isEmpty()) {
             if (disposableConditions.size() == 1) {

@@ -449,8 +449,12 @@ public class ItemDesigner {
                 final String itemProperties = itemMap.getNodeLocation().getString(".properties");
                 if (itemProperties != null && !itemProperties.isEmpty()) {
                     final Map<Object, Object> tagValues = new HashMap<>();
-                    final String[] properties = itemProperties.split(",");
+                    final List<String> properties = NBTProperties.split(itemProperties);
                     for (final String property : properties) {
+                        if (NBTProperties.isTyped(property)) {
+                            tagValues.putAll(NBTProperties.deserialize(property));
+                            continue;
+                        }
                         final String[] propertyParts = property.split(":");
                         final String identifier = (propertyParts[0].startsWith(" ") ? propertyParts[0].substring(1) : propertyParts[0]);
                         String tagName = identifier;
@@ -475,7 +479,7 @@ public class ItemDesigner {
                         final Object propertyTag = ReflectionUtils.getConstructor(nbtTagCompoundClass).invoke();
                         ReflectionUtils.getMethod(propertyTag.getClass(), setStringMethod, String.class, String.class).invoke(propertyTag, tagName, value.toString());
                         if (tagList == null) {
-                            tagValues.put(identifier, value.toString());
+                            tagValues.putAll(NBTProperties.scalar(identifier, value.toString()));
                         } else {
                             tagValues.put(identifier, tagList);
                         }
